@@ -106,7 +106,7 @@ export function Header() {
               <Link href="/services" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Services</Link>
               <Link href="/blog" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Blog</Link>
               <Link href="/categories" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Categories</Link>
-              <Link href="/all-products" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Products</Link>
+              <Link href="/products" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Products</Link>
             </nav>
           </div>
         </div>
@@ -128,7 +128,7 @@ export function Header() {
               { href: '/services', label: 'Services' },
               { href: '/blog', label: 'Blog' },
               { href: '/categories', label: 'Categories' },
-              { href: '/all-products', label: 'Products' },
+              { href: '/products', label: 'Products' },
             ].map((item) => (
               <Link
                 key={item.href}

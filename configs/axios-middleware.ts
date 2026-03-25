@@ -1,58 +1,142 @@
-/**
- * Axios-compatible fetch wrapper middleware.
- * Auto-attaches the Bearer token from localStorage.
- * Handles 401 by clearing stored credentials.
- */
+// import axios from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.itfixer199.com'
+// const axiosInstance = axios.create({
+//   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+// });
 
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem('token')
-}
+// /* ================= REQUEST ================= */
 
-interface RequestConfig {
-  method?: string
-  headers?: Record<string, string>
-  body?: string
-}
+// axiosInstance.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("token");
 
-async function request(url: string, config: RequestConfig = {}) {
-  const token = getToken()
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(config.headers || {}),
-  }
-  if (token) headers['Authorization'] = `Bearer ${token}`
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
 
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...config,
-    headers,
-  })
+//   return config;
+// });
 
-  if (response.status === 401) {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refresh')
-      localStorage.removeItem('user')
+// /* ================= RESPONSE ================= */
+
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     // 🔥 If token expired
+//     if (
+//       error.response?.status === 401 &&
+//       !originalRequest._retry
+//     ) {
+//       originalRequest._retry = true;
+
+//       try {
+//         const refreshToken = localStorage.getItem("refresh");
+
+//         if (!refreshToken) {
+//           // window.location.href = "/login";
+//           return Promise.reject(error);
+//         }
+
+//         // 🔥 CALL YOUR REFRESH API
+//         const refreshResponse = await axios.post(
+//           `${import.meta.env.VITE_API_BASE_URL}/api/token/refresh/`,
+//           {
+//             refresh: refreshToken,
+//           }
+//         );
+
+//         const newAccessToken = refreshResponse.data.access;
+
+//         // 🔥 SAVE NEW ACCESS TOKEN
+//         localStorage.setItem("token", newAccessToken);
+
+//         // 🔥 UPDATE HEADER
+//         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+//         // 🔥 RETRY ORIGINAL REQUEST
+//         return axiosInstance(originalRequest);
+
+//       } catch (refreshError) {
+//         // 🔥 If refresh also expired → logout
+//         localStorage.clear();
+//         // window.location.href = "/login";
+//         return Promise.reject(refreshError);
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+
+// export default axiosInstance;
+
+
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+});
+
+/* ================= REQUEST ================= */
+
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+
+    // ✅ token irundha mattum attach
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
 
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) throw { response: { status: response.status, data } }
+  return config;
+});
 
-  return { data, status: response.status }
-}
+/* ================= RESPONSE ================= */
 
-const axiosInstance = {
-  get: (url: string, config?: any) => request(url, { method: 'GET', ...config }),
-  post: (url: string, body?: any, config?: any) =>
-    request(url, { method: 'POST', body: JSON.stringify(body), ...config }),
-  put: (url: string, body?: any, config?: any) =>
-    request(url, { method: 'PUT', body: JSON.stringify(body), ...config }),
-  patch: (url: string, body?: any, config?: any) =>
-    request(url, { method: 'PATCH', body: JSON.stringify(body), ...config }),
-  delete: (url: string, config?: any) => request(url, { method: 'DELETE', ...config }),
-}
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-export default axiosInstance
+    // ❌ token illa na refresh try panna koodathu
+    const refreshToken = localStorage.getItem("refresh");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      refreshToken // ✅ only if refresh exists
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/token/refresh/`,
+          {
+            refresh: refreshToken,
+          }
+        );
+
+        const newAccessToken = refreshResponse.data.access;
+
+        // ✅ save new token
+        localStorage.setItem("token", newAccessToken);
+
+        // ✅ retry original request
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return axiosInstance(originalRequest);
+
+      } catch (refreshError) {
+        // 🔥 refresh fail → logout
+        localStorage.clear();
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;
