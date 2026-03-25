@@ -3,67 +3,49 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import Image from 'next/image'
-import { ArrowRight, Star, Search } from 'lucide-react'
+import { ArrowRight, Search, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-
-const CATEGORIES = [
-  {
-    id: 1,
-    name: 'Cleaning',
-    image: '/service-cleaning.jpg',
-    services: 12,
-    rating: 4.9,
-    description: 'Professional deep cleaning for homes and offices.',
-  },
-  {
-    id: 2,
-    name: 'Repairs',
-    image: '/service-appliance.jpg',
-    services: 18,
-    rating: 4.8,
-    description: 'Expert appliance repair and maintenance services.',
-  },
-  {
-    id: 3,
-    name: 'Plumbing',
-    image: '/service-plumbing.jpg',
-    services: 15,
-    rating: 4.7,
-    description: 'Reliable plumbing solutions for leaks and more.',
-  },
-  {
-    id: 4,
-    name: 'Painting',
-    image: '/service-painting.jpg',
-    services: 9,
-    rating: 4.9,
-    description: 'Quality interior and exterior painting services.',
-  },
-  {
-    id: 5,
-    name: 'Electrical',
-    image: '/service-electrical.jpg',
-    services: 14,
-    rating: 4.8,
-    description: 'Certified electrical repairs and installations.',
-  },
-  {
-    id: 6,
-    name: 'Venumi',
-    image: '/venum.png',
-    services: 25,
-    rating: 4.9,
-    description: 'Premium specialized services for your unique needs.',
-  },
-]
+import { useState, useEffect, useMemo } from 'react'
+import Api from '@/api-endpoints/ApiUrls'
+import axiosInstance from '@/configs/axios-middleware'
 
 export default function CategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredCategories = CATEGORIES.filter(cat =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setCategories([])
+      setLoading(true)
+      try {
+        const response = await axiosInstance.get(Api.categories)
+
+        const categoriesData = response.data?.data || []
+
+        const mappedCategories = categoriesData.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name,
+          image: cat.media?.[0]?.url || '/placeholder-category.jpg',
+          count: cat.services_count || 'Explore'
+        }))
+
+        setCategories(mappedCategories)
+      } catch (error) {
+        console.error("Error fetching categories:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  const filteredCategories = useMemo(() => {
+    return categories.filter(cat =>
+      cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [categories, searchQuery])
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -94,11 +76,16 @@ export default function CategoriesPage() {
 
       {/* Main Content */}
       <main className="flex-1 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        {filteredCategories.length > 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 space-y-4">
+            <Loader2 className="w-12 h-12 text-[#800000] animate-spin" />
+            <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse">Fetching Categories...</p>
+          </div>
+        ) : filteredCategories.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
             {filteredCategories.map((category) => (
               <Link
-                href="/all-products"
+                href={`/categories/${category.id}`}
                 key={category.id}
                 className="group bg-white rounded-[30px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-sm"
               >
@@ -111,14 +98,14 @@ export default function CategoriesPage() {
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
 
-
-
                   {/* Services Badge */}
+                  {/*
                   <div className="absolute top-5 left-5">
                     <span className="px-4 py-2 rounded-full bg-[#800000] text-white text-[10px] font-bold uppercase tracking-widest shadow-lg">
-                      {category.services} Services
+                      {category.count} {typeof category.count === 'number' ? 'Services' : ''}
                     </span>
                   </div>
+                  */}
                 </div>
 
                 {/* Content Area */}
@@ -135,8 +122,6 @@ export default function CategoriesPage() {
                       <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
                     </div>
                   </div>
-
-
                 </div>
               </Link>
             ))}

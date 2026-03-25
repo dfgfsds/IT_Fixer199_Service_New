@@ -5,9 +5,10 @@ import type { Product } from '@/lib/products'
 
 type Props = {
   product: Product
+  basePath?: string
 }
 
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product, basePath = 'services' }: Props) {
   const discountPct = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
@@ -72,7 +73,7 @@ export function ProductCard({ product }: Props) {
             </div>
           </div>
           <Link
-            href={`/service/${product.id}`}
+            href={`/${basePath}/${product.id}`}
             className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent text-white px-3 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-lg hover:shadow-xl"
           >
             <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

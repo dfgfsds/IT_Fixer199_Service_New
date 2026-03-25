@@ -107,7 +107,7 @@ export function ServiceCard({ service }: Props) {
             </div>
           </div>
           <Link 
-            href={`/service/${service.id}`}
+            href={`/services/${service.id}`}
             className="bg-[#800000] hover:bg-[#600000] text-white px-8 py-4 rounded-2xl font-black text-sm tracking-widest uppercase transition-all duration-300 shadow-xl shadow-[#800000]/20 hover:shadow-[#800000]/30 hover:-translate-y-0.5"
           >
             Book Now
