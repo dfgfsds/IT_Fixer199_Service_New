@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# next.js build
+.next/
+out/
+
+# environment variables
+.env
+.env*.local
+
+# vercel
+.vercel/
+
+# mac / system files
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# v0 / sandbox files
+.snowflake/
+.v0-trash/
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+
+# next config temp
+next.user-config.*
