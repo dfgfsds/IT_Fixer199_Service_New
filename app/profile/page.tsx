@@ -6,6 +6,7 @@ import { User, MapPin, Package, Settings, LogOut, ChevronRight, Edit2, Plus, Clo
 import Link from 'next/link'
 import { useState } from 'react'
 import Image from 'next/image'
+import { useAuth } from '@/context/auth-context'
 
 const BOOKINGS = [
   {
@@ -41,15 +42,16 @@ const ADDRESSES = [
 ]
 
 export default function ProfilePage() {
+  const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Header />
-      
+
       <main className="flex-1 py-12 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-          
+
           {/* Sidebar Navigation */}
           <aside className="lg:col-span-3 space-y-6">
             <div className="bg-white p-8 rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-100 text-center space-y-4">
@@ -61,7 +63,7 @@ export default function ProfilePage() {
                   className="rounded-full object-cover border-4 border-slate-50"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://ui-avatars.com/api/?name=John+Doe&background=800000&color=fff";
+                    target.src = `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=800000&color=fff`;
                   }}
                 />
                 <button className="absolute bottom-0 right-0 p-2 bg-[#800000] text-white rounded-full shadow-lg hover:scale-110 transition-transform">
@@ -69,13 +71,13 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#1a1c2e]">John Doe</h2>
+                <h2 className="text-xl font-bold text-[#1a1c2e]">{user?.name || 'User'}</h2>
                 <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Premium Member</p>
               </div>
             </div>
 
             <nav className="bg-white p-4 rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-100 divide-y divide-slate-50">
-              <button 
+              <button
                 onClick={() => setActiveTab('profile')}
                 className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'profile' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
@@ -85,8 +87,8 @@ export default function ProfilePage() {
                 </div>
                 <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'profile' ? 'translate-x-1' : ''}`} />
               </button>
-              
-              <button 
+
+              <button
                 onClick={() => setActiveTab('addresses')}
                 className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'addresses' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
@@ -97,7 +99,7 @@ export default function ProfilePage() {
                 <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'addresses' ? 'translate-x-1' : ''}`} />
               </button>
 
-              <button 
+              <button
                 onClick={() => setActiveTab('bookings')}
                 className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'bookings' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
@@ -108,12 +110,13 @@ export default function ProfilePage() {
                 <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'bookings' ? 'translate-x-1' : ''}`} />
               </button>
 
-              <button 
+              <button
+                onClick={logout}
                 className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group text-[#800000] hover:bg-red-50`}
               >
                 <div className="flex items-center gap-4">
                   <LogOut className="w-5 h-5 transition-transform group-hover:scale-110" />
-                  <span className="font-bold tracking-tight">Sign Out</span>
+                  <span className="font-bold tracking-tight">Logout</span>
                 </div>
               </button>
             </nav>
@@ -134,15 +137,15 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-2 text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Full Name</p>
-                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">John Doe</div>
+                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">{user?.name || 'N/A'}</div>
                   </div>
                   <div className="space-y-2 text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Email Address</p>
-                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">john.doe@example.com</div>
+                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">{user?.email || 'N/A'}</div>
                   </div>
                   <div className="space-y-2 text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phone Number</p>
-                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">+91 98765 43210</div>
+                    <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">{user?.mobile_number || 'N/A'}</div>
                   </div>
                   <div className="space-y-2 text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Language</p>

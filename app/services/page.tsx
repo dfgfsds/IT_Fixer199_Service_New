@@ -15,6 +15,7 @@ export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [services, setServices] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const { location } = useLocation()
 
   useEffect(() => {
@@ -24,12 +25,14 @@ export default function ServicesPage() {
       }
       setServices([])
       setLoading(true)
+      setError(null)
       try {
-        const url = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&lat=${location.lat}&lng=${location.lng}`
+        const url = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}`
         const response = await axiosInstance.get(url)
         console.log("API Response:", response.data)
 
-        const servicesArray = response.data?.services || []
+        // The API returns either an array directly or an object with a 'services' key
+        const servicesArray = Array.isArray(response.data) ? response.data : (response.data?.services || [])
 
         if (Array.isArray(servicesArray)) {
           const mappedServices: Product[] = servicesArray
@@ -41,7 +44,7 @@ export default function ServicesPage() {
               return {
                 id: s.id,
                 name: s.name,
-                category: s.categories?.[0]?.name || 'Service',
+                category: Array.isArray(s.categories) && s.categories.length > 0 ? (s.categories[0]?.name || 'Service') : 'Service',
                 price: Number(sellingPrice),
                 originalPrice: regularPrice ? Number(regularPrice) : undefined,
                 image: s.media_files?.[0]?.image_url || '/placeholder-service.jpg',
@@ -53,8 +56,18 @@ export default function ServicesPage() {
             })
           setServices(mappedServices)
         }
-      } catch (error) {
-        console.error("Error fetching services:", error)
+      } catch (err: any) {
+        // Silence console.error for expected 400 "No services" responses
+        // to avoid triggering the Next.js dev overlay button
+        if (err.response?.status !== 400) {
+          console.error("Error fetching services:", err)
+        }
+
+        if (err.response?.status === 400 && err.response?.data?.message) {
+          setError(err.response.data.message)
+        } else {
+          setError('An error occurred while fetching services.')
+        }
       } finally {
         setLoading(false)
       }
@@ -110,9 +123,14 @@ export default function ServicesPage() {
         {/* Content Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-4">
-              <Loader2 className="w-12 h-12 text-[#800000] animate-spin" />
-              <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse ml-2">Finding best services near you...</p>
+            <div className="flex flex-col items-center justify-center py-40 p-8 space-y-6">
+              <div className="relative">
+                <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
+                <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+              </div>
+              <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm text-center">
+                Finding best services near you...
+              </p>
             </div>
           ) : (
             <>
@@ -153,15 +171,21 @@ export default function ServicesPage() {
                     <Search className="w-12 h-12" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-[#1a1c2e]">No services match your search</h3>
-                    <p className="text-slate-400 font-medium">Try adjusting your filters or search keywords</p>
+                    <h3 className="text-3xl font-black text-[#1a1c2e]">
+                      {error || "No services match your search"}
+                    </h3>
+                    <p className="text-slate-400 font-medium">
+                      {error ? "Please try a different location" : "Try adjusting your filters or search keywords"}
+                    </p>
                   </div>
+                  {/*
                   <button
                     onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
                     className="px-10 py-4 bg-[#1a1c2e] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl hover:bg-[#1a1c2e]/90 transition-all active:scale-95"
                   >
                     Clear all filters
                   </button>
+                  */}
                 </div>
               )}
             </>

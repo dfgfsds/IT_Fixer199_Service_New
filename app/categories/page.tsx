@@ -22,7 +22,7 @@ export default function CategoriesPage() {
         const response = await axiosInstance.get(Api.categories)
 
         const categoriesData = response.data?.data || []
-
+        console.log(categoriesData);
         const mappedCategories = categoriesData.map((cat: any) => ({
           id: cat.id,
           name: cat.name,

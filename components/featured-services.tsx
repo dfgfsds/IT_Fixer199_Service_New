@@ -24,17 +24,19 @@ export function FeaturedServices() {
       setServices([])
       setLoading(true)
       try {
-        const url = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&lat=${location.lat}&lng=${location.lng}`
+        const url = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}`
         const response = await axiosInstance.get(url)
-        
-        const servicesArray = response.data?.services || []
+
+        // The API returns either an array directly or an object with a 'services' key
+        const servicesArray = Array.isArray(response.data) ? response.data : (response.data?.services || [])
+
         const activeServices = servicesArray
           .filter((s: any) => s.status === "ACTIVE")
           .slice(0, 6)
           .map((s: any) => {
             const sellingPrice = s.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
             const regularPrice = s.pricing_models?.find((p: any) => p.pricing_type_name === "Regular Price")?.price
-            
+
             // Calculate discount percentage if both prices exist
             let discount = 0
             if (regularPrice && Number(regularPrice) > Number(sellingPrice)) {
@@ -44,7 +46,7 @@ export function FeaturedServices() {
             return {
               id: s.id,
               name: s.name,
-              category: s.categories?.[0]?.name || 'Service',
+              category: Array.isArray(s.categories) && s.categories.length > 0 ? (s.categories[0]?.name || 'Service') : 'Service',
               rating: s.rating || 4.8,
               reviews: s.reviews_count || 1500,
               price: Number(sellingPrice),
@@ -55,10 +57,14 @@ export function FeaturedServices() {
               verified: true,
             }
           })
-        
+
         setServices(activeServices)
-      } catch (error) {
-        console.error("Error fetching featured services:", error)
+      } catch (err: any) {
+        // Silence console.error for expected 400 "No services" responses
+        // to avoid triggering the Next.js dev overlay button
+        if (err.response?.status !== 400) {
+          console.error("Error fetching featured services:", err)
+        }
       } finally {
         setLoading(false)
       }
