@@ -63,6 +63,10 @@ const getIp = `${baseUrl}/api/third-party/get-ip/`;
 // Logout
 const logout = `${baseUrl}/api/logout/`;
 
+// Get User Detail
+const getUser = `${baseUrl}/api/user/`;
+const updateUser = `${baseUrl}/api/user/`;
+
 
 export default {
     categories,
@@ -70,6 +74,8 @@ export default {
     products,
     login,
     logout,
+    getUser,
+    updateUser,
     user,
     emailLogin,
     verifyOtp,

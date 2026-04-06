@@ -57,6 +57,7 @@ interface AuthContextType {
   setShowLoginModal: (show: boolean) => void
   login: (data: any) => void
   logout: () => void
+  refreshUserData: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -125,8 +126,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user, router])
 
+  const refreshUserData = useCallback(async () => {
+    if (!user?.id) return
+    try {
+      const response = await axiosInstance.get(`${Api.getUser}${user.id}`)
+      const body = response.data;
+      
+      // Robustly find the user object within the response
+      const updatedUser = body?.data?.user || body?.data || body?.user || body;
+      
+      console.log("USER REFRESH DATA RECEIVED:", updatedUser)
+
+      if (updatedUser && (updatedUser.name || updatedUser.email)) {
+        setUser(updatedUser)
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+      }
+    } catch (e) {
+      console.warn("Refresh user error:", e)
+    }
+  }, [user?.id])
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, showLoginModal, setShowLoginModal, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, showLoginModal, setShowLoginModal, login, logout, refreshUserData }}>
       {children}
     </AuthContext.Provider>
   )
