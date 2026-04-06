@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react'
+import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, ShoppingCart, AlertTriangle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useMemo, use } from 'react'
@@ -15,45 +15,55 @@ import { toast } from 'sonner'
 export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
 
-  const [services, setServices] = useState<any[]>([])
+  const [service, setService] = useState<any>(null)
+  const [relatedServices, setRelatedServices] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const { location } = useLocation()
   const { cartItem, fetchCart } = useCartItem()
 
   useEffect(() => {
-    const fetchServices = async () => {
+    const fetchServiceDetails = async () => {
       if (!location?.lat || !location?.lng) {
         return
       }
 
       setLoading(true)
+      setError(null)
       try {
-        const url = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&lat=${location.lat}&lng=${location.lng}`
+        // 1. Fetch Single Service Detail
+        const url = `${Api.services}/${id}/?include_categories=true&include_media=true&include_pricing=true&lat=${location.lat}&lng=${location.lng}`
         const response = await axiosInstance.get(url)
-        const servicesArray = response.data?.services || []
-        setServices(servicesArray)
-      } catch (error) {
-        console.error("Error fetching services:", error)
+        const serviceData = response.data?.service || response.data
+        setService(serviceData)
+
+        // 2. Fetch Related Services in same category
+        if (serviceData?.categories?.[0]?.id) {
+          // Use the 'category' field for filtering if 'category_id' doesn't work directly with the junction object ID
+          const categoryId = serviceData.categories[0].category || serviceData.categories[0].id
+          const relatedUrl = `${Api.services}/?category_id=${categoryId}&lat=${location.lat}&lng=${location.lng}&size=3`
+          const relatedRes = await axiosInstance.get(relatedUrl)
+          const rs = Array.isArray(relatedRes.data) ? relatedRes.data : (relatedRes.data?.services || [])
+          setRelatedServices(rs.filter((s: any) => s.id !== id))
+        }
+      } catch (err: any) {
+        if (err.response?.status !== 400) {
+          console.error("Error fetching service details:", err)
+        }
+        setError(err.response?.data?.message || 'Service details not available at your location.')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchServices()
-  }, [location?.lat, location?.lng])
+    fetchServiceDetails()
+  }, [location?.lat, location?.lng, id])
 
-  const service = useMemo(() => {
-    return services.find(s => s.id === id)
-  }, [services, id])
-
-  const relatedServices = useMemo(() => {
-    if (!service) return []
-    const currentCategoryIds = service.categories?.map((c: any) => c.id) || []
-    return services.filter(s =>
-      s.id !== id &&
-      s.categories?.some((c: any) => currentCategoryIds.includes(c.id))
-    ).slice(0, 3)
-  }, [services, service, id])
+  // Clear service data only when switching to a different ID
+  useEffect(() => {
+    setService(null)
+    setRelatedServices([])
+  }, [id])
 
   const currentCartItem = useMemo(() => {
     return cartItem?.find((item: any) => item.service_id === id)
@@ -110,9 +120,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
-          <Loader2 className="w-12 h-12 text-[#800000] animate-spin" />
-          <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse ml-2">Loading service details...</p>
+        <main className="flex-1 flex flex-col items-center justify-center py-40 p-8 space-y-6">
+          <div className="relative">
+            <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
+            <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+          </div>
+          <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm">
+            Loading service details...
+          </p>
         </main>
         <Footer />
       </div>
@@ -123,12 +138,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6">
+        <main className="flex-1 flex flex-col items-center justify-center py-32 p-8 text-center space-y-8">
           <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
             <Star className="w-12 h-12" />
           </div>
-          <h2 className="text-3xl font-black text-[#1a1c2e]">Service Not Found</h2>
-          <p className="text-slate-500 max-w-sm font-medium">We couldn't find the service you're looking for. It might not be available in your area or coordinates are missing.</p>
+          <h2 className="text-3xl font-black text-[#1a1c2e]">{error || "Service Not Found"}</h2>
+          <p className="text-slate-500 max-w-sm font-medium">
+            {error ? "Please try a different location" : "We couldn't find the service you're looking for. It might not be available in your area or coordinates are missing."}
+          </p>
           <Link href="/services" className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl transition-all active:scale-95">
             View All Services
           </Link>
@@ -141,6 +158,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   const sellingPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
   const regularPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Regular Price")?.price
   const serviceImage = service.media_files?.[0]?.image_url || '/placeholder-service.jpg'
+  const serviceCategory = service.categories?.[0]?.category_name || service.categories?.[0]?.name || 'Service'
 
   // Default includes if not provided by API
   const includes = service.whats_included?.length > 0 ? service.whats_included : [
@@ -155,6 +173,15 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="min-h-screen bg-white">
       <Header />
+
+      {error && service && (
+        <div className="bg-amber-50 border-y border-amber-100 py-3 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-amber-800 text-sm font-bold">
+            <AlertTriangle className="w-4 h-4" />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
@@ -181,6 +208,9 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
           {/* Right: Details */}
           <div className="space-y-8 py-4">
             <div className="space-y-4">
+              <span className="inline-flex px-4 py-1.5 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest border border-[#800000]/10">
+                {serviceCategory}
+              </span>
               <h1 className="text-5xl font-extrabold text-[#1a1c2e] tracking-tight">
                 {service.name}
               </h1>
@@ -236,8 +266,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                   <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm grow max-w-xs">
                     <button
                       onClick={decreaseQty}
-                      disabled={loading}
-                      className="w-14 h-14 flex items-center justify-center bg-slate-50 rounded-xl hover:bg-[#800000]/5 transition-colors group"
+                      disabled={loading || !!error}
+                      className="w-14 h-14 flex items-center justify-center bg-[#800000] rounded-xl shadow-lg shadow-[#800000]/20 hover:bg-[#600000] transition-all hover:scale-105 disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:scale-100"
                     >
                       <Minus className="w-6 h-6 text-slate-400 group-hover:text-[#800000] stroke-[3px]" />
                     </button>
@@ -246,8 +276,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                     </span>
                     <button
                       onClick={increaseQty}
-                      disabled={loading}
-                      className="w-14 h-14 flex items-center justify-center bg-[#800000] rounded-xl shadow-lg shadow-[#800000]/20 hover:bg-[#600000] transition-all hover:scale-105"
+                      disabled={loading || !!error}
+                      className="w-14 h-14 flex items-center justify-center bg-[#800000] rounded-xl shadow-lg shadow-[#800000]/20 hover:bg-[#600000] transition-all hover:scale-105 disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:scale-100"
                     >
                       <Plus className="w-6 h-6 text-white stroke-[3px]" />
                     </button>
@@ -260,10 +290,11 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               ) : (
                 <button
                   onClick={addToCartApi}
-                  className="w-full bg-[#800000] hover:bg-[#600000] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-[#800000]/20 uppercase tracking-widest"
+                  disabled={loading || !!error}
+                  className="w-full bg-[#800000] hover:bg-[#600000] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-[#800000]/20 uppercase tracking-widest disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:transform-none"
                 >
                   <ShoppingCart className="w-6 h-6" />
-                  <span>Book Now — ₹{sellingPrice}</span>
+                  <span>{error ? "Unavailable in this location" : `Book Now — ₹${sellingPrice}`}</span>
                 </button>
               )}
             </div>
@@ -313,7 +344,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                     <div className="p-8 space-y-6 flex flex-col flex-1">
                       <div className="space-y-2">
                         <span className="text-[10px] font-bold text-[#800000] uppercase tracking-widest bg-[#800000]/5 px-3 py-1 rounded-lg">
-                          {rs.categories?.[0]?.name || 'Service'}
+                          {rs.categories?.[0]?.category_name || rs.categories?.[0]?.name || 'Service'}
                         </span>
                         <h3 className="text-xl font-bold text-[#1a1c2e] line-clamp-1 group-hover:text-[#800000] transition-colors">
                           {rs.name}

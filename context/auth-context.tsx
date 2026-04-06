@@ -46,6 +46,9 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
+import { useRouter } from 'next/navigation'
+import Api from '@/api-endpoints/ApiUrls'
+import axiosInstance from '@/configs/axios-middleware'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -59,19 +62,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
-  // 🔥 LOGIN (MAIN LOGIC)
-  const login = useCallback((data: any) => {
-    console.log("LOGIN DATA:", data)
+  // LOGIN (MAIN LOGIC)
+  const login = useCallback((response: any) => {
+    console.log("LOGIN RESPONSE RECEIVED:", response)
 
-    const user = data?.data?.data?.user
-    const token = data?.data?.data?.tokens?.access
-    const refresh = data?.data?.data?.tokens?.refresh
+    const body = response?.data;
+
+    const data = body?.data || body;
+
+    const user = data?.user || (body?.user ? body.user : null);
+    const token = data?.tokens?.access || data?.access_token || data?.token;
+    const refresh = data?.tokens?.refresh || data?.refresh_token;
+
     if (!token) {
-      console.error("Token not found")
+      console.error("Token not found in response structure. Body:", body)
       return
     }
 
@@ -79,14 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(true)
     setShowLoginModal(false)
 
-    // ✅ STORE
+    // STORE
     localStorage.setItem("token", token)
     localStorage.setItem("refresh", refresh)
     localStorage.setItem("user", JSON.stringify(user))
 
   }, [])
 
-  // 🔥 RESTORE LOGIN
+  // RESTORE LOGIN
   useEffect(() => {
     const token = localStorage.getItem("token")
     const storedUser = localStorage.getItem("user")
@@ -97,14 +106,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const logout = useCallback(() => {
-    setUser(null)
-    setIsLoggedIn(false)
+  const logout = useCallback(async () => {
+    try {
+      if (user?.id) {
+        await axiosInstance.post(`${Api.logout}${user.id}`)
+      }
+    } catch (e) {
+      console.warn("Logout error:", e)
+    } finally {
+      setUser(null)
+      setIsLoggedIn(false)
 
-    localStorage.removeItem("token")
-    localStorage.removeItem("refresh")
-    localStorage.removeItem("user")
-  }, [])
+      localStorage.removeItem("token")
+      localStorage.removeItem("refresh")
+      localStorage.removeItem("user")
+
+      router.push('/login')
+    }
+  }, [user, router])
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, user, showLoginModal, setShowLoginModal, login, logout }}>

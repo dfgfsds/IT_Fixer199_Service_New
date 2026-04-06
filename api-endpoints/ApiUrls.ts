@@ -1,6 +1,13 @@
+//Live
+// const baseUrl =
+//     process.env.NEXT_PUBLIC_API_BASE_URL ||
+//     "https://api.itfixer199.com"
+
+//Test
 const baseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://api.itfixer199.com"
+    "https://api-test.itfixer199.com"
+
 
 // Categories
 const categories = `${baseUrl}/api/category`;
@@ -50,15 +57,23 @@ const requestCancellation = `${baseUrl}/api/request/cancellation/`;
 // requestRefund
 const requestRefund = `${baseUrl}/api/request/refund/`;
 
+// Third Party
+const getIp = `${baseUrl}/api/third-party/get-ip/`;
+
+// Logout
+const logout = `${baseUrl}/api/logout/`;
+
 
 export default {
     categories,
     services,
     products,
     login,
+    logout,
     user,
     emailLogin,
     verifyOtp,
+    getIp,
     cartApi,
     zoneByLocation,
     address,

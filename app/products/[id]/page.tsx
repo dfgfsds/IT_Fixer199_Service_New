@@ -33,42 +33,55 @@ export default function ProductDetailPage({
 
             setLoading(true)
             try {
-                // Fetch product details
-                const response = await axiosInstance.get(Api.products, {
+                const url = `${Api.products}/${id}`
+                const response = await axiosInstance.get(url, {
                     params: {
-                        id: id,
                         lat: location.lat,
                         lng: location.lng,
                         include_pricing: true,
                         include_media: true,
                         include_category: true,
-                        include_attributes: true
+                        include_attribute: true,
+                        include_brand: true,
+                        status: 'ACTIVE'
                     }
                 })
 
-                const products = response.data?.products || []
-                const foundProduct = products.find((p: any) => p.id.toString() === id)
+                const foundProduct = response.data?.data
 
-                if (foundProduct) {
+                if (foundProduct && foundProduct.id) {
                     setProduct(foundProduct)
 
-                    // Fetch related products using category_id
-                    if (foundProduct.category_id) {
+                    const categoryId = foundProduct.category_id || foundProduct.categories?.[0]?.id
+
+                    if (categoryId) {
                         const relatedRes = await axiosInstance.get(Api.products, {
                             params: {
-                                category_id: foundProduct.category_id,
+                                category_id: categoryId,
                                 lat: location.lat,
                                 lng: location.lng,
                                 include_pricing: true,
-                                include_media: true
+                                include_media: true,
+                                include_category: true,
+                                status: 'ACTIVE',
+                                size: 4
                             }
                         })
-                        const relatedData = relatedRes.data?.products || []
-                        setRelatedProducts(relatedData.filter((p: any) => p.id.toString() !== id))
+                        const relatedData = Array.isArray(relatedRes.data)
+                            ? relatedRes.data
+                            : (relatedRes.data?.data || relatedRes.data?.products || [])
+
+                        setRelatedProducts(relatedData
+                            .filter((p: any) => p.id.toString() !== id)
+                            .slice(0, 3)
+                        )
                     }
                 }
-            } catch (error) {
-                console.error("Error fetching product details:", error)
+            } catch (error: any) {
+                if (![400, 404, 422].includes(error.response?.status)) {
+                    console.error("Error fetching product details:", error)
+                }
+                setProduct(null)
             } finally {
                 setLoading(false)
             }
@@ -101,9 +114,12 @@ export default function ProductDetailPage({
         return (
             <div className="min-h-screen bg-background flex flex-col">
                 <Header />
-                <main className="flex-1 flex flex-col items-center justify-center py-32 space-y-4">
-                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                    <p className="text-muted-foreground font-bold uppercase tracking-widest animate-pulse text-sm">
+                <main className="flex-1 flex flex-col items-center justify-center py-40 p-8 space-y-6">
+                    <div className="relative">
+                        <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
+                        <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+                    </div>
+                    <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm">
                         Loading product details...
                     </p>
                 </main>
