@@ -9,10 +9,11 @@ import { useAuth } from '@/context/auth-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login, isLoggedIn } = useAuth()
   const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('mobile')
   const [email, setEmail] = useState('')
@@ -22,6 +23,19 @@ export default function LoginPage() {
   const [ipAddress, setIpAddress] = useState('0.0.0.0')
   const [mounted, setMounted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  // Handle pre-filled phone/email from signup
+  useEffect(() => {
+    const prefilledPhone = searchParams.get('phone')
+    const prefilledEmail = searchParams.get('email')
+
+    if (prefilledPhone) setPhone(prefilledPhone)
+    if (prefilledEmail) setEmail(prefilledEmail)
+
+    if (prefilledPhone || prefilledEmail) {
+      setLoginMethod('mobile')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setMounted(true)
@@ -212,7 +226,7 @@ export default function LoginPage() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="block w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-2xl focus:bg-white focus:border-[#800000]/20 focus:ring-4 focus:ring-[#800000]/5 transition-all outline-none font-medium text-[#1a1c2e]"
-                          placeholder="name@example.com"
+                          placeholder="Enter your email address"
                           disabled={loading}
                           required
                         />
@@ -220,10 +234,14 @@ export default function LoginPage() {
                     </div>
 
                     <div className="space-y-2">
+
+                      {/* 
                       <div className="flex justify-between items-center ml-1">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Password</label>
                         <Link href="/forgot-password" title='forgot password' className="text-xs font-bold text-[#800000] hover:text-[#600000] tracking-widest uppercase">Forgot?</Link>
-                      </div>
+                      </div> 
+                      */}
+
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-[#800000]">
                           <Lock className="w-5 h-5 text-slate-300 transition-colors group-focus-within:text-[#800000]" />
@@ -233,7 +251,7 @@ export default function LoginPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           className="block w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-2xl focus:bg-white focus:border-[#800000]/20 focus:ring-4 focus:ring-[#800000]/5 transition-all outline-none font-medium text-[#1a1c2e]"
-                          placeholder="••••••••"
+                          placeholder="Enter your password"
                           disabled={loading}
                           required
                         />
