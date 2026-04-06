@@ -77,8 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = body?.data || body;
 
     const user = data?.user || (body?.user ? body.user : null);
-    const token = data?.tokens?.access || data?.access_token || data?.token;
-    const refresh = data?.tokens?.refresh || data?.refresh_token;
+    const token = data?.tokens?.access || data?.access_token || data?.token || data?.access;
+    const refresh = data?.tokens?.refresh || data?.refresh_token || data?.refresh;
 
     if (!token) {
       console.error("Token not found in response structure. Body:", body)
@@ -90,9 +90,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setShowLoginModal(false)
 
     // STORE
-    localStorage.setItem("token", token)
-    localStorage.setItem("refresh", refresh)
-    localStorage.setItem("user", JSON.stringify(user))
+    if (token && token !== 'undefined') {
+      localStorage.setItem("token", token)
+    }
+    if (refresh && refresh !== 'undefined') {
+      localStorage.setItem("refresh", refresh)
+    }
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user))
+    }
 
   }, [])
 
