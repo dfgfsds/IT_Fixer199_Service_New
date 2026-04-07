@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
-  const { location, zoneData } = useLocation()
+  const { location, setLocation, zoneData } = useLocation()
   const router = useRouter()
 
   const [scheduleType, setScheduleType] = useState<"instant" | "later">("instant")
@@ -89,11 +89,20 @@ export default function CartPage() {
       try {
         const res = await axiosInstance.get(Api.myAddress)
         // Adjust parsing based on DRF response shape
-        const addrList = Array.isArray(res.data) ? res.data : (res.data?.data || res.data?.results || [])
-        setAddresses(addrList)
-        if (addrList.length > 0) {
-          const defaultAddr = addrList.find((a: any) => a.is_default) || addrList[0]
-          setSelectedAddressId(defaultAddr.id)
+        const rawData = res.data?.data || res.data
+        const addrList = Array.isArray(rawData) ? rawData : []
+        
+        // Sort: selected_address true comes first
+        const sorted = [...addrList].sort((a: any, b: any) => {
+          if (a.selected_address && !b.selected_address) return -1
+          if (!a.selected_address && b.selected_address) return 1
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        })
+
+        setAddresses(sorted)
+        if (sorted.length > 0) {
+          const selected = sorted.find((a: any) => a.selected_address) || sorted[0]
+          setSelectedAddressId(selected.id)
         }
       } catch (err) {
         console.error("Error fetching addresses:", err)
@@ -301,7 +310,7 @@ export default function CartPage() {
         order_id: razorpay_order_id,
 
         handler: function (response: any) {
-          completeCheckout()
+           completeCheckout()
         },
 
         modal: {
@@ -329,6 +338,42 @@ export default function CartPage() {
       console.error("Checkout validation failed:", err?.response?.data, err)
       toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Checkout failed. Please try again.')
       setIsCheckoutLoading(false)
+    }
+  }
+
+  // Handle address select with server sync (PATCH /api/address/flags/)
+  const handleAddressSelectSync = async (addr: any) => {
+    setSelectedAddressId(addr.id)
+    try {
+      await axiosInstance.patch(`${Api.addressFlags}/${addr.id}`, {
+        ...addr,
+        selected_address: true,
+        is_primary: true
+      })
+      
+      // Sync global navbar immediately
+      setLocation({
+        city: addr.district || addr.city || "Unknown",
+        address: addr.full_address || addr.address || "",
+        lat: Number(addr.lat),
+        lng: Number(addr.lng),
+        pincode: addr.pincode,
+        state: addr.state
+      })
+
+      // Re-fetch and re-sort local list to move the new selection to the top
+      const res = await axiosInstance.get(Api.myAddress)
+      const rawData = res.data?.data || res.data
+      const addrList = Array.isArray(rawData) ? rawData : []
+      const sorted = [...addrList].sort((a: any, b: any) => {
+        if (a.selected_address && !b.selected_address) return -1
+        if (!a.selected_address && b.selected_address) return 1
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      })
+      setAddresses(sorted)
+
+    } catch (err) {
+      console.error("Failed to sync selection to backend:", err)
     }
   }
 
@@ -462,8 +507,11 @@ export default function CartPage() {
                   <MapPin className="w-5 h-5" />
                   Service Location
                 </h2>
-                <Link href="/profile" className="text-sm font-bold text-[#800000] hover:underline">
-                  + Add New
+                <Link
+                  href="/profile?tab=addresses&action=add"
+                  className="px-6 py-2.5 bg-[#800000] text-white text-sm font-black rounded-2xl shadow-lg shadow-red-900/20 hover:bg-[#600000] transition-all active:scale-95 whitespace-nowrap"
+                >
+                  Add New
                 </Link>
               </div>
 
@@ -481,12 +529,12 @@ export default function CartPage() {
                       name="address"
                       className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300"
                       checked={selectedAddressId === addr.id}
-                      onChange={() => setSelectedAddressId(addr.id)}
+                      onChange={() => handleAddressSelectSync(addr)}
                     />
                     <div className="flex-1">
                       <p className="font-bold text-[#1a1c2e] flex items-center gap-2">
-                        {addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Other'}
-                        {addr.is_default && <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase tracking-wider">Default</span>}
+                        {addr.name || (addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Saved Address')}
+                        {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#800000] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
                       </p>
                       <p className="text-sm text-slate-500 mt-1 line-clamp-2">
                         {addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ')}
@@ -504,9 +552,6 @@ export default function CartPage() {
                         <p className="text-sm text-slate-500">Please add an address to continue checkout</p>
                       </div>
                     </div>
-                    <Link href="/profile" className="px-4 py-2 bg-[#800000] text-white text-sm font-bold rounded-xl whitespace-nowrap hidden sm:block">
-                      Add Address
-                    </Link>
                   </div>
                 )}
               </div>
