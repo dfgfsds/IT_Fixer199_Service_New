@@ -5,78 +5,51 @@ import axiosInstance from "@/configs/axios-middleware"
 import Api from "@/api-endpoints/ApiUrls"
 
 export interface LocationData {
+  city: string
+  address: string
   lat: number
   lng: number
-  city: string
-  state: string
-  pincode: string
-  address: string
+  state?: string
+  pincode?: string
 }
 
-const LocationContext = createContext<any>(null)
-
-const CHENNAI_AREAS = [
-  { name: 'T. Nagar', lat: 13.0418, lng: 80.2341 },
-  { name: 'Anna Nagar', lat: 13.0850, lng: 80.2101 },
-  { name: 'Velachery', lat: 12.9754, lng: 80.2201 },
-  { name: 'Adyar', lat: 13.0063, lng: 80.2574 },
-  { name: 'Porur', lat: 13.0339, lng: 80.1561 },
-  { name: 'Ambattur', lat: 13.1143, lng: 80.1548 },
-  { name: 'Tambaram', lat: 12.9249, lng: 80.1000 },
-  { name: 'Guindy', lat: 13.0067, lng: 80.2206 },
-  { name: 'Chromepet', lat: 12.9516, lng: 80.1462 },
-  { name: 'Perambur', lat: 13.1177, lng: 80.2323 },
-  { name: 'Pallavaram', lat: 12.9675, lng: 80.1491 },
-  { name: 'Sholinganallur', lat: 12.9010, lng: 80.2279 },
-]
-
-function getClosestArea(lat: number, lng: number, defaultName: string) {
-  if (!lat || !lng) return defaultName;
-  const R = 6371;
-  let closest = null;
-  let minD = 2.5; // 2.5 km radius snap
-
-  for (const area of CHENNAI_AREAS) {
-    const dLat = (area.lat - lat) * (Math.PI / 180);
-    const dLon = (area.lng - lng) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat * (Math.PI / 180)) * Math.cos(area.lat * (Math.PI / 180)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c;
-    if (d < minD) {
-      minD = d;
-      closest = area.name;
-    }
-  }
-  return closest || defaultName;
+interface LocationContextType {
+  location: LocationData | null
+  setLocation: (loc: LocationData) => void
+  showLocationModal: boolean
+  setShowLocationModal: (show: boolean) => void
+  zoneData: any
 }
 
+const LocationContext = createContext<LocationContextType | undefined>(undefined)
+
+// Helper to extract a city name from Nominatim data
 const extractLocalArea = (addr: any) => {
-  if (!addr) return "Unknown"
-  const str = (name: any) => name ? String(name) : ""
-  const isValid = (name: string) => {
-    const l = name.toLowerCase()
-    return !l.includes('ward') && !l.includes('division') && !l.includes('cmwssb')
-  }
-  const clean = (name: string) => name.replace(/zone\s*\d+\s*/i, '').trim()
+  return (
+    addr.suburb ||
+    addr.neighbourhood ||
+    addr.city_district ||
+    addr.town ||
+    addr.village ||
+    addr.city ||
+    ""
+  )
+}
 
-  const candidates = [
-    addr.residential,
-    addr.neighbourhood,
-    addr.suburb,
-    addr.city_district,
-    addr.city,
-    addr.town,
-    addr.village
-  ]
-
-  for (const c of candidates) {
-    const val = str(c)
-    if (val && isValid(val)) {
-      const cleaned = clean(val)
-      if (cleaned) return cleaned
-    }
+// Simple fallback to find the "closest" city if Nominatim's data is fragmented
+const getClosestArea = (lat: number, lng: number, addr: any) => {
+  if (lat && lng && !addr.city && !addr.town) {
+    // If we have coordinates but Nominatim didn't give a clear city/town
+    // we can use the most descriptive local place name available.
+    return (
+      addr.suburb || 
+      addr.neighbourhood || 
+      addr.residential || 
+      addr.city_district || 
+      addr.state_district || 
+      addr.state || 
+      "Chennai"
+    )
   }
   return addr.city || addr.town || addr.village || "Unknown"
 }
@@ -94,8 +67,11 @@ export function LocationProvider({ children }: any) {
       if (res?.data) {
         setZoneData(res.data?.data)
       }
-    } catch (err) {
-      console.error("Zone fetch error", err)
+    } catch (err: any) {
+       // Silence expected server-side errors to avoid triggering the dev overlay
+       if (err.response?.status !== 500) {
+        console.warn("Zone fetch error", err)
+      }
     }
   }, [])
 
@@ -113,12 +89,11 @@ export function LocationProvider({ children }: any) {
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
-
+        const { latitude: lat, longitude: lng } = pos.coords
         try {
+          // Reverse geocode via Nominatim (Free, no key needed)
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
           )
 
           const data = await res.json()
@@ -169,8 +144,11 @@ export function LocationProvider({ children }: any) {
             });
             return; // 🎯 Found server-side address. STOP HERE. (No GPS prompt shown)
           }
-        } catch (e) {
+        } catch (e: any) {
           // Silent 404 is allowed here.
+          if (e.response?.status !== 401 && e.response?.status !== 404) {
+             console.warn("Init location fetch error", e)
+          }
         }
       }
 
@@ -178,8 +156,8 @@ export function LocationProvider({ children }: any) {
       // This will trigger the browser permission popup only if step 1 found nothing.
       handleCurrentLocation();
 
-    } catch (error) {
-      console.error("Critical error in location initialization", error);
+    } catch (error: any) {
+       // Final fallback if everything fails
     }
   };
 
@@ -206,4 +184,10 @@ export function LocationProvider({ children }: any) {
   )
 }
 
-export const useLocation = () => useContext(LocationContext)
+export const useLocation = () => {
+  const context = useContext(LocationContext)
+  if (context === undefined) {
+    throw new Error("useLocation must be used within a LocationProvider")
+  }
+  return context
+}

@@ -34,7 +34,7 @@ const BOOKINGS = [
 export default function ProfilePage() {
   const router = useRouter()
   const { user, logout, refreshUserData } = useAuth()
-  const { location, setLocation }: any = useLocation()
+  const { location, setLocation } = useLocation()
   const [activeTab, setActiveTab] = useState('profile')
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -378,8 +378,10 @@ export default function ProfilePage() {
           console.error("Auto-selection failed:", err)
         }
       }
-    } catch (error) {
-      console.error('Error fetching addresses:', error)
+    } catch (error: any) {
+      if (error.response?.status !== 401) {
+        console.error('Error fetching addresses:', error)
+      }
     } finally {
       setLoadingAddresses(false)
     }
