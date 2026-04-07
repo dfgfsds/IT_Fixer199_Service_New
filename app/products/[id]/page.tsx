@@ -2,10 +2,11 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Star, Check, ArrowRight, Share2, Heart, Loader2 } from 'lucide-react'
+import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
@@ -19,13 +20,33 @@ export default function ProductDetailPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = use(params)
+    const router = useRouter()
     const { location } = useLocation()
-    const { fetchCart } = useCartItem()
+    const { cartItem, fetchCart } = useCartItem()
+
+    const currentCartItem = useMemo(() => {
+        return cartItem?.find((item: any) => item.product_id === id || item.product?.id === id)
+    }, [cartItem, id])
 
     const [product, setProduct] = useState<any>(null)
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [addingToCart, setAddingToCart] = useState(false)
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
+
+    const attributeGroups = useMemo(() => {
+        if (!product?.attributes || product.attributes.length === 0) return null
+        const groups: Record<string, any[]> = {}
+        product.attributes.forEach((attr: any) => {
+            if (!groups[attr.attribute_name]) {
+                groups[attr.attribute_name] = []
+            }
+            if (!groups[attr.attribute_name].find((v: any) => v.value_id === attr.value_id)) {
+                groups[attr.attribute_name].push(attr)
+            }
+        })
+        return groups
+    }, [product])
 
     useEffect(() => {
         const fetchProductDetails = async () => {
@@ -43,7 +64,8 @@ export default function ProductDetailPage({
                         include_category: true,
                         include_attribute: true,
                         include_brand: true,
-                        status: 'ACTIVE'
+                        status: 'ACTIVE',
+                        size: "10000"
                     }
                 })
 
@@ -93,18 +115,86 @@ export default function ProductDetailPage({
     const handleAddToCart = async () => {
         if (!product) return
 
+        if (attributeGroups) {
+            const requiredGroups = Object.keys(attributeGroups)
+            const isAllSelected = requiredGroups.every(groupName => !!selectedAttributes[groupName])
+            if (!isAllSelected) {
+                toast.error('Please select all product options before adding to cart.')
+                return
+            }
+        }
+
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+        if (!token) {
+            toast.error('Please login to add to cart')
+            router.push('/login')
+            return
+        }
+
         setAddingToCart(true)
         try {
-            await axiosInstance.post(Api.cartApi, {
-                id: product.id,
+            // Collect the full attribute objects for the API based on selected value IDs
+            const attributesToSend = attributeGroups
+                ? Object.keys(attributeGroups).map(groupName => {
+                    const valueId = selectedAttributes[groupName]
+                    const attr = attributeGroups[groupName].find((v: any) => v.value_id === valueId)
+                    return {
+                        attribute_id: attr.attribute_id,
+                        value_id: attr.value_id
+                    }
+                })
+                : []
+
+            await axiosInstance.post(`${Api.cartApi}/add/`, {
+                type: 'PRODUCT',
+                product_id: product.id,
                 quantity: 1,
-                type: 'product'
+                attributes: attributesToSend
             })
             await fetchCart()
-            toast.success('Product added to cart')
+            toast.success('Product added to cart!')
+        } catch (error: any) {
+            if (error?.response?.status === 401) {
+                toast.error('Please login to add to cart')
+                router.push('/login')
+            } else {
+                console.error('Error adding to cart:', error)
+                toast.error('Failed to add to cart')
+            }
+        } finally {
+            setAddingToCart(false)
+        }
+    }
+
+    const increaseQty = async () => {
+        if (!currentCartItem) return
+        setAddingToCart(true)
+        try {
+            await axiosInstance.post(`${Api.cartApi}/add/`, {
+                type: 'PRODUCT',
+                product_id: id,
+                quantity: 1,
+            })
+            await fetchCart()
         } catch (error) {
-            console.error("Error adding to cart:", error)
-            toast.error('Failed to add to cart')
+            toast.error('Failed to increase quantity')
+        } finally {
+            setAddingToCart(false)
+        }
+    }
+
+    const decreaseQty = async () => {
+        if (!currentCartItem) return
+        setAddingToCart(true)
+        try {
+            await axiosInstance.post(`${Api.cartApi}/item/${currentCartItem.id}/decrease/`, {
+                type: 'PRODUCT',
+                product_id: id,
+                quantity: currentCartItem.quantity - 1,
+            })
+            await fetchCart()
+        } catch (error) {
+            toast.error('Failed to decrease quantity')
         } finally {
             setAddingToCart(false)
         }
@@ -141,6 +231,7 @@ export default function ProductDetailPage({
         )
     }
 
+    console.log(product, 'jkhgjkgjhgjh')
     const price = product.pricing?.[0]?.price || 0
     const regularPrice = product.pricing?.[0]?.regular_price
     const imageUrl = product.media?.[0]?.url || '/placeholder.jpg'
@@ -230,18 +321,68 @@ export default function ProductDetailPage({
                             </div>
                         </div>
 
-                        {/* Action Button */}
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={addingToCart}
-                            className="w-full bg-[#800000] hover:bg-[#600000] disabled:bg-slate-300 text-white py-5 rounded-2xl font-bold text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-red-900/10"
-                        >
-                            {addingToCart ? (
-                                <Loader2 className="w-6 h-6 animate-spin" />
+                        {/* Dynamic Product Attributes Selection */}
+                        {attributeGroups && (
+                            <div className="space-y-6 pt-2">
+                                {Object.keys(attributeGroups).map((groupName) => (
+                                    <div key={groupName} className="space-y-3">
+                                        <h3 className="text-lg font-bold text-[#1a1c2e] uppercase tracking-wider">{groupName}</h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {attributeGroups[groupName].map((attr) => {
+                                                const isSelected = selectedAttributes[groupName] === attr.value_id
+                                                return (
+                                                    <button
+                                                        key={attr.value_id}
+                                                        onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
+                                                        className={`px-5 py-2.5 rounded-xl border-2 transition-all font-bold text-sm ${isSelected
+                                                            ? 'border-primary bg-primary/10 text-primary scale-[1.02] shadow-sm'
+                                                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                                            }`}
+                                                    >
+                                                        {attr.value}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="pt-4 flex flex-col sm:flex-row gap-4">
+                            {currentCartItem ? (
+                                <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-3xl border border-border/50 shadow-inner w-full sm:w-auto">
+                                    <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-border shadow-sm grow min-w-[200px]">
+                                        <button
+                                            onClick={decreaseQty}
+                                            disabled={addingToCart}
+                                            className="w-14 h-14 flex items-center justify-center bg-primary rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                        >
+                                            {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Minus className="w-6 h-6 text-white stroke-[3px]" />}
+                                        </button>
+                                        <span className="flex-1 text-center text-2xl font-black text-foreground tabular-nums">
+                                            {currentCartItem.quantity}
+                                        </span>
+                                        <button
+                                            onClick={increaseQty}
+                                            disabled={addingToCart}
+                                            className="w-14 h-14 flex items-center justify-center bg-primary rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                        >
+                                            {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6 text-white stroke-[3px]" />}
+                                        </button>
+                                    </div>
+                                </div>
                             ) : (
-                                <span>Book Now — ₹{price}</span>
+                                <button
+                                    onClick={handleAddToCart}
+                                    disabled={addingToCart}
+                                    className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white py-4 px-8 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg disabled:opacity-70"
+                                >
+                                    {addingToCart ? 'Adding...' : 'Add to Cart'}
+                                </button>
                             )}
-                        </button>
+                        </div>
                     </div>
                 </div>
 
