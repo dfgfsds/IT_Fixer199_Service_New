@@ -84,7 +84,20 @@ const extractLocalArea = (addr: any) => {
 export function LocationProvider({ children }: any) {
   const [location, setLocationState] = useState<LocationData | null>(null)
   const [showLocationModal, setShowLocationModal] = useState(false)
-  const [zoneData, setZoneData] = useState<any>("")
+  const [zoneData, setZoneData] = useState<any>(null)
+
+  const fetchZoneData = useCallback(async (lat: number, lng: number) => {
+    try {
+      const res = await axiosInstance.get(Api.zoneByLocation, {
+        params: { lat, lng }
+      })
+      if (res?.data) {
+        setZoneData(res.data?.data)
+      }
+    } catch (err) {
+      console.error("Zone fetch error", err)
+    }
+  }, [])
 
   const setLocation = useCallback((loc: LocationData) => {
     setLocationState(loc)
@@ -173,6 +186,12 @@ export function LocationProvider({ children }: any) {
   useEffect(() => {
     initLocation()
   }, [])
+
+  useEffect(() => {
+    if (location?.lat && location?.lng) {
+      fetchZoneData(location.lat, location.lng)
+    }
+  }, [location?.lat, location?.lng, fetchZoneData])
 
   return (
     <LocationContext.Provider value={{
