@@ -3,6 +3,7 @@ import axiosInstance from "@/configs/axios-middleware";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import Api from "../api-endpoints/ApiUrls";
 import { useLocation } from "./location-context";
+import { toast } from "sonner";
 
 
 const CartItemContext = createContext<any | undefined>(undefined);
@@ -54,7 +55,12 @@ export function CartItemProvider({ children }: { children: ReactNode }) {
       setData(items)
 
     } catch (err: any) {
-      console.error("Cart fetch error:", err?.response?.status, err)
+      console.warn("Cart fetch note:", err?.response?.data?.message || "Out of zone or server error");
+
+      if (err?.response?.status !== 404 && err?.response?.status !== 401) {
+        toast.error("Services are currently not available in this location.");
+      }
+
       setData([])
     } finally {
       setIsLoading(false)

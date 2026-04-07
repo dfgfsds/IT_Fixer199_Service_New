@@ -334,7 +334,6 @@ export default function ProfilePage() {
     if (tab === 'addresses') {
       setActiveTab('addresses')
       if (action === 'add') {
-        // give a small delay to ensure the modal states and DOM are ready
         const timer = setTimeout(() => {
           setEditingAddressId(null)
           setNewAddress({
@@ -381,19 +380,15 @@ export default function ProfilePage() {
 
       setUserAddresses(sortedData)
 
-      // 🔥 AUTO-SELECTION LOGIC:
-      // If we have addresses but NONE are currently selected (e.g., after deleting the primary one),
-      // we automatically promote the next most recent address to "Selected" status.
       if (sortedData.length > 0 && !sortedData.some((a: any) => a.selected_address)) {
         const topAddr = sortedData[0]
         try {
-          // 🔥 PATCH VERSION: Use the dedicated flags endpoint
           await axiosInstance.patch(`${Api.addressFlags}/${topAddr.id}`, {
             ...topAddr,
             selected_address: true,
             is_primary: true
           })
-          // Re-fetch once to get the updated status from server
+
           const finalRes = await axiosInstance.get(Api.myAddress)
           const finalData = Array.isArray(finalRes.data?.data || finalRes.data) ? (finalRes.data?.data || finalRes.data) : []
           const finalSorted = [...finalData].sort((a: any, b: any) => {
@@ -403,7 +398,6 @@ export default function ProfilePage() {
           })
           setUserAddresses(finalSorted)
 
-          // 🔥 SYNC GLOBAL NAV BAR (On Deletion Promotion)
           setLocation({
             lat: Number(topAddr.lat),
             lng: Number(topAddr.lng),
@@ -438,7 +432,6 @@ export default function ProfilePage() {
       await axiosInstance.delete(`${Api.address}/${addressToDelete}`)
       toast.success('Address removed successfully')
 
-      // If we just deleted our ONLY address, reload to clear all states (Navbar, Context, etc.)
       if (userAddresses.length <= 1) {
         window.location.reload()
         return
@@ -453,6 +446,34 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }
+
+  const handleSetPrimary = async (addr: any) => {
+    if (addr.selected_address) return;
+    setLoading(true);
+    try {
+      await axiosInstance.patch(`${Api.addressFlags}/${addr.id}`, {
+        ...addr,
+        selected_address: true,
+        is_primary: true
+      });
+
+      setLocation({
+        lat: Number(addr.lat),
+        lng: Number(addr.lng),
+        city: addr.district || addr.city || "Unknown",
+        address: addr.full_address || addr.address || "",
+        pincode: addr.pincode,
+        state: addr.state
+      });
+
+      await fetchAddresses();
+      toast.success('Active address updated successfully');
+    } catch (error: any) {
+      toast.error('Failed to set active address');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAddModal = () => {
     setEditingAddressId(null)
@@ -501,8 +522,6 @@ export default function ProfilePage() {
       let finalLat = newAddress.lat;
       let finalLng = newAddress.lng;
 
-      // 🔥 AUTOMATIC HIGH-PRECISION GEOCODING ON SAVE:
-      // We combine ALL fields to ensure we have valid and highly accurate coordinates.
       const searchString = [newAddress.full_address, newAddress.district, newAddress.state, newAddress.pincode].filter(Boolean).join(', ');
 
       if (searchString && (newAddress.full_address || newAddress.district)) {
@@ -540,8 +559,6 @@ export default function ProfilePage() {
 
       await fetchAddresses()
 
-      // 🔥 SYNC GLOBAL NAV BAR (On Create/Edit)
-      // We pass the new address data to the global context so the navbar and modal update instantly
       setLocation({
         lat: Number(finalLat),
         lng: Number(finalLng),
@@ -560,8 +577,6 @@ export default function ProfilePage() {
     }
   }
 
-
-  // 🔥 DEEP LINKING EFFECT - Keep after openAddModal is defined
   useEffect(() => {
     const savedTab = localStorage.getItem("activeTab")
     const shouldOpenAdd = localStorage.getItem("openAddModal")
@@ -607,9 +622,9 @@ export default function ProfilePage() {
                     target.src = `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=800000&color=fff`;
                   }}
                 />
-                <button className="absolute bottom-0 right-0 p-2 bg-[#800000] text-white rounded-full shadow-lg hover:scale-110 transition-transform">
+                {/* <button className="absolute bottom-0 right-0 p-2 bg-[#800000] text-white rounded-full shadow-lg hover:scale-110 transition-transform">
                   <Edit2 className="w-4 h-4" />
-                </button>
+                </button> */}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-[#1a1c2e]">{user?.name || user?.email || user?.mobile_number}</h2>
@@ -787,7 +802,7 @@ export default function ProfilePage() {
                     userAddresses.map((addr) => (
                       <div
                         key={addr.id}
-                        className={`p-6 bg-white rounded-[32px] border ${addr.selected_address ? 'border-[#800000]/50 shadow-lg shadow-[#800000]/5' : 'border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}
+                        className={`p-6 rounded-[32px] border ${addr.selected_address ? 'border-[#800000] bg-red-50/40 shadow-lg shadow-[#800000]/10' : 'bg-white border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -795,7 +810,7 @@ export default function ProfilePage() {
                             <span className="font-bold text-[#1a1c2e]">{addr.name || 'Saved Address'}</span>
                           </div>
                           {addr.selected_address && (
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#800000] bg-[#800000]/5 px-2 py-1 rounded-md">Selected</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-[#800000] bg-white border border-red-100 shadow-sm px-3 py-1.5 rounded-full">Active</span>
                           )}
                         </div>
                         <div className="space-y-1">
@@ -817,6 +832,15 @@ export default function ProfilePage() {
                           >
                             Remove
                           </button>
+                          {!addr.selected_address && (
+                            <button
+                              onClick={() => handleSetPrimary(addr)}
+                              disabled={loading}
+                              className="text-xs font-black text-white bg-slate-900 hover:bg-[#800000] px-4 py-2 rounded-xl tracking-widest uppercase transition-all ml-auto disabled:opacity-50 shadow-md"
+                            >
+                              Set Active
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))
