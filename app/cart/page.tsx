@@ -17,21 +17,73 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
 export default function CartPage() {
-  const { cartItem, fetchCart, isLoading } = useCartItem()
-  const { location } = useLocation()
+  const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
+  const { location, zoneData } = useLocation()
   const router = useRouter()
 
-  const [selectedSlot, setSelectedSlot] = useState('instant')
-  const [scheduledDate, setScheduledDate] = useState('')
+  const [scheduleType, setScheduleType] = useState<"instant" | "later">("instant")
+  const [selectedTime, setSelectedTime] = useState<string | number>("")
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [selectedPayment, setSelectedPayment] = useState('cash')
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
-  
+
+  // Generate next 7 days
+  const DATES = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() + i)
+    return {
+      value: d.toISOString().split("T")[0],
+      label: d.toLocaleDateString("en-IN", { weekday: "short" }),
+      day: d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    }
+  })
+
   const [addresses, setAddresses] = useState<any[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false)
+  const [appData, setAppData] = useState<any>('')
+  const [successModal, setSuccessModal] = useState(false)
 
-  // Fetch saved addresses
+  // Slots & Instant from Zone
+  const backendSlots = zoneData?.slots || []
+  const instant = zoneData?.instant_availability
+
+  // Dummy fallback slots if backend has none configured
+  const dummySlots = [
+    { id: '9:00 AM - 11:00 AM', name: 'Morning', start_time: '09:00 AM', end_time: '11:00 AM' },
+    { id: '11:00 AM - 1:00 PM', name: 'Late Morning', start_time: '11:00 AM', end_time: '01:00 PM' },
+    { id: '2:00 PM - 4:00 PM', name: 'Afternoon', start_time: '02:00 PM', end_time: '04:00 PM' },
+    { id: '4:00 PM - 6:00 PM', name: 'Evening', start_time: '04:00 PM', end_time: '06:00 PM' },
+  ]
+
+  const slots = backendSlots.length > 0 ? backendSlots : dummySlots
+
+  // Sync with Cart Status
+  useEffect(() => {
+    if (!rawCartData) return
+    const cart = rawCartData?.data || rawCartData
+    if (cart.is_instant_slot) {
+      setScheduleType("instant")
+      setSelectedTime("")
+    } else if (cart.slot_id) {
+      setScheduleType("later")
+      setSelectedTime(cart.slot_id)
+      if (cart.scheduled_date) setSelectedDate(cart.scheduled_date)
+    }
+  }, [rawCartData])
+
+  const handleSlotSelect = (slot: any) => {
+    setSelectedTime(slot.id)
+    setScheduleType("later")
+  }
+
+  const handleInstantSelect = () => {
+    setScheduleType("instant")
+    setSelectedTime("")
+  }
+
+  // Fetch saved addresses and app settings
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -47,9 +99,37 @@ export default function CartPage() {
         console.error("Error fetching addresses:", err)
       }
     }
+
+    const FetchAppSetting = async () => {
+      try {
+        const updatedApi = await axiosInstance.get(Api?.appSettings)
+        if (updatedApi) {
+          setAppData(updatedApi?.data?.data);
+        }
+      } catch (error) { }
+    }
+
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-    if (token) fetchAddresses()
+    if (token) {
+      fetchAddresses()
+    }
+    FetchAppSetting()
   }, [])
+
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const updateQuantity = async (item: any, newQty: number) => {
     const currentQty = item.quantity || 1
@@ -169,29 +249,85 @@ export default function CartPage() {
       return
     }
 
-    if (selectedSlot === 'later' && !scheduledDate) {
-      toast.error('Please select a date and time for scheduled service')
+    if (scheduleType === 'later' && !selectedTime) {
+      toast.error('Please select a time slot for scheduled service')
       return
     }
 
     setIsCheckoutLoading(true)
     try {
+      const razorpayLoaded = await loadRazorpay()
+
+      if (!razorpayLoaded) {
+        toast.error("Payment gateway blocked. Try Chrome / disable adblock.")
+        setIsCheckoutLoading(false)
+        return
+      }
+
       const payload = {
         address_id: selectedAddressId,
         payment_method: selectedPayment.toUpperCase(),
-        service_slot: selectedSlot.toUpperCase(),
-        ...(selectedSlot === 'later' ? { scheduled_date: scheduledDate } : {})
+        service_slot: scheduleType.toUpperCase(),
+        ...(scheduleType === 'later' ? { slot_id: selectedTime, scheduled_date: selectedDate } : {})
       }
-      await axiosInstance.post(Api.orderCheckout, payload)
-      
-      // Clear cart locally or fetch to verify it's empty
-      await fetchCart()
-      toast.success('Booking Confirmed Successfully! 🎉')
-      router.push('/profile/orders') // Adjust if order page is different
+      const res = await axiosInstance.post(Api.orderCheckout, payload)
+      if (!res?.data) throw new Error("Payment init failed")
+
+      const checkoutData = res.data?.checkout || res.data;
+
+      // Make sure the cart gets empty locally
+      const completeCheckout = () => {
+        setSuccessModal(true)
+        setIsCheckoutLoading(false)
+        fetchCart()
+        setTimeout(() => {
+          router.push('/profile/orders') // Adjust if order page is different
+        }, 2000)
+      }
+
+      if (selectedPayment.toLowerCase() === 'cash' || !checkoutData?.razorpay_order_id) {
+        completeCheckout()
+        return
+      }
+
+      const { razorpay_order_id, amount, order_id } = checkoutData
+
+      const options = {
+        key: appData?.pg_api_key,
+        amount: Math.round(amount * 100),
+        currency: "INR",
+        name: "ITFixer@199",
+        description: "Order Payment",
+        order_id: razorpay_order_id,
+
+        handler: function (response: any) {
+          completeCheckout()
+        },
+
+        modal: {
+          ondismiss: function () {
+            setIsCheckoutLoading(false)
+            toast.error("Payment cancelled.")
+          },
+        },
+
+        theme: {
+          color: "#800000",
+        },
+      }
+
+      const razorpay = new (window as any).Razorpay(options)
+
+      razorpay.on("payment.failed", function (response: any) {
+        toast.error(response?.error?.description || "Payment failed")
+        setIsCheckoutLoading(false)
+      })
+
+      razorpay.open()
+
     } catch (err: any) {
       console.error("Checkout validation failed:", err?.response?.data, err)
       toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Checkout failed. Please try again.')
-    } finally {
       setIsCheckoutLoading(false)
     }
   }
@@ -330,21 +466,20 @@ export default function CartPage() {
                   + Add New
                 </Link>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {addresses.length > 0 ? addresses.map((addr) => (
-                  <label 
-                    key={addr.id} 
-                    className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${
-                      selectedAddressId === addr.id 
-                        ? 'border-[#800000] shadow-md bg-red-50/10' 
-                        : 'border-slate-100 hover:border-slate-200 shadow-sm'
-                    }`}
+                  <label
+                    key={addr.id}
+                    className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${selectedAddressId === addr.id
+                      ? 'border-[#800000] shadow-md bg-red-50/10'
+                      : 'border-slate-100 hover:border-slate-200 shadow-sm'
+                      }`}
                   >
-                    <input 
-                      type="radio" 
-                      name="address" 
-                      className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300" 
+                    <input
+                      type="radio"
+                      name="address"
+                      className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300"
                       checked={selectedAddressId === addr.id}
                       onChange={() => setSelectedAddressId(addr.id)}
                     />
@@ -354,7 +489,7 @@ export default function CartPage() {
                         {addr.is_default && <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase tracking-wider">Default</span>}
                       </p>
                       <p className="text-sm text-slate-500 mt-1 line-clamp-2">
-                        {addr.door_no}, {addr.street}, {addr.city}, {addr.state} - {addr.pincode}
+                        {addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ')}
                       </p>
                     </div>
                   </label>
@@ -381,42 +516,110 @@ export default function CartPage() {
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 ml-1">
                 <Calendar className="w-5 h-5" />
-                Service Slot
+                Schedule
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+
+              {/* Toggle */}
+              <div className="flex rounded-2xl border border-slate-100 bg-white p-1.5 shadow-sm">
                 <button
-                  onClick={() => { setSelectedSlot('instant'); setScheduledDate(''); }}
-                  className={`p-5 rounded-2xl border-2 transition-all flex items-center justify-center gap-3 font-bold ${selectedSlot === 'instant'
-                    ? 'border-[#800000] bg-red-50/30 text-[#800000]'
-                    : 'border-white bg-white shadow-sm text-slate-500 hover:border-slate-100'
+                  onClick={handleInstantSelect}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "instant"
+                    ? "bg-[#800000] text-white shadow-lg shadow-red-900/20"
+                    : "text-slate-500 hover:bg-slate-50"
                     }`}
                 >
-                  <Zap className="w-5 h-5" />
+                  <Zap className={`w-4 h-4 ${scheduleType === "instant" ? "animate-pulse" : ""}`} />
                   Instant Service
                 </button>
+
                 <button
-                  onClick={() => setSelectedSlot('later')}
-                  className={`p-5 rounded-2xl border-2 transition-all flex items-center justify-center gap-3 font-bold ${selectedSlot === 'later'
-                    ? 'border-[#800000] bg-red-50/30 text-[#800000]'
-                    : 'border-white bg-white shadow-sm text-slate-500 hover:border-slate-100'
+                  onClick={() => setScheduleType("later")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "later"
+                    ? "bg-[#800000] text-white shadow-lg shadow-red-900/20"
+                    : "text-slate-500 hover:bg-slate-50"
                     }`}
                 >
-                  <Calendar className="w-5 h-5" />
+                  <Calendar className="w-4 h-4" />
                   Schedule for Later
                 </button>
               </div>
 
-              {selectedSlot === 'later' && (
-                <div className="mt-4 bg-white p-5 rounded-2xl border-2 border-[#800000]/20 flex flex-col gap-2 animate-in slide-in-from-top-2">
-                  <label className="text-sm font-bold text-[#1a1c2e]">Select Date & Time</label>
-                  <input 
-                    type="datetime-local" 
-                    value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
-                    min={new Date().toISOString().slice(0, 16)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#1a1c2e] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000] transition-colors"
-                  />
-                  <p className="text-xs text-slate-400 mt-1">Please select an available slot</p>
+              {/* Instant View */}
+              {scheduleType === "instant" && (
+                <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm animate-in slide-in-from-top-2">
+                  {instant?.available ? (
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
+                        <Clock className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-[#1a1c2e]">Technician Available Now</p>
+                        <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-green-600 font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4 text-amber-600 bg-amber-50/50 p-4 rounded-2xl">
+                      <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                      <p className="text-sm font-bold leading-tight">Instant service currently unavailable for this location. Please schedule for later.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Slots & Date Selection View */}
+              {scheduleType === "later" && (
+                <div className="space-y-6 animate-in slide-in-from-top-2">
+                  {/* Date Picker */}
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+                    {DATES.map((d) => (
+                      <button
+                        key={d.value}
+                        onClick={() => { setSelectedDate(d.value); setSelectedTime(""); }}
+                        className={`flex flex-col items-center min-w-[70px] p-3 rounded-2xl border-2 transition-all ${selectedDate === d.value
+                          ? "border-[#800000] bg-red-50/20 shadow-sm"
+                          : "border-slate-50 bg-white hover:border-slate-200"
+                          }`}
+                      >
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#800000]" : "text-slate-400"}`}>
+                          {d.label}
+                        </span>
+                        <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#800000]" : "text-[#1a1c2e]"}`}>
+                          {d.day}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Time Slots */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {slots.length > 0 ? slots.map((slot: any) => (
+                      <button
+                        key={slot.id}
+                        onClick={() => handleSlotSelect(slot)}
+                        className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden group ${selectedTime === slot.id
+                          ? 'border-[#800000] bg-red-50/30'
+                          : 'border-white bg-white shadow-sm hover:border-slate-100'
+                          }`}
+                      >
+                        <div className="relative z-10">
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">{slot.name}</p>
+                          <p className={`font-bold ${selectedTime === slot.id ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>
+                            {slot.start_time} - {slot.end_time}
+                          </p>
+                        </div>
+                        {selectedTime === slot.id && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <CheckCircle className="w-5 h-5 text-[#800000]" />
+                          </div>
+                        )}
+                      </button>
+                    )) : (
+                      <div className="col-span-2 p-10 bg-white rounded-3xl border border-dashed border-slate-200 text-center text-slate-400">
+                        <Calendar className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                        <p className="text-sm font-bold">No available slots found for this location</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -429,10 +632,9 @@ export default function CartPage() {
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'cash', name: 'Cash on Service', icon: Smartphone },
+
                   { id: 'upi', name: 'UPI', icon: Smartphone },
-                  { id: 'card', name: 'Card', icon: CreditCard },
-                  { id: 'wallet', name: 'Wallet', icon: Wallet },
+
                 ].map((pm) => (
                   <button
                     key={pm.id}
@@ -496,14 +698,37 @@ export default function CartPage() {
                     <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0" />
                     <div className="space-y-1">
                       <p className="font-bold text-[#1a1c2e]">Service Location</p>
-                      <p className="text-slate-500">{location?.city || 'Not selected'}</p>
+                      {selectedAddressId ? (
+                        <p className="text-slate-500 line-clamp-2 leading-relaxed">
+                          {(() => {
+                            const addr = addresses.find((a) => a.id === selectedAddressId);
+                            if (addr) {
+                              return addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ');
+                            }
+                            return location?.city || 'Not selected';
+                          })()}
+                        </p>
+                      ) : (
+                        <p className="text-slate-500">{location?.city || 'Not selected'}</p>
+                      )}
                     </div>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl flex gap-3 text-xs">
                     <Clock className="w-4 h-4 text-[#800000] flex-shrink-0" />
                     <div className="space-y-1">
                       <p className="font-bold text-[#1a1c2e]">Slot</p>
-                      <p className="text-slate-500 capitalize">{selectedSlot} Service</p>
+                      {scheduleType === 'later' ? (
+                        <div className="text-slate-500">
+                          <p className="font-bold text-[#800000]">
+                            {DATES.find(d => d.value === selectedDate)?.day}, {DATES.find(d => d.value === selectedDate)?.label}
+                          </p>
+                          <p className="text-[10px]">
+                            {slots.find((s: any) => s.id === selectedTime)?.start_time} - {slots.find((s: any) => s.id === selectedTime)?.end_time || 'Select Time'}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-slate-500 capitalize">Instant Service</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -532,6 +757,22 @@ export default function CartPage() {
       </main>
 
       <Footer />
+      {successModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl animate-in zoom-in-95">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold mb-2 text-[#1a1c2e]">Payment Successful 🎉</h2>
+            <p className="text-sm text-slate-500">
+              Your order has been placed successfully
+            </p>
+            <p className="mt-3 text-xs text-slate-400">
+              Redirecting to order page...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
