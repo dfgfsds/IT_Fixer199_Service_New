@@ -85,8 +85,11 @@ axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
 
     // ✅ token irundha mattum attach
-    if (token) {
+    if (token && token !== 'undefined') {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("🛡️ AUTH HEADER SENT:", `Bearer ${token.substring(0, 5)}...`);
+    } else {
+      console.warn("⚠️ NO TOKEN FOUND IN LOCAL STORAGE!");
     }
   }
 
@@ -111,8 +114,9 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-test.itfixer199.com';
         const refreshResponse = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/token/refresh/`,
+          `${baseUrl}/api/token/refresh/`,
           {
             refresh: refreshToken,
           }
