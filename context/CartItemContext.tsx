@@ -9,10 +9,10 @@ const CartItemContext = createContext<any | undefined>(undefined);
 
 
 export function CartItemProvider({ children }: { children: ReactNode }) {
-  // const [data, setData] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState(false)
-  const { location, zoneData } = useLocation()
-  const [data, setData] = useState<any[]>([]) // ✅ correct
+  const { location } = useLocation()
+  const [data, setData] = useState<any[]>([])
+  const [rawCartData, setRawCartData] = useState<any>(null)
 
   const getToken = () => {
     if (typeof window !== "undefined") {
@@ -20,32 +20,6 @@ export function CartItemProvider({ children }: { children: ReactNode }) {
     }
     return null
   }
-
-
-  // const fetchCart = async () => {
-  //   const token = getToken()
-
-  //   // ❌ token illa → empty cart
-  //   if (!token) {
-  //     setData("")
-  //     return
-  //   }
-
-  //   setIsLoading(true)
-
-  //   try {
-  //     const res = await axiosInstance.get(`${Api?.cartApi}?include_inactive=true&lat=${location?.lat}&lng=${location?.lng}`)
-
-  //     const items = res?.data?.data || []
-  //     setData(items)
-
-  //   } catch (err) {
-  //     console.error("Cart fetch error", err)
-  //     setData("") // fallback
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
 
   const fetchCart = async () => {
     const token = getToken()
@@ -55,56 +29,62 @@ export function CartItemProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    // 🔥 IMPORTANT
-    if (!location?.lat || !location?.lng) return
-
     setIsLoading(true)
 
     try {
-      const res = await axiosInstance.get(
-        `${Api?.cartApi}?include_inactive=true&lat=${location.lat}&lng=${location.lng}`
-      )
+      // Build URL — include lat/lng if available (trailing slash required for DRF)
+      let url = `${Api?.cartApi}/?include_inactive=true`
+      if (location?.lat && location?.lng) {
+        url += `&lat=${location.lat}&lng=${location.lng}`
+      }
 
-      const items = res?.data?.data || [] // ✅ correct path
+      const res = await axiosInstance.get(url)
+      console.log("Cart API raw response:", res?.data)
+      setRawCartData(res?.data)
+
+      // Try multiple response structures
+      const items =
+        res?.data?.data?.items ||
+        res?.data?.items ||
+        res?.data?.cart_items ||
+        (Array.isArray(res?.data?.data) ? res?.data?.data : null) ||
+        (Array.isArray(res?.data) ? res.data : [])
+
+      console.log("Cart items parsed:", items)
       setData(items)
 
-    } catch (err) {
-      console.error("Cart fetch error", err)
+    } catch (err: any) {
+      console.error("Cart fetch error:", err?.response?.status, err)
       setData([])
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Fetch cart whenever location changes (covers login redirect back too)
   useEffect(() => {
     const token = getToken()
-
-    if (token && location?.lat && location?.lng) {
+    if (token) {
       fetchCart()
     } else {
       setData([])
     }
-  }, [location?.lat, location?.lng]) // 🔥 THIS IS THE KEY
+  }, [location?.lat, location?.lng])
 
+  // Also fetch on first mount (in case location is already set)
+  useEffect(() => {
+    const token = getToken()
+    if (token) {
+      fetchCart()
+    }
+  }, [])
 
-  // useEffect(() => {
-  //   const token = getToken()
-
-  //   if (token) {
-  //     fetchCart()
-  //   } else {
-  //     setData("") // 🔥 important
-  //   }
-  // }, [])
   return (
     <CartItemContext.Provider
       value={{
-        // cartItem: data || [],
-        // isAuthenticated: !!data,
-        // isLoading,
-        // fetchCart,
-        cartItem: data, // already array
-        totalItems: data.length,
+        cartItem: data,
+        rawCartData,
+        totalItems: data.reduce((sum, item) => sum + (item.quantity || 1), 0),
         isAuthenticated: !!getToken(),
         isLoading,
         fetchCart,

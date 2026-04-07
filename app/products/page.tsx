@@ -37,7 +37,8 @@ export default function AllProductsPage() {
                         include_category: true,
                         status: 'ACTIVE',
                         page: currentPage,
-                        size: PAGE_SIZE
+                        size: PAGE_SIZE,
+                        include_attribute: true,
                     }
                 })
 

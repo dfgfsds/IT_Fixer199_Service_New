@@ -2,10 +2,11 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, ShoppingCart, AlertTriangle } from 'lucide-react'
+import { Star, Check, ArrowRight, Share2, CheckCircle, Heart, Loader2, Minus, Plus, ShoppingCart, AlertTriangle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useMemo, use } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLocation } from '@/context/location-context'
 import { useCartItem } from '@/context/CartItemContext'
 import axiosInstance from '@/configs/axios-middleware'
@@ -14,6 +15,7 @@ import { toast } from 'sonner'
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const router = useRouter()
 
   const [service, setService] = useState<any>(null)
   const [relatedServices, setRelatedServices] = useState<any[]>([])
@@ -21,6 +23,20 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   const [error, setError] = useState<string | null>(null)
   const { location } = useLocation()
   const { cartItem, fetchCart } = useCartItem()
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
+  const [isAdding, setIsAdding] = useState(false)
+
+  const attributeGroups = useMemo(() => {
+    if (!service?.attributes || service.attributes.length === 0) return null
+    const groups: Record<string, any[]> = {}
+    service.attributes.forEach((attr: any) => {
+      if (!groups[attr.attribute_name]) groups[attr.attribute_name] = []
+      if (!groups[attr.attribute_name].find((v: any) => v.value_id === attr.value_id)) {
+        groups[attr.attribute_name].push(attr)
+      }
+    })
+    return groups
+  }, [service])
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
@@ -66,22 +82,54 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   }, [id])
 
   const currentCartItem = useMemo(() => {
-    return cartItem?.find((item: any) => item.service_id === id)
+    return cartItem?.find((item: any) => String(item.service_id) === String(id) || String(item.service?.id) === String(id))
   }, [cartItem, id])
-  console.log("Cart Content:", cartItem)
   const addToCartApi = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    if (!token) {
+      toast.error('Please login to book this service')
+      router.push('/login')
+      return
+    }
+
+    if (attributeGroups) {
+      const allSelected = Object.keys(attributeGroups).every(g => !!selectedAttributes[g])
+      if (!allSelected) {
+        toast.error('Please select all required options before booking.')
+        return
+      }
+    }
+
+    setIsAdding(true)
     try {
-      const payload = {
+      const attributesToSend = attributeGroups
+        ? Object.keys(attributeGroups).map(groupName => {
+          const valueId = selectedAttributes[groupName]
+          const attr = attributeGroups[groupName].find((v: any) => v.value_id === valueId)
+          return { attribute_id: attr.attribute_id, value_id: attr.value_id }
+        })
+        : []
+
+      const payload: any = {
         type: "SERVICE",
         service_id: id,
-        quantity: 1
+        quantity: 1,
       }
+      if (attributesToSend.length > 0) payload.attributes = attributesToSend
+
       await axiosInstance.post(`${Api.cartApi}/add/`, payload)
       await fetchCart()
-      toast.success("Service added to cart")
-    } catch (error) {
-      console.error("Add to cart error:", error)
-      toast.error("Process failed. Please try again.")
+      toast.success("Service added to cart!")
+    } catch (error: any) {
+      if (error?.response?.status === 401) {
+        toast.error('Please login to book this service')
+        router.push('/login')
+      } else {
+        console.error("Add to cart error:", error)
+        toast.error("Failed to add to cart. Please try again.")
+      }
+    } finally {
+      setIsAdding(false)
     }
   }
 
@@ -259,42 +307,63 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
+            {/* Attribute Selection */}
+            {attributeGroups && Object.keys(attributeGroups).length > 0 && (
+              <div className="space-y-6 pt-4 border-t border-slate-100">
+                {Object.keys(attributeGroups).map((groupName) => (
+                  <div key={groupName} className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-400 tracking-widest uppercase">{groupName}</h3>
+                      {!selectedAttributes[groupName] && (
+                        <span className="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">Required</span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      {attributeGroups[groupName].map((attr: any) => {
+                        const isSelected = selectedAttributes[groupName] === attr.value_id
+                        return (
+                          <button
+                            key={attr.value_id}
+                            onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
+                            className={`relative flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border-2 transition-all duration-300 font-bold text-sm overflow-hidden ${isSelected
+                                ? 'border-[#800000] bg-white text-[#1a1c2e] shadow-md scale-[1.02]'
+                                : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-[#1a1c2e]'
+                              }`}
+                          >
+                            {isSelected && <span className="absolute inset-0 bg-[#800000]/5" />}
+                            {isSelected && <Check className="w-4 h-4 text-[#800000] relative z-10" />}
+                            <span className="relative z-10">{attr.value}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="pt-4">
               {currentCartItem ? (
-                <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner">
-                  <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm grow max-w-xs">
-                    <button
-                      onClick={decreaseQty}
-                      disabled={loading || !!error}
-                      className="w-14 h-14 flex items-center justify-center bg-[#800000] rounded-xl shadow-lg shadow-[#800000]/20 hover:bg-[#600000] transition-all hover:scale-105 disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:scale-100"
-                    >
-                      <Minus className="w-6 h-6 text-slate-400 group-hover:text-[#800000] stroke-[3px]" />
-                    </button>
-                    <span className="flex-1 text-center text-2xl font-black text-[#1a1c2e] tabular-nums">
-                      {currentCartItem.quantity}
-                    </span>
-                    <button
-                      onClick={increaseQty}
-                      disabled={loading || !!error}
-                      className="w-14 h-14 flex items-center justify-center bg-[#800000] rounded-xl shadow-lg shadow-[#800000]/20 hover:bg-[#600000] transition-all hover:scale-105 disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:scale-100"
-                    >
-                      <Plus className="w-6 h-6 text-white stroke-[3px]" />
-                    </button>
-                  </div>
-                  <div className="hidden sm:block">
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Added to Cart</p>
-                    <Link href="/cart" className="text-[#800000] font-black text-sm uppercase tracking-widest hover:underline">View Checkout</Link>
-                  </div>
-                </div>
+                <button
+                  onClick={() => router.push('/cart')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-green-600/20 uppercase tracking-widest"
+                >
+                  <CheckCircle className="w-6 h-6" />
+                  <span>Added — View Cart</span>
+                </button>
               ) : (
                 <button
                   onClick={addToCartApi}
-                  disabled={loading || !!error}
+                  disabled={loading || !!error || isAdding}
                   className="w-full bg-[#800000] hover:bg-[#600000] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-[#800000]/20 uppercase tracking-widest disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:transform-none"
                 >
-                  <ShoppingCart className="w-6 h-6" />
-                  <span>{error ? "Unavailable in this location" : `Book Now — ₹${sellingPrice}`}</span>
+                  {isAdding ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <ShoppingCart className="w-6 h-6" />
+                  )}
+                  <span>{error ? "Unavailable in this location" : isAdding ? "Adding..." : `Book Now — ₹${sellingPrice}`}</span>
                 </button>
               )}
             </div>

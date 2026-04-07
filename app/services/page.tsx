@@ -5,6 +5,8 @@ import { Footer } from '@/components/footer'
 import { ProductCard } from '../../components/product-card'
 import { type Product } from '@/lib/products'
 import { Search, Sparkles, Loader2, MapPin, Navigation } from 'lucide-react'
+import { ServiceCard } from '@/components/service-card'
+import { Search, Sparkles, Loader2 } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
@@ -13,7 +15,7 @@ import axiosInstance from '@/configs/axios-middleware'
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
-  const [services, setServices] = useState<Product[]>([])
+  const [services, setServices] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { location, setShowLocationModal } = useLocation()
@@ -35,7 +37,7 @@ export default function ServicesPage() {
         const servicesArray = Array.isArray(response.data) ? response.data : (response.data?.services || [])
 
         if (Array.isArray(servicesArray)) {
-          const mappedServices: Product[] = servicesArray
+          const mappedServices = servicesArray
             .filter((s: any) => s.status === "ACTIVE")
             .map((s: any) => {
               const sellingPrice = s.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
@@ -181,7 +183,7 @@ export default function ServicesPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
                   {filteredServices.map((service) => (
                     <div key={service.id}>
-                      <ProductCard product={service} />
+                      <ServiceCard service={service} />
                     </div>
                   ))}
                 </div>

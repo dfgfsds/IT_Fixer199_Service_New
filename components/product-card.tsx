@@ -1,20 +1,25 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star, Clock, CheckCircle, ShoppingCart } from 'lucide-react'
+import { CheckCircle, ShoppingCart } from 'lucide-react'
 import type { Product } from '@/lib/products'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 type Props = {
   product: Product
   basePath?: string
 }
 
-export function ProductCard({ product, basePath = 'services' }: Props) {
+export function ProductCard({ product, basePath = 'products' }: Props) {
+  const router = useRouter()
   const discountPct = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
 
   return (
-    <div className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300">
+    <Link href={`/${basePath}/${product.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300 block">
       {/* Image Section */}
       <div className="relative h-32 sm:h-56 overflow-hidden bg-muted">
         <Image
@@ -56,9 +61,6 @@ export function ProductCard({ product, basePath = 'services' }: Props) {
           </h3>
         </div>
 
-
-
-
         {/* Price and CTA */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 sm:pt-4 border-t border-border/50 gap-2 sm:gap-0">
           <div className="space-y-0.5 sm:space-y-1">
@@ -72,15 +74,28 @@ export function ProductCard({ product, basePath = 'services' }: Props) {
               )}
             </div>
           </div>
-          <Link
-            href={`/${basePath}/${product.id}`}
-            className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent text-white px-3 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-lg hover:shadow-xl"
+          
+          <button 
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+              if (!token) {
+                toast.error('Please login to book a product')
+                router.push('/login')
+              } else {
+                router.push(`/${basePath}/${product.id}`)
+              }
+            }}
+            className="flex justify-center items-center gap-1.5 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-md hover:shadow-lg active:scale-95"
           >
-            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             Book
-          </Link>
+          </button>
+
         </div>
       </div>
-    </div>
+    </Link>
+
   )
 }
