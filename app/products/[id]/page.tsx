@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus } from 'lucide-react'
+import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, MapPin, Navigation } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, use, useMemo } from 'react'
@@ -21,7 +21,7 @@ export default function ProductDetailPage({
 }) {
     const { id } = use(params)
     const router = useRouter()
-    const { location } = useLocation()
+    const { location, setShowLocationModal } = useLocation()
     const { cartItem, fetchCart } = useCartItem()
 
     const currentCartItem = useMemo(() => {
@@ -198,6 +198,36 @@ export default function ProductDetailPage({
         } finally {
             setAddingToCart(false)
         }
+    }
+
+    if (!location?.lat || !location?.lng) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col">
+                <Header />
+                <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
+                    <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
+                        <div className="relative">
+                            <div className="w-24 h-24 bg-primary/5 text-primary rounded-full flex items-center justify-center mx-auto">
+                                <MapPin className="w-10 h-10" />
+                            </div>
+                            <div className="absolute inset-0 blur-xl bg-primary/5 rounded-full"></div>
+                        </div>
+                        <div className="space-y-3 max-w-sm mx-auto">
+                            <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
+                            <p className="text-slate-500 font-medium">To show you available products and accurate pricing, please select your city.</p>
+                        </div>
+                        <button
+                            onClick={() => setShowLocationModal(true)}
+                            className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                        >
+                            <Navigation className="w-5 h-5 text-white/50" />
+                            Select Your Location
+                        </button>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        )
     }
 
     if (loading) {
