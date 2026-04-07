@@ -157,13 +157,13 @@ export function Header() {
             {/* Location Picker */}
             <button
               onClick={() => setShowLocationModal(true)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 hover:border-[#800000]/40 hover:shadow-md transition-all text-slate-600 shadow-sm max-w-[220px]"
+              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#800000]/40 hover:shadow-lg transition-all text-slate-600 shadow-sm max-w-[280px] group"
             >
-              <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0" />
-              <span className="text-sm font-semibold truncate">
-                {location?.city || 'Select Location'}
+              <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0 group-hover:scale-110 transition-transform" />
+              <span className="text-[13px] font-bold truncate text-[#1a1c2e]">
+                {location?.address || location?.city || 'Select Location'}
               </span>
-              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 group-hover:translate-y-0.5 transition-transform" />
             </button>
 
             {/* Search Bar Container */}
@@ -348,10 +348,12 @@ export function Header() {
             {/* Mobile Location */}
             <button
               onClick={() => { setShowLocationModal(true); setIsMenuOpen(false) }}
-              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-medium text-slate-600"
+              className="w-full flex items-center gap-2.5 px-3 py-3 rounded-xl hover:bg-slate-50 text-[13px] font-bold text-[#1a1c2e]"
             >
-              <MapPin className="w-4 h-4 text-[#800000]" />
-              {location?.city || 'Select Location'}
+              <MapPin className="w-4 h-4 text-[#800000] shrink-0" />
+              <span className="truncate flex-1 text-left">
+                {location?.address || location?.city || 'Select Location'}
+              </span>
             </button>
             {[
               { href: '/', label: 'Home' },

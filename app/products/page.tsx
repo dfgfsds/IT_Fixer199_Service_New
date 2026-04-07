@@ -4,13 +4,13 @@ import { useState, useEffect, useMemo } from 'react'
 import { ProductCard } from '../../components/product-card'
 import { Header } from '../../components/header'
 import { Footer } from '../../components/footer'
-import { Package, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Package, Loader2, ChevronLeft, ChevronRight, MapPin, Navigation } from 'lucide-react'
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 
 export default function AllProductsPage() {
-    const { location } = useLocation()
+    const { location, setShowLocationModal } = useLocation()
     const [products, setProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCategory, setSelectedCategory] = useState('All')
@@ -136,7 +136,27 @@ export default function AllProductsPage() {
                         ))}
                     </div>
 
-                    {loading ? (
+                    {!location?.lat || !location?.lng ? (
+                        <div className="flex flex-col items-center justify-center py-40 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-border shadow-sm">
+                            <div className="relative">
+                                <div className="w-24 h-24 bg-primary/5 text-primary rounded-full flex items-center justify-center mx-auto">
+                                    <MapPin className="w-10 h-10" />
+                                </div>
+                                <div className="absolute inset-0 blur-xl bg-primary/5 rounded-full"></div>
+                            </div>
+                            <div className="text-center space-y-3 max-w-sm mx-auto">
+                                <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Location Required</h3>
+                                <p className="text-muted-foreground font-medium">To show you available products and accurate pricing, please select your city.</p>
+                            </div>
+                            <button
+                                onClick={() => setShowLocationModal(true)}
+                                className="px-10 py-4 bg-primary text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-3"
+                            >
+                                <Navigation className="w-5 h-5 text-white/50" />
+                                Select Your Location
+                            </button>
+                        </div>
+                    ) : loading ? (
                         <div className="flex flex-col items-center justify-center py-40 p-8 space-y-6">
                             <div className="relative">
                                 <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
