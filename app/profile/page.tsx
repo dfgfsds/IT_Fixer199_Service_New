@@ -29,7 +29,6 @@ const BOOKINGS = [
   },
 ]
 
-
 export default function ProfilePage() {
   const router = useRouter()
   const { user, logout, refreshUserData } = useAuth()
@@ -67,16 +66,27 @@ export default function ProfilePage() {
 
   // Map initialization and helpers
   const loadGoogleMaps = useCallback(() => {
-    return new Promise((resolve) => {
-      if (typeof window !== "undefined" && (window as any).google) {
+    return new Promise((resolve, reject) => {
+      if (typeof window === "undefined") return;
+      if ((window as any).google) {
         resolve((window as any).google);
         return;
       }
+
+      const existingScript = document.getElementById("google-maps-script");
+      if (existingScript) {
+        const handleLoad = () => resolve((window as any).google);
+        existingScript.addEventListener("load", handleLoad);
+        return;
+      }
+
       const script = document.createElement("script");
+      script.id = "google-maps-script";
       script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve((window as any).google);
+      script.onerror = () => reject(new Error("Failed to load Google Maps script"));
       document.head.appendChild(script);
     });
   }, []);
@@ -123,39 +133,57 @@ export default function ProfilePage() {
   const initMap = useCallback(async () => {
     if (!showMap || !mapRef.current) return;
 
-    setMapLoading(true);
-    const google: any = await loadGoogleMaps();
-    const currentLat = parseFloat(newAddress.lat) || 13.0827;
-    const currentLng = parseFloat(newAddress.lng) || 80.2707;
+    try {
+      setMapLoading(true);
+      const google: any = await loadGoogleMaps();
+      const currentLat = parseFloat(newAddress.lat) || 13.0827;
+      const currentLng = parseFloat(newAddress.lng) || 80.2707;
 
-    const mapOptions = {
-      center: { lat: currentLat, lng: currentLng },
-      zoom: 15,
-      mapTypeControl: false,
-      streetViewControl: false,
-    };
+      const mapOptions = {
+        center: { lat: currentLat, lng: currentLng },
+        zoom: 15,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      };
 
-    googleMapRef.current = new google.maps.Map(mapRef.current, mapOptions);
-    markerRef.current = new google.maps.Marker({
-      position: { lat: currentLat, lng: currentLng },
-      map: googleMapRef.current,
-      draggable: true,
-    });
+      // Cleanup existing map if re-initializing
+      if (googleMapRef.current) {
+        google.maps.event.clearInstanceListeners(googleMapRef.current);
+      }
 
-    googleMapRef.current.addListener("click", (e: any) => {
-      const clickedLat = e.latLng.lat();
-      const clickedLng = e.latLng.lng();
-      markerRef.current.setPosition({ lat: clickedLat, lng: clickedLng });
-      handleMarkerUpdate(clickedLat, clickedLng);
-    });
+      googleMapRef.current = new google.maps.Map(mapRef.current, mapOptions);
+      markerRef.current = new google.maps.Marker({
+        position: { lat: currentLat, lng: currentLng },
+        map: googleMapRef.current,
+        draggable: true,
+        animation: google.maps.Animation.DROP,
+      });
 
-    markerRef.current.addListener("dragend", (e: any) => {
-      const draggedLat = e.latLng.lat();
-      const draggedLng = e.latLng.lng();
-      handleMarkerUpdate(draggedLat, draggedLng);
-    });
+      googleMapRef.current.addListener("click", (e: any) => {
+        const clickedLat = e.latLng.lat();
+        const clickedLng = e.latLng.lng();
+        markerRef.current.setPosition({ lat: clickedLat, lng: clickedLng });
+        handleMarkerUpdate(clickedLat, clickedLng);
+      });
 
-    setMapLoading(false);
+      markerRef.current.addListener("dragend", (e: any) => {
+        const draggedLat = e.latLng.lat();
+        const draggedLng = e.latLng.lng();
+        handleMarkerUpdate(draggedLat, draggedLng);
+      });
+
+      // Ensure map resizes correctly
+      setTimeout(() => {
+        google.maps.event.trigger(googleMapRef.current, 'resize');
+      }, 300);
+
+    } catch (error) {
+      console.error("Map initialization failed:", error);
+      toast.error("Failed to load Map. Please check your connection.");
+    } finally {
+      setMapLoading(false);
+    }
   }, [showMap, loadGoogleMaps]);
 
   const handleMarkerUpdate = async (lat: number, lng: number) => {
@@ -245,6 +273,13 @@ export default function ProfilePage() {
     if (showMap) {
       initMap();
     }
+    return () => {
+      if (googleMapRef.current) {
+        // Simple cleanup
+        googleMapRef.current = null;
+        markerRef.current = null;
+      }
+    };
   }, [showMap, initMap]);
 
   // Initialize edit states when entering edit mode
