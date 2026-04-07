@@ -4,7 +4,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { User, MapPin, Package, Settings, LogOut, ChevronRight, Edit2, Plus, Clock, CheckCircle, Map, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/context/auth-context'
 import Api from '@/api-endpoints/ApiUrls'
@@ -317,12 +317,44 @@ export default function ProfilePage() {
     }
   }
 
+  const searchParams = useSearchParams()
+
   // Background refresh on load
   useEffect(() => {
     if (user?.id) {
       refreshUserData()
     }
   }, [user?.id, refreshUserData])
+
+  // Handle auto-open address form from query params
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    const action = searchParams.get('action')
+
+    if (tab === 'addresses') {
+      setActiveTab('addresses')
+      if (action === 'add') {
+        // give a small delay to ensure the modal states and DOM are ready
+        const timer = setTimeout(() => {
+          setEditingAddressId(null)
+          setNewAddress({
+            name: user?.name || '',
+            contact: user?.mobile_number || '',
+            full_address: '',
+            pincode: '',
+            district: '',
+            state: '',
+            selected_address: true,
+            lat: "",
+            lng: ""
+          })
+          setShowAddModal(true)
+          setShowMap(false)
+        }, 500)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [searchParams, user])
 
   // Redirect to login if NO session found
   useEffect(() => {
@@ -340,10 +372,12 @@ export default function ProfilePage() {
       const rawData = response.data?.data || response.data
       const data = Array.isArray(rawData) ? rawData : []
 
-      // Sort by latest update to ensure the most recent is at the top
-      const sortedData = data.sort((a, b) =>
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      )
+      // Sort by selected status first, then latest update
+      const sortedData = [...data].sort((a: any, b: any) => {
+        if (a.selected_address && !b.selected_address) return -1
+        if (!a.selected_address && b.selected_address) return 1
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      })
 
       setUserAddresses(sortedData)
 
@@ -353,7 +387,8 @@ export default function ProfilePage() {
       if (sortedData.length > 0 && !sortedData.some((a: any) => a.selected_address)) {
         const topAddr = sortedData[0]
         try {
-          await axiosInstance.put(`${Api.address}/${topAddr.id}`, {
+          // 🔥 PATCH VERSION: Use the dedicated flags endpoint
+          await axiosInstance.patch(`${Api.addressFlags}/${topAddr.id}`, {
             ...topAddr,
             selected_address: true,
             is_primary: true
@@ -361,9 +396,12 @@ export default function ProfilePage() {
           // Re-fetch once to get the updated status from server
           const finalRes = await axiosInstance.get(Api.myAddress)
           const finalData = Array.isArray(finalRes.data?.data || finalRes.data) ? (finalRes.data?.data || finalRes.data) : []
-          setUserAddresses(finalData.sort((a: any, b: any) =>
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-          ))
+          const finalSorted = [...finalData].sort((a: any, b: any) => {
+            if (a.selected_address && !b.selected_address) return -1
+            if (!a.selected_address && b.selected_address) return 1
+            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          })
+          setUserAddresses(finalSorted)
 
           // 🔥 SYNC GLOBAL NAV BAR (On Deletion Promotion)
           setLocation({
@@ -747,7 +785,10 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     userAddresses.map((addr) => (
-                      <div key={addr.id} className={`p-6 bg-white rounded-[32px] border ${addr.selected_address ? 'border-[#800000]/50 shadow-lg shadow-[#800000]/5' : 'border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}>
+                      <div
+                        key={addr.id}
+                        className={`p-6 bg-white rounded-[32px] border ${addr.selected_address ? 'border-[#800000]/50 shadow-lg shadow-[#800000]/5' : 'border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <MapPin className={`w-5 h-5 ${addr.selected_address ? 'text-[#800000]' : 'text-slate-400'}`} />

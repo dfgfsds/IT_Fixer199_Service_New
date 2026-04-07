@@ -113,6 +113,32 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
     setStep("map")
   }
 
+  // Handle selecting a saved address
+  const handleAddressSelect = async (addr: any) => {
+    try {
+      // mark it as selected on server using the dedicated flags PATCH endpoint
+      await axiosInstance.patch(`${Api.addressFlags}/${addr.id}`, {
+        ...addr,
+        selected_address: true,
+        is_primary: true
+      })
+
+      // set globally in context
+      setLocation({
+        city: addr.district || addr.city || "Unknown",
+        address: addr.full_address || addr.address,
+        lat: Number(addr.lat),
+        lng: Number(addr.lng),
+        state: addr.state || "",
+        pincode: addr.pincode || "",
+      })
+      handleClose()
+    } catch (err) {
+      console.error("Failed to set primary address:", err)
+      toast.error("Could not sync selected address")
+    }
+  }
+
   // Handle popular city click
   const handleCityClick = (city: (typeof POPULAR_CITIES)[0]) => {
     setSelectedCoords({ lat: city.lat, lng: city.lng })
@@ -325,30 +351,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                         return (
                           <button
                             key={addr.id}
-                            onClick={async () => {
-                              // 🔥 BACKEND UPDATE FIRST: Await server-side selection so that watchers receive fresh data
-                              try {
-                                await axiosInstance.put(`${Api.address}/${addr.id}`, {
-                                  ...addr,
-                                  selected_address: true,
-                                  is_primary: true
-                                });
-
-                                // 🔥 FRONTEND UPDATE SECOND: This triggers the Profile tab to re-fetch
-                                setLocation({
-                                  city: addr.district || addr.city || "Unknown",
-                                  address: addr.full_address || addr.address,
-                                  lat: Number(addr.lat),
-                                  lng: Number(addr.lng),
-                                  pincode: addr.pincode,
-                                  state: addr.state
-                                });
-
-                                handleClose();
-                              } catch (err) {
-                                console.error("Failed to sync selection to backend:", err);
-                              }
-                            }}
+                            onClick={() => handleAddressSelect(addr)}
                             className={`group flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-all hover:bg-muted/80 active:scale-[0.99] border-2 ${isSelected ? 'bg-primary/5 border-primary/20 shadow-sm' : 'border-transparent bg-slate-50/50'
                               }`}
                           >

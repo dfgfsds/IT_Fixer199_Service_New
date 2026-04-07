@@ -32,6 +32,7 @@ const zoneByLocation = `${baseUrl}/api/zone/by-location`;
 
 // Address
 const address = `${baseUrl}/api/address`;
+const addressFlags = `${baseUrl}/api/address/flags`;
 
 // selectedAddress
 const selectedAddress = `${baseUrl}/api/user/my-selected-address`;
@@ -83,6 +84,7 @@ export default {
     cartApi,
     zoneByLocation,
     address,
+    addressFlags,
     selectedAddress,
     myAddress,
     appSettings,

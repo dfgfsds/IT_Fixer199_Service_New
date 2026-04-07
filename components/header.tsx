@@ -285,18 +285,20 @@ export function Header() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-4">
-              {/* Cart */}
-              <Link
-                href="/cart"
-                className="relative p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#800000] hover:text-white transition-all shadow-sm group"
-              >
-                <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-110" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              {/* Cart - Only visible if logged in */}
+              {isLoggedIn && (
+                <Link
+                  href="/cart"
+                  className="relative p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#800000] hover:text-white transition-all shadow-sm group"
+                >
+                  <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {/* Login / Profile */}
               {isLoggedIn ? (
