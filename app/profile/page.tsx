@@ -397,6 +397,13 @@ export default function ProfilePage() {
     try {
       await axiosInstance.delete(`${Api.address}/${addressToDelete}`)
       toast.success('Address removed successfully')
+
+      // If we just deleted our ONLY address, reload to clear all states (Navbar, Context, etc.)
+      if (userAddresses.length <= 1) {
+        window.location.reload()
+        return
+      }
+
       await fetchAddresses()
       setShowDeleteModal(false)
       setAddressToDelete(null)
