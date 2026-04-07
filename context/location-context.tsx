@@ -124,56 +124,51 @@ export function LocationProvider({ children }: any) {
           })
 
         } catch {
-          setShowLocationModal(true)
+          console.warn("Reverse geocoding failed.")
         }
       },
-      () => setShowLocationModal(true)
+      () => {
+        // GPS permission denied or failed but we keep it silent
+        console.log("No location detected from GPS.")
+      }
     )
   }
 
-  // 🔥 INIT FLOW
+  // 🔥 INIT FLOW: Implements the exact priority: 1. Selected Address -> 2. GPS Fallback
   const initLocation = async () => {
     try {
-      const savedLoc = localStorage.getItem("user_location")
-      if (savedLoc) {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      
+      // STEP 1: PRIORITIZE SELECTED ADDRESS (Server Profile)
+      if (token) {
         try {
-          const parsed = JSON.parse(savedLoc)
-          if (parsed && parsed.lat && parsed.lng) {
-            setLocationState(parsed)
-            return
+          const res = await axiosInstance.get(Api?.selectedAddress);
+          const selected = res?.data?.data;
+
+          if (selected && selected?.lat && selected?.lng) {
+             setLocation({
+              lat: Number(selected.lat),
+              lng: Number(selected.lng),
+              city: selected.district || "Unknown",
+              state: selected.state || "",
+              pincode: selected.pincode || "",
+              address: selected.full_address || "",
+            });
+            return; // 🎯 Found server-side address. STOP HERE. (No GPS prompt shown)
           }
         } catch (e) {
-          console.error("Failed to parse saved location", e)
+          // Silent 404 is allowed here.
         }
       }
 
-      const token = localStorage.getItem("token")
+      // STEP 2: GPS FALLBACK (If profile is empty)
+      // This will trigger the browser permission popup only if step 1 found nothing.
+      handleCurrentLocation();
 
-      if (!token) {
-        handleCurrentLocation()
-        return
-      }
-
-      const res = await axiosInstance.get(Api?.selectedAddress)
-      const selected = res?.data?.data
-
-      if (selected && selected.lat && selected.lng) {
-        setLocation({
-          lat: Number(selected.lat),
-          lng: Number(selected.lng),
-          city: selected.district,
-          state: selected.state,
-          pincode: selected.pincode,
-          address: selected.full_address,
-        })
-      } else {
-        handleCurrentLocation()
-      }
-
-    } catch {
-      handleCurrentLocation()
+    } catch (error) {
+      console.error("Critical error in location initialization", error);
     }
-  }
+  };
 
   useEffect(() => {
     initLocation()

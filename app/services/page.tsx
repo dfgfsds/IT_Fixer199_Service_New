@@ -4,7 +4,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { ProductCard } from '../../components/product-card'
 import { type Product } from '@/lib/products'
-import { Search, Sparkles, Loader2 } from 'lucide-react'
+import { Search, Sparkles, Loader2, MapPin, Navigation } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
@@ -16,7 +16,7 @@ export default function ServicesPage() {
   const [services, setServices] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { location } = useLocation()
+  const { location, setShowLocationModal } = useLocation()
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -122,7 +122,27 @@ export default function ServicesPage() {
 
         {/* Content Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
-          {loading ? (
+          {!location?.lat || !location?.lng ? (
+            <div className="flex flex-col items-center justify-center py-40 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200">
+              <div className="relative">
+                <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+                    <MapPin className="w-10 h-10" />
+                </div>
+                <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+              </div>
+              <div className="text-center space-y-3 max-w-sm mx-auto">
+                <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
+                <p className="text-slate-500 font-medium">To show you available services and accurate pricing, please select your city.</p>
+              </div>
+              <button
+                onClick={() => setShowLocationModal(true)}
+                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+              >
+                <Navigation className="w-5 h-5 text-white/50" />
+                Select Your Location
+              </button>
+            </div>
+          ) : loading ? (
             <div className="flex flex-col items-center justify-center py-40 p-8 space-y-6">
               <div className="relative">
                 <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />

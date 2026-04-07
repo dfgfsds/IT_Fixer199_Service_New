@@ -10,6 +10,7 @@ import { useAuth } from '@/context/auth-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { toast } from 'sonner'
+import { useLocation } from '@/context/location-context'
 
 const BOOKINGS = [
   {
@@ -29,9 +30,11 @@ const BOOKINGS = [
   },
 ]
 
+
 export default function ProfilePage() {
   const router = useRouter()
   const { user, logout, refreshUserData } = useAuth()
+  const { location, setLocation }: any = useLocation()
   const [activeTab, setActiveTab] = useState('profile')
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -45,6 +48,7 @@ export default function ProfilePage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
 
+
   // New address form state
   const [newAddress, setNewAddress] = useState({
     name: '',
@@ -54,8 +58,8 @@ export default function ProfilePage() {
     district: '',
     state: '',
     selected_address: true,
-    lat: "13.0827",
-    lng: "80.2707"
+    lat: "",
+    lng: ""
   })
 
   const [showMap, setShowMap] = useState(false)
@@ -201,13 +205,16 @@ export default function ProfilePage() {
   };
 
   const handleLocateOnMap = async () => {
-    if (!newAddress.full_address) {
-      toast.error("Please enter an address first");
+    // Combine all fields for a perfect map search
+    const searchString = [newAddress.full_address, newAddress.district, newAddress.state, newAddress.pincode].filter(Boolean).join(', ');
+
+    if (!searchString || !newAddress.full_address) {
+      toast.error("Please enter your address details first");
       return;
     }
     setMapLoading(true);
     try {
-      const result: any = await geocodeAddress(newAddress.full_address);
+      const result: any = await geocodeAddress(searchString);
       const latNum = parseFloat(result.lat);
       const lngNum = parseFloat(result.lng);
 
@@ -221,7 +228,7 @@ export default function ProfilePage() {
         }
       }, 500);
     } catch (error) {
-      toast.error("Could not find address on map");
+      toast.error("Could not find address on map. Please check your details.");
     } finally {
       setMapLoading(false);
     }
@@ -333,22 +340,43 @@ export default function ProfilePage() {
       const rawData = response.data?.data || response.data
       const data = Array.isArray(rawData) ? rawData : []
 
+      // Sort by latest update to ensure the most recent is at the top
       const sortedData = data.sort((a, b) =>
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
 
       setUserAddresses(sortedData)
 
-      // After deletion auto-select first address if none selected
+      // 🔥 AUTO-SELECTION LOGIC:
+      // If we have addresses but NONE are currently selected (e.g., after deleting the primary one),
+      // we automatically promote the next most recent address to "Selected" status.
       if (sortedData.length > 0 && !sortedData.some((a: any) => a.selected_address)) {
         const topAddr = sortedData[0]
-        axiosInstance.put(`${Api.address}/${topAddr.id}`, {
-          ...topAddr,
-          selected_address: true,
-          is_primary: true
-        }).then(() => {
-          fetchAddresses()
-        }).catch(err => console.error("Auto-select failed:", err))
+        try {
+          await axiosInstance.put(`${Api.address}/${topAddr.id}`, {
+            ...topAddr,
+            selected_address: true,
+            is_primary: true
+          })
+          // Re-fetch once to get the updated status from server
+          const finalRes = await axiosInstance.get(Api.myAddress)
+          const finalData = Array.isArray(finalRes.data?.data || finalRes.data) ? (finalRes.data?.data || finalRes.data) : []
+          setUserAddresses(finalData.sort((a: any, b: any) =>
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          ))
+
+          // 🔥 SYNC GLOBAL NAV BAR (On Deletion Promotion)
+          setLocation({
+            lat: Number(topAddr.lat),
+            lng: Number(topAddr.lng),
+            city: topAddr.district || topAddr.city || "Unknown",
+            address: topAddr.full_address || topAddr.address || "",
+            pincode: topAddr.pincode,
+            state: topAddr.state
+          });
+        } catch (err) {
+          console.error("Auto-selection failed:", err)
+        }
       }
     } catch (error) {
       console.error('Error fetching addresses:', error)
@@ -389,8 +417,8 @@ export default function ProfilePage() {
       district: '',
       state: '',
       selected_address: true,
-      lat: "13.0827",
-      lng: "80.2707"
+      lat: "",
+      lng: ""
     })
     setShowAddModal(true)
     setShowMap(false)
@@ -406,8 +434,8 @@ export default function ProfilePage() {
       district: addr.district || '',
       state: addr.state || '',
       selected_address: true,
-      lat: addr.lat?.toString() || "13.0827",
-      lng: addr.lng?.toString() || "80.2707"
+      lat: addr.lat?.toString() || "",
+      lng: addr.lng?.toString() || ""
     })
     setShowAddModal(true)
     setShowMap(false)
@@ -423,23 +451,59 @@ export default function ProfilePage() {
 
     setLoading(true)
     try {
+      let finalLat = newAddress.lat;
+      let finalLng = newAddress.lng;
+
+      // 🔥 AUTOMATIC HIGH-PRECISION GEOCODING ON SAVE:
+      // We combine ALL fields to ensure we have valid and highly accurate coordinates.
+      const searchString = [newAddress.full_address, newAddress.district, newAddress.state, newAddress.pincode].filter(Boolean).join(', ');
+
+      if (searchString && (newAddress.full_address || newAddress.district)) {
+        try {
+          const result: any = await geocodeAddress(searchString);
+          finalLat = result.lat.toString();
+          finalLng = result.lng.toString();
+        } catch (err) {
+          // If geocoding fails, and we haven't manually pinned anything yet, we must stop.
+          if (!finalLat || !finalLng || (finalLat === "13.0827" && finalLng === "80.2707")) {
+            toast.error("Could not find precise address on map. Please verify or pin manually.");
+            setLoading(false);
+            return;
+          }
+        }
+      } else if (!finalLat || !finalLng) {
+        toast.error("Please provide your address and search on map");
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         ...newAddress,
         is_primary: true,
         google_address: newAddress.full_address,
-        lat: newAddress.lat,
-        lng: newAddress.lng
+        lat: finalLat,
+        lng: finalLng
       }
 
-      if (editingAddressId) {
-        await axiosInstance.put(`${Api.address}/${editingAddressId}`, payload)
-        toast.success('Address updated successfully')
-      } else {
-        await axiosInstance.post(Api.address, payload)
-        toast.success('Address added successfully')
-      }
+      const url = editingAddressId ? `${Api.address}/${editingAddressId}` : Api.address;
+      const method = editingAddressId ? 'put' : 'post';
+
+      await axiosInstance[method](url, payload)
+      toast.success(editingAddressId ? 'Address updated successfully' : 'Address added successfully')
 
       await fetchAddresses()
+
+      // 🔥 SYNC GLOBAL NAV BAR (On Create/Edit)
+      // We pass the new address data to the global context so the navbar and modal update instantly
+      setLocation({
+        lat: Number(finalLat),
+        lng: Number(finalLng),
+        city: newAddress.district || "Unknown",
+        address: newAddress.full_address,
+        pincode: newAddress.pincode,
+        state: newAddress.state
+      });
+
       setShowAddModal(false)
       setEditingAddressId(null)
     } catch (error: any) {
@@ -449,11 +513,31 @@ export default function ProfilePage() {
     }
   }
 
+
+  // 🔥 DEEP LINKING EFFECT - Keep after openAddModal is defined
+  useEffect(() => {
+    const savedTab = localStorage.getItem("activeTab")
+    const shouldOpenAdd = localStorage.getItem("openAddModal")
+
+    if (savedTab) {
+      setActiveTab(savedTab)
+      setTimeout(() => localStorage.removeItem("activeTab"), 1000)
+    }
+
+    if (shouldOpenAdd === "true") {
+      setActiveTab("addresses")
+      setTimeout(() => {
+        if (typeof openAddModal === 'function') openAddModal()
+        localStorage.removeItem("openAddModal")
+      }, 200)
+    }
+  }, [])
+
   useEffect(() => {
     if (activeTab === 'addresses') {
       fetchAddresses()
     }
-  }, [activeTab])
+  }, [activeTab, location])
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">

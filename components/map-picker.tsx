@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useRef } from "react"
-import { GoogleMap, useJsApiLoader, Circle } from "@react-google-maps/api"
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api"
 
 interface MapPickerProps {
   lat: number
@@ -30,12 +30,15 @@ export function MapPicker({ lat, lng, onMove }: MapPickerProps) {
     mapRef.current = null
   }, [])
 
-  const handleIdle = () => {
-    if (mapRef.current) {
-      const newCenter = mapRef.current.getCenter()
-      if (newCenter) {
-        onMove(newCenter.lat(), newCenter.lng())
-      }
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      onMove(e.latLng.lat(), e.latLng.lng())
+    }
+  }
+
+  const handleMarkerDragEnd = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      onMove(e.latLng.lat(), e.latLng.lng())
     }
   }
 
@@ -60,34 +63,14 @@ export function MapPicker({ lat, lng, onMove }: MapPickerProps) {
         }}
         onLoad={onLoad}
         onUnmount={onUnmount}
-        onIdle={handleIdle}
+        onClick={handleMapClick}
       >
-        <Circle
-          center={{ lat, lng }}
-          radius={2500}
-          options={{
-            fillColor: "#ea580c",
-            fillOpacity: 0.1,
-            strokeColor: "#ea580c",
-            strokeOpacity: 0.3,
-            strokeWeight: 1,
-            clickable: false,
-          }}
+        <Marker 
+          position={{ lat, lng }}
+          draggable={true}
+          onDragEnd={handleMarkerDragEnd}
         />
       </GoogleMap>
-
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-full pb-1">
-        <svg 
-          width="48" 
-          height="48" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          xmlns="http://www.w3.org/2000/svg" 
-          className="text-primary drop-shadow-[0_10px_10px_rgba(0,0,0,0.3)] origin-bottom"
-        >
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-      </div>
     </div>
   )
 }
