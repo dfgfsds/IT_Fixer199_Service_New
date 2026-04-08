@@ -13,6 +13,7 @@ import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { useCartItem } from '@/context/CartItemContext'
 import { useLocation } from '@/context/location-context'
+import { formatPrice } from '@/lib/format-price'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
@@ -91,7 +92,7 @@ export default function CartPage() {
         // Adjust parsing based on DRF response shape
         const rawData = res.data?.data || res.data
         const addrList = Array.isArray(rawData) ? rawData : []
-        
+
         // Sort: selected_address true comes first
         const sorted = [...addrList].sort((a: any, b: any) => {
           if (a.selected_address && !b.selected_address) return -1
@@ -310,7 +311,7 @@ export default function CartPage() {
         order_id: razorpay_order_id,
 
         handler: function (response: any) {
-           completeCheckout()
+          completeCheckout()
         },
 
         modal: {
@@ -350,7 +351,7 @@ export default function CartPage() {
         selected_address: true,
         is_primary: true
       })
-      
+
       // Sync global navbar immediately
       setLocation({
         city: addr.district || addr.city || "Unknown",
@@ -462,7 +463,7 @@ export default function CartPage() {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-[#1a1c2e] truncate">{getItemName(item)}</h3>
                         <p className="text-sm text-slate-400 font-medium mb-1 capitalize">{getItemCategory(item).toLowerCase()}</p>
-                        <p className="text-xl font-black text-[#1a1c2e] mt-1">₹{itemPrice}</p>
+                        <p className="text-xl font-black text-[#1a1c2e] mt-1">₹{formatPrice(itemPrice)}</p>
                       </div>
 
                       {/* Quantity Controls */}
@@ -507,41 +508,64 @@ export default function CartPage() {
                   <MapPin className="w-5 h-5" />
                   Service Location
                 </h2>
-                <Link
-                  href="/profile?tab=addresses&action=add"
+                <button
+                  onClick={() => {
+                    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                    if (!token) {
+                      toast.error("Please login to add a new address");
+                      setTimeout(() => {
+                        router.push('/login');
+                      }, 1200);
+                    } else {
+                      router.push('/profile?tab=addresses&action=add');
+                    }
+                  }}
                   className="px-6 py-2.5 bg-[#800000] text-white text-sm font-black rounded-2xl shadow-lg shadow-red-900/20 hover:bg-[#600000] transition-all active:scale-95 whitespace-nowrap"
                 >
                   Add New
-                </Link>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {addresses.length > 0 ? addresses.map((addr) => (
-                  <label
-                    key={addr.id}
-                    className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${selectedAddressId === addr.id
-                      ? 'border-[#800000] shadow-md bg-red-50/10'
-                      : 'border-slate-100 hover:border-slate-200 shadow-sm'
-                      }`}
-                  >
-                    <input
-                      type="radio"
-                      name="address"
-                      className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300"
-                      checked={selectedAddressId === addr.id}
-                      onChange={() => handleAddressSelectSync(addr)}
-                    />
-                    <div className="flex-1">
-                      <p className="font-bold text-[#1a1c2e] flex items-center gap-2">
-                        {addr.name || (addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Saved Address')}
-                        {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#800000] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
-                      </p>
-                      <p className="text-sm text-slate-500 mt-1 line-clamp-2">
-                        {addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ')}
-                      </p>
-                    </div>
-                  </label>
-                )) : (
+                {addresses.length > 0 ? (
+                  <>
+                    {addresses.slice(0, 4).map((addr) => (
+                      <label
+                        key={addr.id}
+                        className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${selectedAddressId === addr.id
+                          ? 'border-[#800000] shadow-md bg-red-50/10'
+                          : 'border-slate-100 hover:border-slate-200 shadow-sm'
+                          }`}
+                      >
+                        <input
+                          type="radio"
+                          name="address"
+                          className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300"
+                          checked={selectedAddressId === addr.id}
+                          onChange={() => handleAddressSelectSync(addr)}
+                        />
+                        <div className="flex-1">
+                          <p className="font-bold text-[#1a1c2e] flex items-center gap-2">
+                            {addr.name || (addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Saved Address')}
+                            {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#800000] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
+                          </p>
+                          <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                            {addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ')}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                    {addresses.length > 4 && (
+                      <Link
+                        href="/profile?tab=addresses"
+                        className="sm:col-span-2 w-full flex items-center justify-center rounded-2xl py-3 text-sm font-bold text-[#800000] bg-red-50 hover:bg-red-100 transition-colors"
+                      >
+                        {/* See all {addresses.length} addresses */}
+                        See all addresses
+                      </Link>
+                    )}
+                  </>
+                ) : (
                   <div className="sm:col-span-2 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center">
@@ -709,7 +733,7 @@ export default function CartPage() {
                       <span className="text-slate-500 truncate max-w-[150px]">
                         {getItemName(item)} ×{item.quantity || 1}
                       </span>
-                      <span className="text-[#1a1c2e]">₹{getItemPrice(item) * (item.quantity || 1)}</span>
+                      <span className="text-[#1a1c2e]">₹{formatPrice(getItemPrice(item) * (item.quantity || 1))}</span>
                     </div>
                   ))}
                 </div>
@@ -719,15 +743,15 @@ export default function CartPage() {
                 <div className="space-y-4 text-sm font-medium">
                   <div className="flex justify-between text-slate-500">
                     <span>Subtotal</span>
-                    <span>₹{subtotal}</span>
+                    <span>₹{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Service Charge</span>
-                    <span>₹{serviceCharge}</span>
+                    <span>₹{formatPrice(serviceCharge)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>GST (5%)</span>
-                    <span>₹{gst}</span>
+                    <span>₹{formatPrice(gst)}</span>
                   </div>
                 </div>
 
@@ -735,7 +759,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-baseline">
                   <span className="text-xl font-black text-[#1a1c2e]">Total</span>
-                  <span className="text-3xl font-black text-[#800000]">₹{total}</span>
+                  <span className="text-3xl font-black text-[#800000]">₹{formatPrice(total)}</span>
                 </div>
 
                 <div className="space-y-3">

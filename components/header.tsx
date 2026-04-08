@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { LocationModal } from './location-modal'
 import { useLocation } from '@/context/location-context'
 import { useAuth } from '@/context/auth-context'
+import { formatPrice } from '@/lib/format-price'
 import { useCartItem } from '@/context/CartItemContext'
 
 export function Header() {
@@ -215,7 +216,7 @@ export function Header() {
                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{s.categories?.[0]?.name || 'Service'}</p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#800000]">₹{s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0}</p>
+                                  <p className="text-sm font-black text-[#800000]">₹{formatPrice(s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0)}</p>
                                 </div>
                               </button>
                             ))}
@@ -248,7 +249,7 @@ export function Header() {
                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{p.categories?.[0]?.name || 'Product'}</p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#1a1c2e]">₹{p.pricing?.[0]?.price || 0}</p>
+                                  <p className="text-sm font-black text-[#1a1c2e]">₹{formatPrice(p.pricing?.[0]?.price || 0)}</p>
                                 </div>
                               </button>
                             ))}

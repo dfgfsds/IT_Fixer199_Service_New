@@ -6,6 +6,7 @@ import { CheckCircle, ShoppingCart } from 'lucide-react'
 import type { Product } from '@/lib/products'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { formatPrice } from '@/lib/format-price'
 
 type Props = {
   product: Product
@@ -65,11 +66,11 @@ export function ProductCard({ product, basePath = 'products' }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 sm:pt-4 border-t border-border/50 gap-2 sm:gap-0">
           <div className="space-y-0.5 sm:space-y-1">
             <p className="text-[8px] sm:text-xs text-muted-foreground">Starting from</p>
-            <div className="flex items-baseline gap-1 sm:gap-2">
-              <span className="text-lg sm:text-2xl font-bold text-primary">₹{product.price}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-lg sm:text-2xl font-bold text-primary">₹{formatPrice(product.price)}</span>
               {product.originalPrice && (
-                <span className="text-[8px] sm:text-sm text-muted-foreground line-through">
-                  ₹{product.originalPrice}
+                <span className="text-sm font-medium text-slate-400 line-through decoration-[#800000]/30 underline-offset-2">
+                  ₹{formatPrice(product.originalPrice)}
                 </span>
               )}
             </div>
