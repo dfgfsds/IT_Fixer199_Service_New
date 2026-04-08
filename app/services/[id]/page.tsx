@@ -65,7 +65,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         }
       } catch (err: any) {
         if (err.response?.status !== 400) {
-          console.error("Error fetching service details:", err)
+          console.error("Error fetching service details:", err instanceof Error ? err.message : String(err))
         }
         setError(err.response?.data?.message || 'Service details not available at your location.')
       } finally {
@@ -126,7 +126,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         toast.error('Please login to book this service')
         router.push('/login')
       } else {
-        console.error("Add to cart error:", error)
+        console.error("Add to cart error:", error instanceof Error ? error.message : String(error))
         toast.error("Failed to add to cart. Please try again.")
       }
     } finally {
@@ -145,7 +145,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await axiosInstance.patch(`${Api.cartApi}/item/${currentCartItem.id}/update/`, payload)
       await fetchCart()
     } catch (error) {
-      console.error("Increase qty error:", error)
+      console.error("Increase qty error:", error instanceof Error ? error.message : String(error))
     }
   }
 
@@ -160,7 +160,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await axiosInstance.post(`${Api.cartApi}/item/${currentCartItem.id}/decrease/`, payload)
       await fetchCart()
     } catch (error) {
-      console.error("Decrease qty error:", error)
+      console.error("Decrease qty error:", error instanceof Error ? error.message : String(error))
     }
   }
 

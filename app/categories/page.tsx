@@ -32,7 +32,7 @@ export default function CategoriesPage() {
 
         setCategories(mappedCategories)
       } catch (error) {
-        console.error("Error fetching categories:", error)
+        console.error("Error fetching categories:", error instanceof Error ? error.message : String(error))
       } finally {
         setLoading(false)
       }

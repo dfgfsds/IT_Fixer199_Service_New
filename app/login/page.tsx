@@ -56,7 +56,7 @@ export default function LoginPage() {
         const data = await response.json()
         setIpAddress(data.data?.ip || data.ip || '0.0.0.0')
       } catch (error) {
-        console.error('Error fetching IP:', error)
+        console.error('Error fetching IP:', error instanceof Error ? error.message : String(error))
       }
     }
     fetchIp()

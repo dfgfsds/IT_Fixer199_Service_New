@@ -96,7 +96,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                 setProducts(mappedProducts)
 
             } catch (error) {
-                console.error("Error fetching category data:", error)
+                console.error("Error fetching category data:", error instanceof Error ? error.message : String(error))
             } finally {
                 setLoading(false)
             }

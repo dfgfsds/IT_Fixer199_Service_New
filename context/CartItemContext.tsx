@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import Api from "../api-endpoints/ApiUrls";
 import { useLocation } from "./location-context";
 import { toast } from "sonner";
+import { useAuth } from "./auth-context";
 
 
 const CartItemContext = createContext<any | undefined>(undefined);
@@ -12,6 +13,7 @@ const CartItemContext = createContext<any | undefined>(undefined);
 export function CartItemProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
   const { location } = useLocation()
+  const { user } = useAuth()
   const [data, setData] = useState<any[]>([])
   const [rawCartData, setRawCartData] = useState<any>(null)
 
@@ -67,23 +69,18 @@ export function CartItemProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Fetch cart whenever location changes (covers login redirect back too)
+  // Fetch cart whenever location or user changes (covers login/logout)
   useEffect(() => {
     const token = getToken()
     if (token) {
       fetchCart()
     } else {
       setData([])
+      setRawCartData(null)
     }
-  }, [location?.lat, location?.lng])
+  }, [location?.lat, location?.lng, user?.id])
 
-  // Also fetch on first mount (in case location is already set)
-  useEffect(() => {
-    const token = getToken()
-    if (token) {
-      fetchCart()
-    }
-  }, [])
+
 
   return (
     <CartItemContext.Provider

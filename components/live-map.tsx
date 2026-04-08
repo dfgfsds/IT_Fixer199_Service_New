@@ -1,206 +1,335 @@
 'use client'
 
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Polyline,
-  useMap,
-} from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { Loader2, Target } from 'lucide-react'
 
-// Fix default marker icon missing images issue in Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl
+// Helper: Handle Google Maps Script loading safely
+const loadGoogleMaps = () => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") return;
+    if ((window as any).google) {
+      resolve((window as any).google);
+      return;
+    }
 
-// 🏠 Customer / Home icon using inline SVG
-const homeIcon = L.divIcon({
-  html: `
-    <div style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center">
-      <span style="
-        position:absolute;
-        width:44px;height:44px;
-        background:rgba(128,0,0,0.2);
-        border-radius:50%;
-        animation:pulse 1.5s infinite;
-      "></span>
-      <div style="
-        width:36px;height:36px;
-        background:#800000;
-        border-radius:50%;
-        border:3px solid white;
-        box-shadow:0 2px 8px rgba(0,0,0,0.3);
-        display:flex;align-items:center;justify-content:center;
-        position:relative;z-index:1;
-      ">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
-      </div>
-    </div>
-  `,
-  className: '',
-  iconSize: [44, 44],
-  iconAnchor: [22, 22],
-})
+    const existingScript = document.getElementById("google-maps-script");
+    if (existingScript) {
+      const handleLoad = () => resolve((window as any).google);
+      existingScript.addEventListener("load", handleLoad);
+      return;
+    }
 
-// 🛵 Agent / Bike icon using inline SVG
-const bikeIcon = L.divIcon({
-  html: `
-    <div style="position:relative;width:48px;height:48px;display:flex;align-items:center;justify-content:center">
-      <span style="
-        position:absolute;
-        width:48px;height:48px;
-        background:rgba(59,130,246,0.2);
-        border-radius:50%;
-        animation:pulse 1.5s infinite;
-      "></span>
-      <div style="
-        width:40px;height:40px;
-        background:#1a1c2e;
-        border-radius:50%;
-        border:3px solid white;
-        box-shadow:0 2px 8px rgba(0,0,0,0.35);
-        display:flex;align-items:center;justify-content:center;
-        position:relative;z-index:1;
-      ">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
-          <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H15V3H9v2H6.5c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-        </svg>
-      </div>
-    </div>
-  `,
-  className: '',
-  iconSize: [48, 48],
-  iconAnchor: [24, 24],
-})
+    const script = document.createElement("script");
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve((window as any).google);
+    script.onerror = () => reject(new Error("Failed to load Google Maps script"));
+    document.head.appendChild(script);
+  });
+};
 
-// ── Helper: Fix map resize in modals ───────────────────────────────────────
-function ResizeMap() {
-  const map = useMap()
-  useEffect(() => {
-    const timer = setTimeout(() => map.invalidateSize(), 300)
-    return () => clearTimeout(timer)
-  }, [map])
-  return null
+// Math helper to find the directional angle between two map points
+const getBearing = (startLat: number, startLng: number, destLat: number, destLng: number) => {
+  const toRad = (degree: number) => degree * Math.PI / 180;
+  const toDeg = (rad: number) => rad * 180 / Math.PI;
+
+  const startLatRad = toRad(startLat);
+  const startLngRad = toRad(startLng);
+  const destLatRad = toRad(destLat);
+  const destLngRad = toRad(destLng);
+
+  const y = Math.sin(destLngRad - startLngRad) * Math.cos(destLatRad);
+  const x =
+    Math.cos(startLatRad) * Math.sin(destLatRad) -
+    Math.sin(startLatRad) * Math.cos(destLatRad) * Math.cos(destLngRad - startLngRad);
+
+  const brng = toDeg(Math.atan2(y, x));
+  return (brng + 360) % 360;
 }
 
-// ── Helper: Auto-fit bounds to route ──────────────────────────────────────
-function FitBounds({ points }: { points: [number, number][] }) {
-  const map = useMap()
-  useEffect(() => {
-    if (!points.length) return
-    map.fitBounds(points, { padding: [40, 40] })
-  }, [points, map])
-  return null
-}
-
-// ── Main LiveMap Export ────────────────────────────────────────────────────
 export function LiveMap({
   agentLat,
   agentLng,
   customerLat,
   customerLng,
-  technicianName,
 }: {
   agentLat?: number
   agentLng?: number
   customerLat?: number
   customerLng?: number
-  technicianName?: string
 }) {
-  const [agentPosition, setAgentPosition] = useState<[number, number] | null>(null)
-  const [route, setRoute] = useState<[number, number][]>([])
+  const mapRef = useRef<HTMLDivElement>(null)
+  const googleMapRef = useRef<google.maps.Map | null>(null)
+  const agentMarkerRef = useRef<google.maps.Marker | null>(null)
+  const customerMarkerRef = useRef<google.maps.Marker | null>(null)
+  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null)
 
-  // Smooth interpolated agent movement
-  useEffect(() => {
-    if (!agentLat || !agentLng) return
-    setAgentPosition((prev) => {
-      if (!prev) return [agentLat, agentLng]
-      return [
-        prev[0] + (agentLat - prev[0]) * 0.2,
-        prev[1] + (agentLng - prev[1]) * 0.2,
-      ]
-    })
-  }, [agentLat, agentLng])
+  // Animation refs for smooth movement
+  const prevPosRef = useRef<{ lat: number, lng: number } | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
 
-  // Fetch road route via OSRM
-  useEffect(() => {
-    if (!agentLat || !agentLng || !customerLat || !customerLng) return
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [initialRouteFetched, setInitialRouteFetched] = useState(false)
+  const [isFollowing, setIsFollowing] = useState(true)
 
-    const fetchRoute = async () => {
-      try {
-        const res = await fetch(
-          `https://router.project-osrm.org/route/v1/driving/${agentLng},${agentLat};${customerLng},${customerLat}?overview=full&geometries=geojson`
-        )
-        const data = await res.json()
-        const coords: [number, number][] = data.routes[0].geometry.coordinates.map(
-          ([lng, lat]: [number, number]) => [lat, lng]
-        )
-        setRoute(coords)
-      } catch (err) {
-        console.error('Route fetch error:', err)
+  // 1. INITIALIZE MAP
+  const initMap = useCallback(async () => {
+    if (!mapRef.current || !customerLat || !customerLng) return
+
+    try {
+      const google: any = await loadGoogleMaps()
+
+      const mapOptions: google.maps.MapOptions = {
+        center: { lat: customerLat, lng: customerLng },
+        zoom: 14,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        gestureHandling: "greedy",
+        styles: [
+          {
+            "featureType": "poi",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "transit",
+            "stylers": [{ "visibility": "simplified" }]
+          }
+        ]
       }
+
+      googleMapRef.current = new google.maps.Map(mapRef.current, mapOptions)
+
+      // Listen for user dragging map to pause auto-following
+      googleMapRef.current?.addListener('dragstart', () => {
+        setIsFollowing(false)
+      })
+
+      // Directions setup (Road snap)
+      directionsRendererRef.current = new google.maps.DirectionsRenderer({
+        map: googleMapRef.current,
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: "#1e3a8a",
+          strokeWeight: 6,
+          strokeOpacity: 0.9,
+        }
+      })
+
+      // Customer Marker (Destination - Native Google Red Pin)
+      customerMarkerRef.current = new google.maps.Marker({
+        position: { lat: customerLat, lng: customerLng },
+        map: googleMapRef.current,
+        zIndex: 1
+      })
+
+      setIsLoaded(true)
+    } catch (err: any) {
+      console.error("Map Load Error", err)
+      setError("Failed to load Google Maps")
+    }
+  }, [customerLat, customerLng])
+
+  useEffect(() => {
+    initMap()
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+      googleMapRef.current = null
+    }
+  }, [initMap])
+
+  // 2. FETCH ROUTE FIRST TIME
+  useEffect(() => {
+    if (!isLoaded || !agentLat || !agentLng || !customerLat || !customerLng || !googleMapRef.current || initialRouteFetched) return
+
+    const google: any = (window as any).google
+    const startPos = { lat: agentLat, lng: agentLng }
+
+    const directionsService = new google.maps.DirectionsService()
+    directionsService.route(
+      {
+        origin: startPos,
+        destination: { lat: customerLat, lng: customerLng },
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result: any, status: any) => {
+        if (status === google.maps.DirectionsStatus.OK && directionsRendererRef.current) {
+          directionsRendererRef.current.setDirections(result)
+
+          // Auto-zoom bounds to show both start and end points nicely
+          const bounds = new google.maps.LatLngBounds()
+          bounds.extend(startPos)
+          bounds.extend({ lat: customerLat, lng: customerLng })
+          googleMapRef.current?.fitBounds(bounds, { top: 60, bottom: 60, left: 60, right: 60 })
+
+          setInitialRouteFetched(true)
+        }
+      }
+    )
+  }, [isLoaded, agentLat, agentLng, customerLat, customerLng, initialRouteFetched])
+
+
+  // 3. SMOOTH DRIVER MOVEMENT, ROTATION & AUTO-FOLLOW
+  useEffect(() => {
+    if (!isLoaded || !agentLat || !agentLng || !googleMapRef.current) return
+
+    const google: any = (window as any).google
+    const newPos = { lat: agentLat, lng: agentLng }
+
+    // Top-Down Delivery Bike Icon Configuration (Dynamic SVG)
+    const getAgentIcon = (rotation: number) => {
+      const svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="-30 -30 60 60">
+            <g transform="rotate(${rotation})">
+                <!-- Optional soft shadow -->
+                <ellipse cx="0" cy="0" rx="12" ry="24" fill="rgba(0,0,0,0.15)" />
+                <!-- Front wheel -->
+                <rect x="-2" y="-22" width="4" height="12" rx="2" fill="#1e293b" />
+                <!-- Rear wheel -->
+                <rect x="-2.5" y="10" width="5" height="14" rx="2" fill="#1e293b" />
+                <!-- Bike Chassis / Body (Green) -->
+                <path d="M-4,-14 L4,-14 L5.5,-4 L-5.5,-4 Z" fill="#22c55e" />
+                <!-- Handles -->
+                <rect x="-10" y="-12" width="20" height="2" rx="1" fill="#475569" />
+                <rect x="-10" y="-14" width="2" height="4" rx="1" fill="#0f172a" />
+                <rect x="8" y="-14" width="2" height="4" rx="1" fill="#0f172a" />
+                <!-- Cargo Box (Green outer, dark green inner) -->
+                <rect x="-8" y="2" width="16" height="16" rx="2" fill="#22c55e" />
+                <rect x="-6" y="4" width="12" height="12" rx="1" fill="#16a34a" />
+                <!-- Driver Body -->
+                <path d="M-6,-2 C-6,-6 6,-6 6,-2 C6,4 -6,4 -6,-2 Z" fill="#334155" />
+                <!-- Driver Helmet -->
+                <circle cx="0" cy="-4" r="5.5" fill="#0f172a" stroke="#fff" stroke-width="1.5" />
+            </g>
+        </svg>`;
+      return {
+        url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgString)}`,
+        anchor: new google.maps.Point(30, 30),
+        scaledSize: new google.maps.Size(60, 60),
+      };
+    };
+
+    // Initial setup if tracking just started
+    if (!prevPosRef.current) {
+      agentMarkerRef.current = new google.maps.Marker({
+        position: newPos,
+        map: googleMapRef.current,
+        icon: getAgentIcon(0),
+        zIndex: 999
+      })
+      prevPosRef.current = newPos
+      return
     }
 
-    fetchRoute()
-  }, [agentLat, agentLng, customerLat, customerLng])
+    const prevPos = prevPosRef.current
 
-  if (!customerLat || !customerLng) {
+    // If location changed -> start animation
+    if (prevPos.lat !== newPos.lat || prevPos.lng !== newPos.lng) {
+
+      // Ignore tiny micro-fluctuations (GPS jitter)
+      const distanceThreshold = 0.00001
+      if (Math.abs(prevPos.lat - newPos.lat) < distanceThreshold && Math.abs(prevPos.lng - newPos.lng) < distanceThreshold) {
+        return;
+      }
+
+      // Calculate which direction the arrow should face
+      const currentHeading = getBearing(prevPos.lat, prevPos.lng, newPos.lat, newPos.lng)
+
+      // Rotate the vector arrow icon immediately
+      agentMarkerRef.current?.setIcon(getAgentIcon(currentHeading))
+
+      const startTime = performance.now()
+      const duration = 2000
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+
+        // Ease out quad calculation for smooth stops
+        const easeProgress = progress * (2 - progress)
+
+        // Calculate the intermediate coordinate
+        const currentLat = prevPos.lat + (newPos.lat - prevPos.lat) * easeProgress
+        const currentLng = prevPos.lng + (newPos.lng - prevPos.lng) * easeProgress
+
+        const framePos = { lat: currentLat, lng: currentLng }
+
+        // Reposition the physical marker
+        agentMarkerRef.current?.setPosition(framePos)
+
+        // Gently pan camera along with driver if user hasn't interrupted
+        if (isFollowing) {
+          googleMapRef.current?.panTo(framePos)
+        }
+
+        if (progress < 1) {
+          animationFrameRef.current = requestAnimationFrame(animate)
+        } else {
+          prevPosRef.current = newPos
+        }
+      }
+
+      // Kill any old animation and start the new curve
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+  }, [agentLat, agentLng, isLoaded, isFollowing])
+
+
+  const handleRecenter = () => {
+    setIsFollowing(true)
+    if (agentLat && agentLng) {
+      googleMapRef.current?.panTo({ lat: agentLat, lng: agentLng })
+      googleMapRef.current?.setZoom(16)
+    }
+  }
+
+  if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-3xl">
-        <p className="text-slate-400 font-bold text-sm">Customer location unavailable</p>
+      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 rounded-3xl p-6 text-center space-y-2">
+        <p className="text-slate-500 font-bold">{error}</p>
+        <p className="text-slate-400 text-xs font-medium">Please check your internet connection or API key</p>
       </div>
     )
   }
 
-  const center: [number, number] = agentPosition || [customerLat, customerLng]
-
   return (
-    <>
-      {/* Leaflet pulse animation */}
-      <style>{`
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 0.6; }
-          50% { transform: scale(1.6); opacity: 0.2; }
-          100% { transform: scale(1); opacity: 0.6; }
-        }
-      `}</style>
+    <div className="w-full h-full relative group">
+      {!isLoaded && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-sm rounded-3xl space-y-3">
+          <Loader2 className="w-8 h-8 text-[#800000] animate-spin" />
+          <p className="text-[#1a1c2e] font-bold text-xs uppercase tracking-widest">Initializing Route...</p>
+        </div>
+      )}
 
-      <MapContainer
-        center={center}
-        zoom={15}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={true}
-        scrollWheelZoom={false}
-      >
-        <ResizeMap />
+      <div ref={mapRef} className="w-full h-full rounded-3xl overflow-hidden shadow-inner" />
 
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        />
+      {/* AWAITING AGENT SIGNAL OVERLAY */}
+      {isLoaded && (!agentLat || !agentLng) && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center justify-center bg-white/90 backdrop-blur-md px-6 py-4 rounded-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in slide-in-from-bottom-4">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </div>
+            <p className="text-[#1a1c2e] font-bold text-xs uppercase tracking-widest">Awaiting Expert GPS Signal...</p>
+          </div>
+        </div>
+      )}
 
-        {/* 🏠 Customer marker */}
-        <Marker position={[customerLat, customerLng]} icon={homeIcon} />
-
-        {/* 🛵 Agent marker */}
-        {agentPosition && (
-          <Marker position={agentPosition} icon={bikeIcon} />
-        )}
-
-        {/* 🛣️ Road route line */}
-        {route.length > 0 && (
-          <>
-            <Polyline
-              positions={route}
-              pathOptions={{ color: '#800000', weight: 5, opacity: 0.8, dashArray: undefined }}
-            />
-            <FitBounds points={route} />
-          </>
-        )}
-      </MapContainer>
-    </>
+      {/* Recenter button appearing if user sweeps map away, styled to match screenshot */}
+      {!isFollowing && isLoaded && (agentLat && agentLng) && (
+        <button
+          onClick={handleRecenter}
+          className="absolute bottom-6 right-4 z-20 bg-[#161c4f] p-3.5 rounded-full shadow-lg shadow-black/20 text-white hover:scale-105 transition-transform animate-in fade-in zoom-in"
+          title="Recenter to Expert"
+        >
+          <Target className="w-6 h-6 stroke-[2.5]" />
+        </button>
+      )}
+    </div>
   )
 }

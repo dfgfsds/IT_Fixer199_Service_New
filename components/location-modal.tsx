@@ -38,8 +38,8 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
 
   const [step, setStep] = useState<"search" | "map">("search")
   const [selectedCoords, setSelectedCoords] = useState({
-    lat: location?.lat || 13.0827,
-    lng: location?.lng || 80.2707,
+    lat: location?.lat || "",
+    lng: location?.lng || "",
   })
   const [selectedAddress, setSelectedAddress] = useState<GeocodedAddress | null>(null)
   const [geoError, setGeoError] = useState<string | null>(null)
@@ -54,8 +54,8 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
     if (visible && location) {
       setStep("search")
       setSelectedCoords({
-        lat: location?.lat || 13.0827,
-        lng: location?.lng || 80.2707,
+        lat: location?.lat || "",
+        lng: location?.lng || "",
       })
       setSelectedAddress(null)
       setGeoError(null)
@@ -71,7 +71,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
           const rawData = res.data?.data || res.data
           setSavedAddresses(Array.isArray(rawData) ? rawData : [])
         })
-        .catch(err => console.error("Failed to fetch addresses:", err))
+        .catch(err => console.error("Failed to fetch addresses:", err instanceof Error ? err.message : String(err)))
         .finally(() => setFetchingAddresses(false))
     }
   }, [visible, isLoggedIn])
@@ -130,7 +130,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
       })
       handleClose()
     } catch (err) {
-      console.error("Failed to set primary address:", err)
+      console.error("Failed to set primary address:", err instanceof Error ? err.message : String(err))
       toast.error("Could not sync selected address")
     }
   }

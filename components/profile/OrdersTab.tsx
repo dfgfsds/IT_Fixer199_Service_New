@@ -38,22 +38,26 @@ import Link from 'next/link'
 import { formatPrice } from '@/lib/format-price'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
+import { useAuth } from '@/context/auth-context'
 
 export default function OrdersTab() {
+  const { user } = useAuth()
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchOrders()
-  }, [])
+  }, [user?.id])
 
   const fetchOrders = async () => {
     try {
       setLoading(true)
       const res = await axiosInstance.get(Api.orders)
       setOrders(res?.data?.orders || [])
-    } catch (error) {
-      console.error("Failed to fetch orders:", error)
+    } catch (error: any) {
+      if (error?.response?.status !== 401) {
+        console.error("Failed to fetch orders:", (error as any)?.message || String(error))
+      }
     } finally {
       setLoading(false)
     }
