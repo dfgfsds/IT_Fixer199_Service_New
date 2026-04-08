@@ -75,7 +75,7 @@ export default function AllProductsPage() {
                 setProducts(mappedProducts)
             } catch (error: any) {
                 if (![400, 404, 422, 500].includes(error.response?.status)) {
-                    console.error("Error fetching products:", error)
+                    console.error("Error fetching products:", error instanceof Error ? error.message : String(error))
                 }
                 setProducts([])
                 setPaginationData(null)

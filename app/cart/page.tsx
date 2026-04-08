@@ -16,20 +16,23 @@ import { useLocation } from '@/context/location-context'
 import { formatPrice } from '@/lib/format-price'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/auth-context'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
   const { location, setLocation, zoneData } = useLocation()
+  const { user } = useAuth()
   const router = useRouter()
 
   const [scheduleType, setScheduleType] = useState<"instant" | "later">("instant")
   const [selectedTime, setSelectedTime] = useState<string | number>("")
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
-  const [selectedPayment, setSelectedPayment] = useState('cash')
+  const [selectedPayment, setSelectedPayment] = useState('upi')
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
 
   // Generate next 7 days
+  {/*
   const DATES = Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
     d.setDate(d.getDate() + i)
@@ -39,6 +42,15 @@ export default function CartPage() {
       day: d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
     }
   })
+  */}
+
+  const DATES = [
+    {
+      value: new Date().toISOString().split("T")[0],
+      label: "TODAY",
+      day: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    }
+  ]
 
   const [addresses, setAddresses] = useState<any[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
@@ -50,15 +62,32 @@ export default function CartPage() {
   const backendSlots = zoneData?.slots || []
   const instant = zoneData?.instant_availability
 
-  // Dummy fallback slots if backend has none configured
-  const dummySlots = [
-    { id: '9:00 AM - 11:00 AM', name: 'Morning', start_time: '09:00 AM', end_time: '11:00 AM' },
-    { id: '11:00 AM - 1:00 PM', name: 'Late Morning', start_time: '11:00 AM', end_time: '01:00 PM' },
-    { id: '2:00 PM - 4:00 PM', name: 'Afternoon', start_time: '02:00 PM', end_time: '04:00 PM' },
-    { id: '4:00 PM - 6:00 PM', name: 'Evening', start_time: '04:00 PM', end_time: '06:00 PM' },
-  ]
+  // Ensure we NEVER show dummy slots in production, and strictly filter out any slots that have already expired today
+  const filterFutureSlots = (slotsArr: any[]) => {
+    const now = new Date()
+    return slotsArr.filter((slot) => {
+      if (!slot.start_time) return true
+      const match = slot.start_time.match(/(\d+):(\d+)\s*(AM|PM)/i)
+      if (!match) return true
 
-  const slots = backendSlots.length > 0 ? backendSlots : dummySlots
+      let hours = parseInt(match[1], 10)
+      const mins = parseInt(match[2], 10)
+      const ampm = match[3].toUpperCase()
+
+      if (ampm === 'PM' && hours < 12) hours += 12
+      if (ampm === 'AM' && hours === 12) hours = 0
+
+      const slotTime = new Date()
+      slotTime.setHours(hours, mins, 0, 0)
+
+      // Buffer Mode -> The slot officially dies 30 mins before the start_time
+      const slotDeadline = new Date(slotTime.getTime() - 30 * 60000)
+
+      return now < slotDeadline
+    })
+  }
+
+  const slots = filterFutureSlots(backendSlots)
 
   // Sync with Cart Status
   useEffect(() => {
@@ -106,7 +135,7 @@ export default function CartPage() {
           setSelectedAddressId(selected.id)
         }
       } catch (err) {
-        console.error("Error fetching addresses:", err)
+        console.error("Error fetching addresses:", err instanceof Error ? err.message : String(err))
       }
     }
 
@@ -178,7 +207,7 @@ export default function CartPage() {
       }
       await fetchCart()
     } catch (error: any) {
-      console.error('Update quantity error:', error?.response?.data, error)
+      console.error('Update quantity error:', error?.response?.data, error instanceof Error ? error.message : String(error))
       toast.error('Failed to update quantity')
     } finally {
       setUpdatingId(null)
@@ -250,22 +279,33 @@ export default function CartPage() {
       return
     }
 
-    if (!selectedAddressId && addresses.length > 0) {
-      toast.error('Please select a service address')
-      return
-    } else if (addresses.length === 0) {
-      toast.error('Please add an address in your profile first')
-      router.push('/profile')
-      return
-    }
-
-    if (scheduleType === 'later' && !selectedTime) {
-      toast.error('Please select a time slot for scheduled service')
-      return
-    }
-
     setIsCheckoutLoading(true)
     try {
+      // INTERNAL VALIDATION GUARDS (Safety Net)
+      if (!selectedAddressId) {
+        toast.error("Please select a delivery address")
+        setIsCheckoutLoading(false)
+        return
+      }
+
+      if (scheduleType === 'later' && !selectedTime) {
+        toast.error("Please select a time slot for scheduling")
+        setIsCheckoutLoading(false)
+        return
+      }
+
+      if (scheduleType === 'instant' && !instant?.available) {
+        toast.error("Instant service is currently unavailable")
+        setIsCheckoutLoading(false)
+        return
+      }
+
+      if (cartItems.length === 0) {
+        toast.error("Your cart is empty")
+        setIsCheckoutLoading(false)
+        return
+      }
+
       const razorpayLoaded = await loadRazorpay()
 
       if (!razorpayLoaded) {
@@ -291,12 +331,19 @@ export default function CartPage() {
         setIsCheckoutLoading(false)
         fetchCart()
         setTimeout(() => {
-          router.push('/profile/orders') // Adjust if order page is different
+          router.push('/profile?tab=orders')
         }, 2000)
       }
 
       if (selectedPayment.toLowerCase() === 'cash' || !checkoutData?.razorpay_order_id) {
         completeCheckout()
+        return
+      }
+
+      // RAZORPAY SCRIPT GUARD (Safety Net)
+      if (!(window as any).Razorpay) {
+        toast.error("Payment system failed to load. Please check your internet connection.")
+        setIsCheckoutLoading(false)
         return
       }
 
@@ -309,6 +356,11 @@ export default function CartPage() {
         name: "ITFixer@199",
         description: "Order Payment",
         order_id: razorpay_order_id,
+        prefill: {
+          name: user?.name || "",
+          email: user?.email || "",
+          contact: user?.mobile_number || ""
+        },
 
         handler: function (response: any) {
           completeCheckout()
@@ -336,7 +388,7 @@ export default function CartPage() {
       razorpay.open()
 
     } catch (err: any) {
-      console.error("Checkout validation failed:", err?.response?.data, err)
+      console.warn("Checkout validation failed:", err?.response?.data, err instanceof Error ? err.message : String(err))
       toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Checkout failed. Please try again.')
       setIsCheckoutLoading(false)
     }
@@ -374,7 +426,7 @@ export default function CartPage() {
       setAddresses(sorted)
 
     } catch (err) {
-      console.error("Failed to sync selection to backend:", err)
+      console.error("Failed to sync selection to backend:", err instanceof Error ? err.message : String(err))
     }
   }
 
@@ -683,9 +735,12 @@ export default function CartPage() {
                         )}
                       </button>
                     )) : (
-                      <div className="col-span-2 p-10 bg-white rounded-3xl border border-dashed border-slate-200 text-center text-slate-400">
-                        <Calendar className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                        <p className="text-sm font-bold">No available slots found for this location</p>
+                      <div className="col-span-2 flex flex-col items-center justify-center p-8 bg-amber-50/50 rounded-3xl border border-amber-100/50 text-center text-amber-600 gap-3">
+                        <AlertTriangle className="w-8 h-8 opacity-80" />
+                        <p className="text-sm font-bold leading-relaxed">
+                          No available slots remaining for today.<br />
+                          <span className="text-amber-600/70 font-medium">Please check back tomorrow for new timings.</span>
+                        </p>
                       </div>
                     )}
                   </div>
@@ -701,9 +756,7 @@ export default function CartPage() {
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 {[
-
-                  { id: 'upi', name: 'UPI', icon: Smartphone },
-
+                  { id: 'upi', name: 'UPI / Online', icon: Smartphone },
                 ].map((pm) => (
                   <button
                     key={pm.id}
@@ -805,15 +858,34 @@ export default function CartPage() {
                 <div className="space-y-4 pt-2">
                   <button
                     onClick={handleCheckout}
-                    disabled={isCheckoutLoading}
-                    className="w-full bg-[#800000] hover:bg-[#600000] text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-red-900/20 disabled:opacity-50 disabled:active:scale-100"
+                    disabled={isCheckoutLoading || cartItems.length === 0 || !selectedAddressId || (scheduleType === "later" && !selectedTime) || (scheduleType === "instant" && !instant?.available)}
+                    className="w-full bg-[#800000] hover:bg-[#600000] text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] shadow-xl shadow-red-900/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#800000] disabled:active:scale-100 disabled:shadow-none"
                   >
                     {isCheckoutLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : cartItems.length === 0 ? (
+                      <AlertTriangle className="w-5 h-5" />
+                    ) : !selectedAddressId ? (
+                      <MapPin className="w-5 h-5" />
+                    ) : (scheduleType === "later" && !selectedTime) ? (
+                      <Clock className="w-5 h-5" />
+                    ) : (scheduleType === "instant" && !instant?.available) ? (
+                      <AlertTriangle className="w-5 h-5" />
                     ) : (
                       <CheckCircle className="w-5 h-5" />
                     )}
-                    {isCheckoutLoading ? 'Processing...' : 'Confirm Booking'}
+
+                    {isCheckoutLoading
+                      ? 'Processing...'
+                      : cartItems.length === 0
+                        ? 'Cart is Empty'
+                        : !selectedAddressId
+                          ? 'Select Address'
+                          : (scheduleType === "later" && !selectedTime)
+                            ? 'Select Time Slot'
+                            : (scheduleType === "instant" && !instant?.available)
+                              ? 'Instant Service Unavailable'
+                              : 'Confirm Booking'}
                   </button>
                   <p className="text-[10px] text-center text-slate-400 font-medium px-4 leading-normal">
                     Inclusive of all taxes and service charges

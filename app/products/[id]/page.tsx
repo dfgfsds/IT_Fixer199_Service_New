@@ -102,7 +102,7 @@ export default function ProductDetailPage({
                 }
             } catch (error: any) {
                 if (![400, 404, 422].includes(error.response?.status)) {
-                    console.error("Error fetching product details:", error)
+                    console.error("Error fetching product details:", error instanceof Error ? error.message : String(error))
                 }
                 setProduct(null)
             } finally {
@@ -159,7 +159,7 @@ export default function ProductDetailPage({
                 toast.error('Please login to add to cart')
                 router.push('/login')
             } else {
-                console.error('Error adding to cart:', error)
+                console.error('Error adding to cart:', error instanceof Error ? error.message : String(error))
                 toast.error('Failed to add to cart')
             }
         } finally {

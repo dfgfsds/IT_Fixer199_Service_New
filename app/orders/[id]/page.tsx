@@ -6,11 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import {
-  ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle,
-  FileText, User as UserIcon, Calendar, IndianRupee, Loader2,
-  Phone, MoreVertical, X, Package, Wifi
-} from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle, FileText, User as UserIcon, Calendar, IndianRupee, Loader2, Phone, MoreVertical, X, Package, Wifi } from 'lucide-react'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
@@ -29,8 +25,6 @@ const LiveMap = dynamic(
   }),
   { ssr: false }
 )
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
 
 const transformOrder = (order: any) => ({
   id: order.id,
@@ -100,8 +94,6 @@ const slotChangeReasons = [
   { value: "OTHER", label: "Other" },
 ]
 
-// ── Main Component ───────────────────────────────────────────────────────────
-
 export default function SingleOrderPage() {
   const { id } = useParams()
   const router = useRouter()
@@ -117,6 +109,7 @@ export default function SingleOrderPage() {
   const [showTracking, setShowTracking] = useState(false)
   const [agentLocation, setAgentLocation] = useState<any>(null)
   const [liveStatus, setLiveStatus] = useState('')
+  const [debugData, setDebugData] = useState<any>({ api: null, ws: null })
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => { if (id) fetchOrder() }, [id])
@@ -137,16 +130,23 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
+      console.log("WEBSOCKET DATA RECEIVED:", data)
       setLiveStatus(data.status)
+
+      // Extremely broad catcher for any possible shape of agent location
+      if (data.partner_location) setAgentLocation(data.partner_location)
       if (data.order_details?.partner_location) setAgentLocation(data.order_details.partner_location)
+      if (data.agent_location) setAgentLocation(data.agent_location)
+      if (data.lat && data.lng) setAgentLocation({ lat: data.lat, lng: data.lng })
+      if (data.latitude && data.longitude) setAgentLocation({ lat: data.latitude, lng: data.longitude })
     }
-    ws.onerror = (e) => console.error('WS Error', e)
+    ws.onerror = () => console.warn('WS Connection Error: Live tracking currently unavailable')
     ws.onclose = () => console.log('WS Closed')
 
     return () => ws.close()
@@ -156,7 +156,27 @@ export default function SingleOrderPage() {
     try {
       setLoading(true)
       const res = await axiosInstance.get(`${Api.orders}${id}/`)
-      setOrder(transformOrder(res.data.order))
+      const fetchedOrder = res.data.order
+
+      setOrder(transformOrder(fetchedOrder))
+
+      // Attempt to parse coordinates if stored as a string "lat,lng" or standard object
+      if (fetchedOrder?.starting_agent_coordinates) {
+        if (typeof fetchedOrder.starting_agent_coordinates === 'string') {
+          const [lat, lng] = fetchedOrder.starting_agent_coordinates.split(',').map(Number)
+          if (lat && lng) setAgentLocation({ lat, lng })
+        } else if (fetchedOrder.starting_agent_coordinates.lat) {
+          setAgentLocation(fetchedOrder.starting_agent_coordinates)
+        } else if (fetchedOrder.starting_agent_coordinates.latitude) {
+          setAgentLocation({ lat: fetchedOrder.starting_agent_coordinates.latitude, lng: fetchedOrder.starting_agent_coordinates.longitude })
+        }
+      }
+
+      if (!agentLocation) {
+        if (fetchedOrder?.partner_location) setAgentLocation(fetchedOrder.partner_location)
+        else if (fetchedOrder?.agent_details?.latitude) setAgentLocation({ lat: fetchedOrder.agent_details.latitude, lng: fetchedOrder.agent_details.longitude })
+        else if (fetchedOrder?.agent?.latitude) setAgentLocation({ lat: fetchedOrder.agent.latitude, lng: fetchedOrder.agent.longitude })
+      }
     } catch {
       toast.error('Failed to load order details.')
       router.push('/profile?tab=orders')
@@ -169,7 +189,7 @@ export default function SingleOrderPage() {
     setSubmitting(true)
     try {
       if (actionType === 'cancel') {
-        await axiosInstance.post(Api.requestRefund, {
+        await axiosInstance.post(Api.requestCancellation, {
           order_id: order.id,
           cancellation_reason_type: formData.reason,
           cancellation_reason_description: formData.description,
@@ -187,7 +207,7 @@ export default function SingleOrderPage() {
         toast.success('Slot change request submitted.')
       }
       if (actionType === 'refund') {
-        await axiosInstance.post(Api.requestCancellation, { order_id: order.id })
+        await axiosInstance.post(Api.requestRefund, { order_id: order.id })
         toast.success('Refund request submitted.')
       }
       setActionType(null)
@@ -237,9 +257,11 @@ export default function SingleOrderPage() {
         </Link>
 
         {/* Status Banner */}
-        <div className={`w-full rounded-[40px] p-8 md:p-10 border ${ctx.border} ${ctx.bg} relative overflow-hidden mb-10 shadow-xl shadow-slate-200/40`}>
-          <div className={`absolute top-0 left-0 w-2 h-full ${ctx.bar}`} />
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className={`w-full rounded-[40px] p-8 md:p-10 border ${ctx.border} ${ctx.bg} relative mb-10 shadow-xl shadow-slate-200/40`}>
+          <div className="absolute inset-0 rounded-[40px] overflow-hidden pointer-events-none">
+            <div className={`absolute top-0 left-0 w-2 h-full ${ctx.bar}`} />
+          </div>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex flex-col gap-1">
               <span className="text-xs font-black tracking-widest uppercase opacity-60">Order ID: {order.id}</span>
               <h1 className={`text-3xl md:text-4xl font-black tracking-tight ${ctx.text}`}>{statusLabel(order.status)}</h1>
@@ -249,7 +271,8 @@ export default function SingleOrderPage() {
               <div className={`p-5 ${ctx.bg} border ${ctx.border} rounded-full shadow-sm ${ctx.text}`}>
                 {ctx.icon}
               </div>
-              {/* 3-dot Actions Menu */}
+
+              {/* 3 dots - Menu */}
               {(showCancel || showSlotChange || showRefund) && (
                 <div className="relative">
                   <button
@@ -259,19 +282,19 @@ export default function SingleOrderPage() {
                     <MoreVertical className="w-5 h-5 text-slate-500" />
                   </button>
                   {showMenu && (
-                    <div className="absolute right-0 top-14 w-52 bg-white border border-slate-100 rounded-3xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute left-0 md:left-auto md:right-0 top-14 w-52 bg-white border border-slate-100 rounded-3xl shadow-2xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                       {showCancel && (
                         <button onClick={() => { setActionType('cancel'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-3">
                           <XCircle className="w-4 h-4" /> Cancel Order
                         </button>
                       )}
                       {showSlotChange && (
-                        <button onClick={() => { setActionType('slot'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-amber-600 hover:bg-amber-50 transition flex items-center gap-3">
+                        <button onClick={() => { setActionType('slot'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#1a1c2e] hover:bg-slate-50 transition flex items-center gap-3">
                           <Calendar className="w-4 h-4" /> Change Slot
                         </button>
                       )}
                       {showRefund && (
-                        <button onClick={() => { setActionType('refund'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-slate-700 hover:bg-slate-50 transition flex items-center gap-3">
+                        <button onClick={() => { setActionType('refund'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#1a1c2e] hover:bg-slate-50 transition flex items-center gap-3">
                           <IndianRupee className="w-4 h-4" /> Request Refund
                         </button>
                       )}
@@ -285,7 +308,7 @@ export default function SingleOrderPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-          {/* ── LEFT COLUMN ── */}
+          {/* LEFT COLUMN */}
           <div className="lg:col-span-2 space-y-8">
 
             {/* Service Schedule */}
@@ -294,8 +317,8 @@ export default function SingleOrderPage() {
                 <Calendar className="w-5 h-5 text-slate-400" /> Service Schedule
               </h2>
               <div className="flex items-center gap-4 bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
-                  <Clock className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#1a1c2e] shadow-sm flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Scheduled For</p>
@@ -320,17 +343,17 @@ export default function SingleOrderPage() {
                       <p className="font-bold text-[#1a1c2e] text-lg">{order.agent.name}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <a
                       href={`tel:${order.agent.phone}`}
-                      className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold text-sm hover:bg-emerald-100 transition-all"
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-[#1a1c2e] border border-slate-200 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
                     >
                       <Phone className="w-4 h-4" /> Call
                     </a>
                     {showTrackBtn && (
                       <button
                         onClick={() => setShowTracking(true)}
-                        className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 font-bold text-sm hover:bg-blue-100 transition-all"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#800000] text-white font-bold text-sm hover:bg-[#600000] transition-all shadow-lg shadow-[#800000]/20"
                       >
                         <Wifi className="w-4 h-4" /> Track Live
                       </button>
@@ -385,7 +408,7 @@ export default function SingleOrderPage() {
 
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
+          {/* RIGHT COLUMN */}
           <div className="space-y-8">
 
             {/* Payment Summary */}
@@ -436,7 +459,7 @@ export default function SingleOrderPage() {
 
       <Footer />
 
-      {/* ── ACTION MODAL ── */}
+      {/* ACTION MODAL */}
       {actionType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl border border-slate-100 space-y-6 animate-in zoom-in-95 duration-300">
@@ -526,13 +549,13 @@ export default function SingleOrderPage() {
         </div>
       )}
 
-      {/* ── LIVE TRACKING MODAL ── */}
+      {/* LIVE TRACKING MODAL */}
       {showTracking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-xl rounded-[40px] p-8 shadow-2xl border border-slate-100 space-y-6 animate-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-[#800000]/10 text-[#800000] flex items-center justify-center">
                   <Wifi className="w-5 h-5 animate-pulse" />
                 </div>
                 <div>
@@ -544,13 +567,13 @@ export default function SingleOrderPage() {
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
+
             <div className="h-[320px] w-full rounded-3xl overflow-hidden bg-slate-100">
               <LiveMap
-                agentLat={agentLocation?.lat}
-                agentLng={agentLocation?.lng}
+                agentLat={agentLocation?.lat || agentLocation?.latitude}
+                agentLng={agentLocation?.lng || agentLocation?.longitude}
                 customerLat={order.fullData?.latitude}
                 customerLng={order.fullData?.longitude}
-                technicianName={order.agent?.name}
               />
             </div>
             <button

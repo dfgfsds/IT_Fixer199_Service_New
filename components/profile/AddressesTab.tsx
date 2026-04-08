@@ -144,8 +144,18 @@ export default function AddressesTab() {
     try {
       setMapLoading(true);
       const google: any = await loadGoogleMaps();
-      const currentLat = parseFloat(newAddress.lat) || 13.0827;
-      const currentLng = parseFloat(newAddress.lng) || 80.2707;
+
+      // Ensure the ref still exists after the async call (e.g. if map was closed during load)
+      if (!mapRef.current) {
+        setMapLoading(false);
+        return;
+      }
+
+      const parsedLat = parseFloat(newAddress.lat);
+      const parsedLng = parseFloat(newAddress.lng);
+
+      const currentLat = isNaN(parsedLat) ? 13.0827 : parsedLat;
+      const currentLng = isNaN(parsedLng) ? 80.2707 : parsedLng;
 
       const mapOptions = {
         center: { lat: currentLat, lng: currentLng },
@@ -186,7 +196,7 @@ export default function AddressesTab() {
       }, 300);
 
     } catch (error) {
-      console.error("Map initialization failed:", error);
+      console.error("Map initialization failed:", error instanceof Error ? error.message : String(error));
       toast.error("Failed to load Map. Please check your connection.");
     } finally {
       setMapLoading(false);
@@ -203,7 +213,7 @@ export default function AddressesTab() {
         lng: lng.toString()
       }));
     } catch (error) {
-      console.error(error);
+      console.error(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -262,15 +272,22 @@ export default function AddressesTab() {
                 markerRef.current.setPosition({ lat: latitude, lng: longitude });
               }
             } catch (error) {
-              console.error("Reverse geocoding failed:", error);
+              console.error("Reverse geocoding failed:", error instanceof Error ? error.message : String(error));
             } finally {
               setMapLoading(false);
             }
           },
-          (error) => {
-            console.error("Geolocation error:", error);
+          (error: any) => {
+            const errorMessage = error.message || String(error);
+            console.warn("Geolocation error:", errorMessage);
             setMapLoading(false);
-            toast.error("Could not access current location. Showing default.");
+            setShowMap(false);
+
+            if (error.code === 1 || errorMessage.toLowerCase().includes("denied")) {
+              toast.error("Location access blocked. Please enter your address manually and use 'Locate on Map'.", { duration: 5000 });
+            } else {
+              toast.error("Could not access current location. Please enter your address manually.");
+            }
           },
           { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
@@ -363,12 +380,12 @@ export default function AddressesTab() {
             state: topAddr.state
           });
         } catch (err) {
-          console.error("Auto-selection failed:", err)
+          console.error("Auto-selection failed:", err instanceof Error ? err.message : String(err))
         }
       }
     } catch (error: any) {
       if (error.response?.status !== 401) {
-        console.error('Error fetching addresses:', error)
+        console.error('Error fetching addresses:', error instanceof Error ? error.message : String(error))
       }
     } finally {
       setLoadingAddresses(false)
@@ -517,7 +534,7 @@ export default function AddressesTab() {
 
   useEffect(() => {
     fetchAddresses()
-  }, [])
+  }, [user?.id])
 
   return (
     <>

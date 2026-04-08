@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import axiosInstance from "@/configs/axios-middleware"
 import Api from "@/api-endpoints/ApiUrls"
+import { useAuth } from "./auth-context"
 
 export interface LocationData {
   city: string
@@ -39,15 +40,13 @@ const extractLocalArea = (addr: any) => {
 // Simple fallback to find the "closest" city if Nominatim's data is fragmented
 const getClosestArea = (lat: number, lng: number, addr: any) => {
   if (lat && lng && !addr.city && !addr.town) {
-    // If we have coordinates but Nominatim didn't give a clear city/town
-    // we can use the most descriptive local place name available.
     return (
-      addr.suburb || 
-      addr.neighbourhood || 
-      addr.residential || 
-      addr.city_district || 
-      addr.state_district || 
-      addr.state || 
+      addr.suburb ||
+      addr.neighbourhood ||
+      addr.residential ||
+      addr.city_district ||
+      addr.state_district ||
+      addr.state ||
       "Chennai"
     )
   }
@@ -58,6 +57,7 @@ export function LocationProvider({ children }: any) {
   const [location, setLocationState] = useState<LocationData | null>(null)
   const [showLocationModal, setShowLocationModal] = useState(false)
   const [zoneData, setZoneData] = useState<any>(null)
+  const { user } = useAuth()
 
   const fetchZoneData = useCallback(async (lat: number, lng: number) => {
     try {
@@ -68,8 +68,8 @@ export function LocationProvider({ children }: any) {
         setZoneData(res.data?.data)
       }
     } catch (err: any) {
-       // Silence expected server-side errors to avoid triggering the dev overlay
-       if (err.response?.status !== 500) {
+      // Silence expected server-side errors to avoid triggering the dev overlay
+      if (err.response?.status !== 500) {
         console.warn("Zone fetch error", err)
       }
     }
@@ -80,7 +80,7 @@ export function LocationProvider({ children }: any) {
     localStorage.setItem("user_location", JSON.stringify(loc))
   }, [])
 
-  // 🔥 CURRENT LOCATION
+  // CURRENT LOCATION
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
       setShowLocationModal(true)
@@ -122,11 +122,11 @@ export function LocationProvider({ children }: any) {
     )
   }
 
-  // 🔥 INIT FLOW: Implements the exact priority: 1. Selected Address -> 2. GPS Fallback
+  // INIT FLOW: Implements the exact priority: 1. Selected Address -> 2. GPS Fallback
   const initLocation = async () => {
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      
+
       // STEP 1: PRIORITIZE SELECTED ADDRESS (Server Profile)
       if (token) {
         try {
@@ -134,7 +134,7 @@ export function LocationProvider({ children }: any) {
           const selected = res?.data?.data;
 
           if (selected && selected?.lat && selected?.lng) {
-             setLocation({
+            setLocation({
               lat: Number(selected.lat),
               lng: Number(selected.lng),
               city: selected.district || "Unknown",
@@ -142,12 +142,12 @@ export function LocationProvider({ children }: any) {
               pincode: selected.pincode || "",
               address: selected.full_address || "",
             });
-            return; // 🎯 Found server-side address. STOP HERE. (No GPS prompt shown)
+            return; // Found server-side address. STOP HERE. (No GPS prompt shown)
           }
         } catch (e: any) {
           // Silent 404 is allowed here.
           if (e.response?.status !== 401 && e.response?.status !== 404) {
-             console.warn("Init location fetch error", e)
+            console.warn("Init location fetch error", e)
           }
         }
       }
@@ -157,13 +157,13 @@ export function LocationProvider({ children }: any) {
       handleCurrentLocation();
 
     } catch (error: any) {
-       // Final fallback if everything fails
+      // Final fallback if everything fails
     }
   };
 
   useEffect(() => {
     initLocation()
-  }, [])
+  }, [user?.id])
 
   useEffect(() => {
     if (location?.lat && location?.lng) {

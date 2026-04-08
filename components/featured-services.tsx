@@ -62,7 +62,7 @@ export function FeaturedServices() {
         // Silence console.error for expected 400 "No services" responses
         // to avoid triggering the Next.js dev overlay button
         if (err.response?.status !== 400) {
-          console.error("Error fetching featured services:", err)
+          console.error("Error fetching featured services:", err instanceof Error ? err.message : String(err))
         }
       } finally {
         setLoading(false)

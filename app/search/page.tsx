@@ -94,7 +94,7 @@ export default function SearchPage() {
         setProducts(searchedProducts)
         
       } catch (err) {
-        console.error("Search error:", err)
+        console.error("Search error:", err instanceof Error ? err.message : String(err))
         setError('An error occurred during search.')
       } finally {
         setLoading(false)

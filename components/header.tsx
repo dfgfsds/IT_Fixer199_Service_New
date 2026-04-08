@@ -93,7 +93,7 @@ export function Header() {
 
       setSearchResults({ services: matchedServices, products: matchedProducts })
     } catch (error) {
-      console.error("Header search error:", error)
+      console.error("Header search error:", error instanceof Error ? error.message : String(error))
     } finally {
       setIsSearching(false)
     }
