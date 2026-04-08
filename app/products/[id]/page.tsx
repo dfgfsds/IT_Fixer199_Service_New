@@ -13,6 +13,7 @@ import axiosInstance from '@/configs/axios-middleware'
 import { useCartItem } from '@/context/CartItemContext'
 import { ProductCard } from '@/components/product-card'
 import { toast } from 'sonner'
+import { formatPrice } from '@/lib/format-price'
 
 export default function ProductDetailPage({
     params,
@@ -328,9 +329,9 @@ export default function ProductDetailPage({
                         <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
                             <p className="text-slate-500 font-medium mb-1">Starting from</p>
                             <div className="flex items-baseline gap-3 mb-2">
-                                <span className="text-4xl font-black text-[#1a1c2e]">₹{price}</span>
+                                <span className="text-4xl font-black text-[#1a1c2e]">₹{formatPrice(price)}</span>
                                 {regularPrice && (
-                                    <span className="text-xl text-slate-400 line-through font-medium">₹{regularPrice}</span>
+                                    <span className="text-xl text-slate-400 line-through font-medium">₹{formatPrice(regularPrice)}</span>
                                 )}
                             </div>
                             <p className="text-sm text-slate-400">Inclusive of all taxes</p>

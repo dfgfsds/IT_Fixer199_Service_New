@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { CheckCircle, Plus, Minus, Loader2 } from 'lucide-react'
+import { formatPrice } from '@/lib/format-price'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -30,7 +31,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
   const router = useRouter()
   const originalPrice = service.discount > 0 
     ? Math.round(service.price / (1 - service.discount / 100))
-    : null
+    : 0
 
   return (
     <Link href={`/${basePath}/${service.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-[#800000]/30 transition-all duration-300 block">
@@ -80,11 +81,11 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 sm:pt-4 border-t border-border/50 gap-2 sm:gap-0">
           <div className="space-y-0.5 sm:space-y-1">
             <p className="text-[8px] sm:text-xs text-muted-foreground">Starting from</p>
-            <div className="flex items-baseline gap-1 sm:gap-2">
-              <span className="text-lg sm:text-2xl font-bold text-[#1a1c2e]">₹{service.price}</span>
-              {originalPrice && (
-                <span className="text-[8px] sm:text-sm text-muted-foreground line-through">
-                  ₹{originalPrice}
+            <div className="flex items-center gap-3">
+              <span className="text-lg sm:text-2xl font-bold text-[#1a1c2e]">₹{formatPrice(service.price)}</span>
+              {originalPrice > service.price && (
+                <span className="text-sm font-medium text-slate-400 line-through decoration-[#800000]/30 underline-offset-2">
+                  ₹{formatPrice(originalPrice)}
                 </span>
               )}
             </div>

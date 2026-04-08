@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useState, useEffect, useMemo, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocation } from '@/context/location-context'
+import { formatPrice } from '@/lib/format-price'
 import { useCartItem } from '@/context/CartItemContext'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
@@ -314,9 +315,9 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
               <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-1">Starting from</p>
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-4xl font-black text-[#1a1c2e]">₹{sellingPrice}</span>
+                <span className="text-4xl font-black text-[#1a1c2e]">₹{formatPrice(sellingPrice)}</span>
                 {regularPrice && (
-                  <span className="text-lg font-bold text-slate-300 line-through decoration-[#800000]/30">₹{regularPrice}</span>
+                  <span className="text-lg font-bold text-slate-300 line-through decoration-[#800000]/30">₹{formatPrice(regularPrice)}</span>
                 )}
               </div>
               <p className="text-xs text-slate-400 font-medium tracking-wide">Inclusive of all taxes & service charges</p>
@@ -393,7 +394,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                   ) : (
                     <ShoppingCart className="w-6 h-6" />
                   )}
-                  <span>{error ? "Unavailable in this location" : isAdding ? "Adding..." : `Book Now — ₹${sellingPrice}`}</span>
+                  <span>{error ? "Unavailable in this location" : isAdding ? "Adding..." : `Book Now — ₹${formatPrice(sellingPrice)}`}</span>
                 </button>
               )}
             </div>
@@ -452,7 +453,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                       <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50">
                         <div>
                           <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Starting at</p>
-                          <p className="text-2xl font-black text-[#1a1c2e]">₹{rsPrice}</p>
+                          <p className="text-2xl font-black text-[#1a1c2e]">₹{formatPrice(rsPrice)}</p>
                         </div>
                         <Link href={`/services/${rs.id}`} className="p-4 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-[#800000] group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:scale-105">
                           <ArrowRight className="w-5 h-5 stroke-[2.5px]" />

@@ -76,12 +76,10 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
     }
   }, [visible, isLoggedIn])
 
-  // When moving to map step, reverse geocode the selected coords
   useEffect(() => {
     if (step === "map") {
       reverseGeo.reverseGeocode(selectedCoords.lat, selectedCoords.lng).then(setSelectedAddress)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step])
 
   const handleClose = () => {
@@ -116,14 +114,12 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
   // Handle selecting a saved address
   const handleAddressSelect = async (addr: any) => {
     try {
-      // mark it as selected on server using the dedicated flags PATCH endpoint
       await axiosInstance.patch(`${Api.addressFlags}/${addr.id}`, {
         ...addr,
         selected_address: true,
         is_primary: true
       })
 
-      // set globally in context
       setLocation({
         city: addr.district || addr.city || "Unknown",
         address: addr.full_address || addr.address,
@@ -145,7 +141,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
     setStep("map")
   }
 
-  // Handle map drag - debounced reverse geocode
+  // Handle map drag
   const mapDragTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handleMapMove = useCallback(
     (lat: number, lng: number) => {
@@ -190,7 +186,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
         className="relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:rounded-3xl sm:animate-in sm:fade-in sm:zoom-in-95 sm:slide-in-from-bottom-0"
         style={{ maxHeight: "90vh" }}
       >
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-2.5">
             {step === "map" && (
@@ -220,10 +216,8 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
           </button>
         </div>
 
-        {/* ── Search Step ── */}
         {step === "search" && (
           <div className="flex-1 overflow-y-auto pb-10">
-            {/* Mandatory Location Info - only show if no location is set */}
             {!location && (
               <div className="mx-5 mt-4 flex items-start gap-3 rounded-2xl bg-[#800000]/5 p-4 border border-[#800000]/10 border-dashed">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#800000] text-white">
@@ -289,17 +283,19 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
               )}
             </div>
 
-            {/* Search Suggestions Component - Commented out as requested */}
-            {/* <SearchSuggestions onSelect={handleSearchSelect} autoFocus /> */}
-
-            {/* 🔥 ADD NEW ADDRESS - Re-positioned to top */}
+            {/* ADD NEW ADDRESS */}
             <div className="px-5 pt-4">
               <button
                 onClick={() => {
                   handleClose();
-                  localStorage.setItem("activeTab", "addresses");
-                  localStorage.setItem("openAddModal", "true");
-                  window.location.href = '/profile';
+                  if (!isLoggedIn) {
+                    toast.error("Please login to add a new address", { duration: 3000 });
+                    setTimeout(() => {
+                      window.location.href = '/login';
+                    }, 1200);
+                  } else {
+                    window.location.href = '/profile?tab=addresses&action=add';
+                  }
                 }}
                 className="group flex w-full items-center gap-4 rounded-2xl p-4 text-left transition-all hover:bg-primary/5 bg-slate-50 active:scale-[0.99] border-2 border-dashed border-slate-200"
               >
@@ -313,7 +309,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
               </button>
             </div>
 
-            {/* 🔥 SAVED ADDRESSES SECTION (for logged-in users) */}
+            {/* SAVED ADDRESSES SECTION*/}
             {isLoggedIn && (fetchingAddresses || (savedAddresses && savedAddresses.length > 0)) && (
               <div className="px-5 pt-6">
                 <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -332,49 +328,60 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                 ) : (
                   <div className="space-y-1.5 pt-2 pb-2">
                     {(() => {
-                      // 1. First, sort by latest
                       const sorted = [...savedAddresses].sort((a: any, b: any) =>
                         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
                       );
 
-                      // 2. Put selected on top
                       const finale = sorted.sort((a: any, b: any) => {
-                        const isA = location?.lat?.toString() === a.lat?.toString() && location?.lng?.toString() === a.lng?.toString();
-                        const isB = location?.lat?.toString() === b.lat?.toString() && location?.lng?.toString() === b.lng?.toString();
-                        return isA ? -1 : isB ? 1 : 0;
+                        return a.selected_address ? -1 : b.selected_address ? 1 : 0;
                       });
 
-                      return finale.map((addr: any) => {
-                        const isSelected = location?.lat?.toString() === addr.lat?.toString() &&
-                          location?.lng?.toString() === addr.lng?.toString();
+                      return (
+                        <>
+                          {finale.slice(0, 4).map((addr: any) => {
+                            const isSelected = addr.selected_address === true;
 
-                        return (
-                          <button
-                            key={addr.id}
-                            onClick={() => handleAddressSelect(addr)}
-                            className={`group flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-all hover:bg-muted/80 active:scale-[0.99] border-2 ${isSelected ? 'bg-primary/5 border-primary/20 shadow-sm' : 'border-transparent bg-slate-50/50'
-                              }`}
-                          >
-                            <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm transition-all ${isSelected ? 'bg-primary text-white shadow-primary/20' : 'bg-white text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'
-                              }`}>
-                              <MapPin className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1 py-0.5">
-                              <div className="flex items-center gap-2">
-                                <p className="truncate text-sm font-bold text-[#1a1c2e] tracking-tight">{addr.name || 'Saved Address'}</p>
-                                {isSelected && (
-                                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 scale-105">
-                                    <Check className="h-2.5 w-2.5 stroke-[4]" />
+                            return (
+                              <button
+                                key={addr.id}
+                                onClick={() => handleAddressSelect(addr)}
+                                className={`group flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-all hover:bg-muted/80 active:scale-[0.99] border-2 ${isSelected ? 'bg-primary/5 border-primary/20 shadow-sm' : 'border-transparent bg-slate-50/50'
+                                  }`}
+                              >
+                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm transition-all ${isSelected ? 'bg-primary text-white shadow-primary/20' : 'bg-white text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'
+                                  }`}>
+                                  <MapPin className="h-4 w-4" />
+                                </div>
+                                <div className="min-w-0 flex-1 py-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <p className="truncate text-sm font-bold text-[#1a1c2e] tracking-tight">{addr.name || 'Saved Address'}</p>
+                                    {isSelected && (
+                                      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 scale-105">
+                                        <Check className="h-2.5 w-2.5 stroke-[4]" />
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              <p className="truncate leading-tight text-[11px] text-slate-500 mt-0.5 font-medium italic">
-                                {addr.full_address}
-                              </p>
-                            </div>
-                          </button>
-                        );
-                      });
+                                  <p className="truncate leading-tight text-[11px] text-slate-500 mt-0.5 font-medium italic">
+                                    {addr.full_address}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                          {finale.length > 4 && (
+                            <button
+                              onClick={() => {
+                                handleClose();
+                                window.location.href = '/profile?tab=addresses';
+                              }}
+                              className="w-full flex items-center justify-center mt-2 rounded-2xl py-3 text-sm font-bold text-primary bg-primary/5 hover:bg-primary/10 transition-colors"
+                            >
+                              {/* See all {finale.length} addresses */}
+                              See all addresses
+                            </button>
+                          )}
+                        </>
+                      );
                     })()}
                   </div>
                 )}
@@ -411,7 +418,6 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
           </div>
         )}
 
-        {/* ── Map Step ── */}
         {step === "map" && (
           <div className="flex flex-1 flex-col overflow-hidden">
             {/* Map */}
@@ -422,12 +428,12 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                 onMove={handleMapMove}
               />
 
-              {/* "Move map to adjust" tooltip */}
               <div className="absolute left-1/2 top-4 z-[1001] -translate-x-1/2 animate-in fade-in">
                 <div className="rounded-full bg-foreground/80 px-3 py-1.5 text-xs font-medium text-background shadow-lg backdrop-blur-sm">
                   Move map to adjust pin
                 </div>
               </div>
+
               {/* Floating "Locate Me" GPS Button */}
               {/* <button
                 onClick={handleDetectLocation}
