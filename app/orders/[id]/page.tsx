@@ -271,8 +271,21 @@ export default function SingleOrderPage() {
       setFormData({ reason: '', description: '', date: '', slotId: '' })
       fetchOrder()
     } catch (err: any) {
-      console.error('Action failed:', err?.response?.data || err.message)
-      toast.error(err?.response?.data?.message || 'Action failed. Please try again.')
+      const data = err?.response?.data
+      const errMsg =
+        (typeof data === 'string' ? data : null) ||
+        data?.message ||
+        data?.detail ||
+        data?.error ||
+        (Array.isArray(data?.non_field_errors) ? data.non_field_errors[0] : null) ||
+        err?.message ||
+        'Action failed. Please try again.'
+      if (data && Object.keys(data).length > 0) {
+        console.warn('Action failed:', data)
+      } else {
+        console.warn('Action failed:', err?.message || err)
+      }
+      toast.error(errMsg)
     } finally {
       setSubmitting(false)
     }
@@ -514,26 +527,29 @@ export default function SingleOrderPage() {
           {/* RIGHT COLUMN */}
           <div className="space-y-8">
 
-            {/* Payment Summary */}
-            <div className="bg-[#1a1c2e] text-white rounded-[40px] p-8 shadow-2xl shadow-slate-900/30 relative overflow-hidden">
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
-              <h2 className="text-lg font-black mb-6 flex items-center gap-3 text-white/90">
-                <IndianRupee className="w-5 h-5 text-emerald-400" /> Payment
-              </h2>
-              <div className="space-y-3">
-                <div className="flex justify-between text-white/70 font-medium text-sm">
+            <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
+              <div className="flex items-center justify-between mb-6 px-1">
+                <h2 className="text-lg font-black flex items-center gap-3 text-[#1a1c2e]">
+                  <IndianRupee className="w-5 h-5 text-slate-400" /> Payment
+                </h2>
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${paymentStatus === 'SUCCESS'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                  {paymentStatus === 'SUCCESS' ? <CheckCircle className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+                  {paymentStatus || 'PENDING'}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-3">
+                <div className="flex justify-between text-slate-500 font-medium text-sm">
                   <span>Service Total</span>
-                  <span className="font-bold text-white">₹{formatPrice(order.amount)}</span>
+                  <span className="font-bold text-[#1a1c2e]">₹{formatPrice(order.amount)}</span>
                 </div>
-                <div className="w-full h-px bg-white/10 my-2" />
+                <div className="w-full h-px bg-slate-200" />
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-white/90">Total Paid</span>
-                  <span className="font-black text-white text-xl">₹{formatPrice(order.amount)}</span>
-                </div>
-                <div className="mt-4">
-                  <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${paymentStatus === 'SUCCESS' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
-                    {paymentStatus || 'PENDING'}
-                  </span>
+                  <span className="font-bold text-slate-500 text-md">Total Paid</span>
+                  <span className="font-black text-[#800000] text-md tracking-tight">₹{formatPrice(order.amount)}</span>
                 </div>
               </div>
             </div>

@@ -177,8 +177,8 @@ export function Header() {
                   onFocus={() => searchQuery.length > 1 && setShowDropdown(true)}
                   placeholder="Search for services, repairs, accessories..."
                   className={`w-full transition-all duration-300 py-3 px-6 pr-12 text-sm outline-none ${showDropdown
-                      ? 'bg-white border-slate-200 rounded-t-3xl shadow-lg border-b-0'
-                      : 'bg-slate-100/80 border-transparent focus:bg-white focus:border-slate-200 rounded-full'
+                    ? 'bg-white border-slate-200 rounded-t-3xl shadow-lg border-b-0'
+                    : 'bg-slate-100/80 border-transparent focus:bg-white focus:border-slate-200 rounded-full'
                     }`}
                   autoComplete="off"
                 />
@@ -361,7 +361,7 @@ export function Header() {
               { href: '/', label: 'Home' },
               { href: '/about', label: 'About' },
               { href: '/services', label: 'Services' },
-              { href: '/blog', label: 'Blog' },
+              // { href: '/blog', label: 'Blog' },
               { href: '/categories', label: 'Categories' },
               { href: '/products', label: 'Products' },
             ].map((item) => (
