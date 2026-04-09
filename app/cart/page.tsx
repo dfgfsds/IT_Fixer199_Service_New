@@ -512,19 +512,24 @@ export default function CartPage() {
                   const isRemoving = removingId === item.id
                   const itemPrice = getItemPrice(item)
                   const itemQty = item.quantity || 1
+                  const isInactive = item.is_active === false
 
                   return (
                     <div
                       key={item.id}
-                      className={`bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-md transition-all duration-300 ${isRemoving ? 'opacity-50' : ''}`}
+                      className={`relative bg-white p-5 rounded-3xl border transition-all duration-300 flex items-center gap-6 group ${isInactive
+                        ? 'border-red-100 bg-slate-50 opacity-80 desaturate-[0.5]'
+                        : 'border-slate-100 shadow-sm hover:shadow-md'
+                        } ${isRemoving ? 'opacity-50' : ''}`}
                     >
                       {/* Image */}
-                      <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-50">
+                      <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-100">
                         <Image
                           src={getItemImage(item)}
                           alt={getItemName(item)}
                           fill
-                          className={`transition-transform duration-500 group-hover:scale-110 ${getItemImage(item) === '/logo.png' ? 'object-contain p-2' : 'object-cover'}`}
+                          className={`transition-transform duration-500 group-hover:scale-110 ${isInactive ? '' : 'group-hover:scale-110'
+                            } ${getItemImage(item) === '/logo.png' ? 'object-contain p-2' : 'object-cover'}`}
                           onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png' }}
                         />
                       </div>
@@ -533,38 +538,48 @@ export default function CartPage() {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-[#1a1c2e] truncate">{getItemName(item)}</h3>
                         <p className="text-sm text-slate-400 font-medium mb-1 capitalize">{getItemCategory(item).toLowerCase()}</p>
-                        <p className="text-xl font-black text-[#1a1c2e] mt-1">₹{formatPrice(itemPrice)}</p>
+                        <p className={`text-xl font-black mt-1 ${isInactive ? 'text-slate-400' : 'text-[#1a1c2e]'}`}>₹{formatPrice(itemPrice)}</p>
                       </div>
 
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                      {/* Right Side Actions */}
+                      <div className="flex items-center gap-2">
+                        {isInactive ? (
+                          <div className="px-4 py-2 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-red-100 flex items-center gap-2 whitespace-nowrap animate-in fade-in zoom-in duration-300">
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            Unavailable at this Address
+                          </div>
+                        ) : (
+                          /* Quantity Controls */
+                          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                            <button
+                              onClick={() => updateQuantity(item, itemQty - 1)}
+                              disabled={isUpdating || isRemoving}
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
+                            >
+                              {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
+                            </button>
+                            <span className="text-lg font-black text-[#1a1c2e] w-6 text-center">
+                              {itemQty}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item, itemQty + 1)}
+                              disabled={isUpdating || isRemoving}
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Remove */}
                         <button
-                          onClick={() => updateQuantity(item, itemQty - 1)}
-                          disabled={isUpdating || isRemoving}
-                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
+                          onClick={() => removeItem(item)}
+                          disabled={isRemoving}
+                          className="p-3 text-slate-600 hover:text-red-600 transition-colors disabled:opacity-50"
                         >
-                          {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
-                        </button>
-                        <span className="text-lg font-black text-[#1a1c2e] w-6 text-center">
-                          {itemQty}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item, itemQty + 1)}
-                          disabled={isUpdating || isRemoving}
-                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
-                        >
-                          <Plus className="w-4 h-4" />
+                          {isRemoving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                         </button>
                       </div>
-
-                      {/* Remove */}
-                      <button
-                        onClick={() => removeItem(item)}
-                        disabled={isRemoving}
-                        className="p-3 text-slate-300 hover:text-red-500 transition-colors disabled:opacity-50"
-                      >
-                        {isRemoving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                      </button>
                     </div>
                   )
                 })}
@@ -817,123 +832,70 @@ export default function CartPage() {
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Right Column: Order Summary */}
+          </div>          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-[40px] border border-slate-100 p-8 space-y-8 sticky top-24 shadow-2xl shadow-slate-200/50">
-              <h2 className="text-2xl font-black text-[#1a1c2e]">Order Summary</h2>
+            {(() => {
+              const hasInactiveItems = cartItems.some(item => item.is_active === false)
 
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  {cartItems.map((item: any) => (
-                    <div key={item.id} className="flex justify-between text-sm font-medium">
-                      <span className="text-slate-500 truncate max-w-[150px]">
-                        {getItemName(item)} ×{item.quantity || 1}
-                      </span>
-                      <span className="text-[#1a1c2e]">₹{formatPrice(getItemPrice(item) * (item.quantity || 1))}</span>
+              return (
+                <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 sticky top-12 space-y-8">
+                  <h2 className="text-2xl font-black text-[#1a1c2e]">Order Summary</h2>
+
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-slate-500 font-medium">
+                      <span>Subtotal</span>
+                      <span className="font-bold text-[#1a1c2e]">₹{formatPrice(subtotal)}</span>
                     </div>
-                  ))}
-                </div>
-
-                <div className="h-px bg-slate-100 w-full" />
-
-                <div className="space-y-4 text-sm font-medium">
-                  <div className="flex justify-between text-slate-500">
-                    <span>Subtotal</span>
-                    <span>₹{formatPrice(subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-500">
-                    <span>Service Charge</span>
-                    <span>₹{formatPrice(serviceCharge)}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-500">
-                    <span>GST (5%)</span>
-                    <span>₹{formatPrice(gst)}</span>
-                  </div>
-                </div>
-
-                <div className="h-px bg-slate-100 w-full" />
-
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xl font-black text-[#1a1c2e]">Total</span>
-                  <span className="text-3xl font-black text-[#800000]">₹{formatPrice(total)}</span>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="bg-slate-50 p-4 rounded-2xl flex gap-3 text-xs">
-                    <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0" />
-                    <div className="space-y-1">
-                      <p className="font-bold text-[#1a1c2e]">Service Location</p>
-                      {selectedAddressId ? (
-                        <p className="text-slate-500 line-clamp-2 leading-relaxed">
-                          {(() => {
-                            const addr = addresses.find((a) => a.id === selectedAddressId);
-                            if (addr) {
-                              return addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ');
-                            }
-                            return location?.city || 'Not selected';
-                          })()}
-                        </p>
-                      ) : (
-                        <p className="text-slate-500">{location?.city || 'Not selected'}</p>
-                      )}
+                    <div className="flex justify-between text-slate-500 font-medium">
+                      <span>Service Charge</span>
+                      <span className="font-bold text-emerald-600">₹{formatPrice(serviceCharge)}</span>
                     </div>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-2xl flex gap-3 text-xs">
-                    <Clock className="w-4 h-4 text-[#800000] flex-shrink-0" />
-                    <div className="space-y-1">
-                      <p className="font-bold text-[#1a1c2e]">Slot</p>
-                      {scheduleType === 'later' ? (
-                        <div className="text-slate-500">
-                          <p className="font-bold text-[#800000]">
-                            {DATES.find(d => d.value === selectedDate)?.day}, {DATES.find(d => d.value === selectedDate)?.label}
-                          </p>
-                          <p className="text-[10px]">
-                            {slots.find((s: any) => s.id === selectedTime)?.start_time} - {slots.find((s: any) => s.id === selectedTime)?.end_time || 'Select Time'}
+                    <div className="flex justify-between text-slate-500 font-medium">
+                      <span>GST (5%)</span>
+                      <span className="font-bold text-[#1a1c2e]">₹{formatPrice(gst)}</span>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-100">
+                      <div className="flex justify-between items-end mb-2">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest pb-1">Total Amount</p>
+                        <p className="text-3xl font-black text-[#1a1c2e]">₹{formatPrice(total)}</p>
+                      </div>
+
+                      {hasInactiveItems && (
+                        <div className="p-4 mt-4 bg-red-50 rounded-2xl border border-red-100 flex gap-3 text-red-600 animate-in fade-in slide-in-from-top-2">
+                          <AlertTriangle className="w-5 h-5 shrink-0" />
+                          <p className="text-[11px] font-bold leading-tight">
+                            Some items are not available at this address. Please remove them or change address to proceed.
                           </p>
                         </div>
-                      ) : (
-                        <p className="text-slate-500 capitalize">Instant Service</p>
                       )}
+
+                      <button
+                        onClick={handleCheckout}
+                        disabled={isCheckoutLoading || hasInactiveItems || !selectedAddressId || !selectedTime}
+                        className={`w-full mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${hasInactiveItems
+                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                          : 'bg-[#800000] text-white hover:bg-[#600000] shadow-none'
+                          }`}
+                      >
+                        {isCheckoutLoading ? (
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                        ) : (
+                          <>
+                            {hasInactiveItems ? 'Unavailable Items' : 'Place Order'}
+                            <Zap className="w-5 h-5 fill-current" />
+                          </>
+                        )}
+                      </button>
+
+                      <p className="text-center mt-4 text-xs text-slate-400 font-medium">
+                        By placing this order, you agree to ITFixer's Terms & Conditions
+                      </p>
                     </div>
                   </div>
                 </div>
-
-                <div className="space-y-4 pt-2">
-                  <button
-                    onClick={handleCheckout}
-                    disabled={isCheckoutLoading || cartItems.length === 0 || !selectedAddressId || !selectedTime}
-                    className="w-full bg-[#800000] hover:bg-[#600000] text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] shadow-xl shadow-red-900/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#800000] disabled:active:scale-100 disabled:shadow-none"
-                  >
-                    {isCheckoutLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : cartItems.length === 0 ? (
-                      <AlertTriangle className="w-5 h-5" />
-                    ) : !selectedAddressId ? (
-                      <MapPin className="w-5 h-5" />
-                    ) : !selectedTime ? (
-                      <Clock className="w-5 h-5" />
-                    ) : (
-                      <CheckCircle className="w-5 h-5" />
-                    )}
-
-                    {isCheckoutLoading
-                      ? 'Processing...'
-                      : cartItems.length === 0
-                        ? 'Cart is Empty'
-                        : !selectedAddressId
-                          ? 'Select Address'
-                          : !selectedTime
-                            ? 'Select Service Time'
-                            : 'Confirm Booking'}
-                  </button>
-                  <p className="text-[10px] text-center text-slate-400 font-medium px-4 leading-normal">
-                    Inclusive of all taxes and service charges
-                  </p>
-                </div>
-              </div>
-            </div>
+              )
+            })()}
           </div>
         </div>
       </main>
