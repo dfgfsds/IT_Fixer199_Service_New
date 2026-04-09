@@ -3,13 +3,14 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { useState, useEffect } from 'react'
-import { User, MapPin, Package, LogOut, ChevronRight } from 'lucide-react'
+import { User, MapPin, Package, LogOut, ChevronRight, ClipboardList } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/context/auth-context'
 import OrdersTab from '@/components/profile/OrdersTab'
 import ProfileTab from '@/components/profile/ProfileTab'
 import AddressesTab from '@/components/profile/AddressesTab'
+import RequestTab from '@/components/profile/RequestTab'
 import { toast } from 'sonner'
 import { useRef } from 'react'
 
@@ -113,6 +114,17 @@ export default function ProfilePage() {
               </button>
 
               <button
+                onClick={() => handleTabChange('requests')}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'requests' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <ClipboardList className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  <span className="font-bold tracking-tight">My Requests</span>
+                </div>
+                <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'requests' ? 'translate-x-1' : ''}`} />
+              </button>
+
+              <button
                 onClick={logout}
                 className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group text-[#800000] hover:bg-red-50`}
               >
@@ -129,6 +141,7 @@ export default function ProfilePage() {
             {activeTab === 'profile' && <ProfileTab />}
             {activeTab === 'addresses' && <AddressesTab />}
             {activeTab === 'orders' && <OrdersTab />}
+            {activeTab === 'requests' && <RequestTab />}
           </div>
         </div>
       </main>

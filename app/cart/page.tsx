@@ -2,10 +2,7 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import {
-  Trash2, Plus, Minus, MapPin, Zap, Calendar, CreditCard, Wallet,
-  Smartphone, CheckCircle, Clock, ShoppingCart, Loader2, AlertTriangle
-} from 'lucide-react'
+import { Trash2, Plus, Minus, MapPin, Zap, Calendar, CreditCard, Wallet, Smartphone, CheckCircle, Clock, ShoppingCart, Loader2, AlertTriangle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -59,35 +56,8 @@ export default function CartPage() {
   const [successModal, setSuccessModal] = useState(false)
 
   // Slots & Instant from Zone
-  const backendSlots = zoneData?.slots || []
+  const slots = zoneData?.slots || []
   const instant = zoneData?.instant_availability
-
-  // Ensure we NEVER show dummy slots in production, and strictly filter out any slots that have already expired today
-  const filterFutureSlots = (slotsArr: any[]) => {
-    const now = new Date()
-    return slotsArr.filter((slot) => {
-      if (!slot.start_time) return true
-      const match = slot.start_time.match(/(\d+):(\d+)\s*(AM|PM)/i)
-      if (!match) return true
-
-      let hours = parseInt(match[1], 10)
-      const mins = parseInt(match[2], 10)
-      const ampm = match[3].toUpperCase()
-
-      if (ampm === 'PM' && hours < 12) hours += 12
-      if (ampm === 'AM' && hours === 12) hours = 0
-
-      const slotTime = new Date()
-      slotTime.setHours(hours, mins, 0, 0)
-
-      // Buffer Mode -> The slot officially dies 30 mins before the start_time
-      const slotDeadline = new Date(slotTime.getTime() - 30 * 60000)
-
-      return now < slotDeadline
-    })
-  }
-
-  const slots = filterFutureSlots(backendSlots)
 
   // Sync with Cart Status
   useEffect(() => {
@@ -103,14 +73,38 @@ export default function CartPage() {
     }
   }, [rawCartData])
 
-  const handleSlotSelect = (slot: any) => {
+  const handleSlotSelect = async (slot: any) => {
     setSelectedTime(slot.id)
     setScheduleType("later")
+    toast.success(`Slot selected: ${slot.name}`)
+
+    try {
+      await axiosInstance.patch(`${Api.cartApi}/update/`, {
+        slot_id: slot.id,
+        zone_id: zoneData?.id,
+        is_instant_slot: false,
+        scheduled_date: selectedDate
+      })
+    } catch (err) {
+      console.error("Failed to sync slot to cart:", err)
+    }
   }
 
-  const handleInstantSelect = () => {
+  const handleInstantSelect = async () => {
     setScheduleType("instant")
-    setSelectedTime("")
+    setSelectedTime("instant")
+    toast.success("Instant arrival selected")
+
+    try {
+      await axiosInstance.patch(`${Api.cartApi}/update/`, {
+        slot_id: instant?.id,
+        zone_id: zoneData?.id,
+        is_instant_slot: true,
+        scheduled_date: new Date().toISOString().split('T')[0]
+      })
+    } catch (err) {
+      console.error("Failed to sync instant slot to cart:", err)
+    }
   }
 
   // Fetch saved addresses and app settings
@@ -179,7 +173,7 @@ export default function CartPage() {
     setUpdatingId(item.id)
     try {
       if (newQty > currentQty) {
-        // INCREASE — use the /add/ endpoint (same as service detail page)
+        // INCREASE
         const itemType = item.type || item.item_type || (item.product ? 'PRODUCT' : 'SERVICE')
         const payload: any = {
           type: itemType,
@@ -192,7 +186,7 @@ export default function CartPage() {
         }
         await axiosInstance.post(`${Api.cartApi}/add/`, payload)
       } else {
-        // DECREASE — use the /decrease/ endpoint (same as service detail page)
+        // DECREASE
         const itemType = item.type || item.item_type || (item.product ? 'PRODUCT' : 'SERVICE')
         const payload: any = {
           type: itemType,
@@ -281,15 +275,14 @@ export default function CartPage() {
 
     setIsCheckoutLoading(true)
     try {
-      // INTERNAL VALIDATION GUARDS (Safety Net)
       if (!selectedAddressId) {
         toast.error("Please select a delivery address")
         setIsCheckoutLoading(false)
         return
       }
 
-      if (scheduleType === 'later' && !selectedTime) {
-        toast.error("Please select a time slot for scheduling")
+      if (!scheduleType || !selectedTime) {
+        toast.error("Please select a service time")
         setIsCheckoutLoading(false)
         return
       }
@@ -314,11 +307,36 @@ export default function CartPage() {
         return
       }
 
-      const payload = {
+      const addr = addresses.find((a) => a.id === selectedAddressId)
+
+      const payload: any = {
         address_id: selectedAddressId,
         payment_method: selectedPayment.toUpperCase(),
         service_slot: scheduleType.toUpperCase(),
-        ...(scheduleType === 'later' ? { slot_id: selectedTime, scheduled_date: selectedDate } : {})
+        // Backend required fields from Swagger
+        customer_name: user?.name || "",
+        customer_number: user?.mobile_number || "",
+        customer_email: user?.email || "",
+        address: addr?.full_address || addr?.address || "",
+        google_address: addr?.google_address || addr?.full_address || "",
+        latitude: addr?.lat ? Number(addr.lat) : 0,
+        longitude: addr?.lng ? Number(addr.lng) : 0,
+      }
+
+      // Scheduling data
+      if (scheduleType === 'later') {
+        const slot = slots.find((s: any) => s.id === selectedTime)
+        payload.slot_id = selectedTime
+        payload.scheduled_date = selectedDate
+        if (slot) {
+          payload.slot_time = `${slot.start_time} - ${slot.end_time}`
+          payload.slot_name = slot.name
+        }
+      } else if (scheduleType === 'instant' && instant?.id) {
+        payload.slot_id = instant.id
+        payload.scheduled_date = new Date().toISOString().split('T')[0]
+        payload.slot_time = `${instant.eta_start_time} - ${instant.eta_end_time}`
+        payload.slot_name = "Instant"
       }
       const res = await axiosInstance.post(Api.orderCheckout, payload)
       if (!res?.data) throw new Error("Payment init failed")
@@ -340,7 +358,7 @@ export default function CartPage() {
         return
       }
 
-      // RAZORPAY SCRIPT GUARD (Safety Net)
+      // RAZORPAY SCRIPT GUARD
       if (!(window as any).Razorpay) {
         toast.error("Payment system failed to load. Please check your internet connection.")
         setIsCheckoutLoading(false)
@@ -394,7 +412,7 @@ export default function CartPage() {
     }
   }
 
-  // Handle address select with server sync (PATCH /api/address/flags/)
+  // Handle address select with server sync
   const handleAddressSelectSync = async (addr: any) => {
     setSelectedAddressId(addr.id)
     try {
@@ -643,7 +661,7 @@ export default function CartPage() {
               {/* Toggle */}
               <div className="flex rounded-2xl border border-slate-100 bg-white p-1.5 shadow-sm">
                 <button
-                  onClick={handleInstantSelect}
+                  onClick={() => setScheduleType("instant")}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "instant"
                     ? "bg-[#800000] text-white shadow-lg shadow-red-900/20"
                     : "text-slate-500 hover:bg-slate-50"
@@ -666,22 +684,49 @@ export default function CartPage() {
               </div>
 
               {/* Instant View */}
-              {scheduleType === "instant" && (
-                <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm animate-in slide-in-from-top-2">
-                  {instant?.available ? (
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
-                        <Clock className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-[#1a1c2e]">Technician Available Now</p>
-                        <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-green-600 font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
+              {(scheduleType === "instant" || !scheduleType) && (
+                <div className="animate-in slide-in-from-top-2">
+                  {!zoneData ? (
+                    /* SKELETON LOADING STATE */
+                    <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm animate-pulse">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-slate-100 rounded-full w-1/2" />
+                          <div className="h-3 bg-slate-100 rounded-full w-3/4" />
+                        </div>
                       </div>
                     </div>
+                  ) : instant?.available ? (
+                    <button
+                      onClick={handleInstantSelect}
+                      className={`w-full bg-white p-5 rounded-3xl border-2 transition-all shadow-sm relative overflow-hidden group ${selectedTime === "instant"
+                        ? 'border-[#800000] bg-red-50/30'
+                        : 'border-slate-100 hover:border-slate-200'
+                        }`}
+                    >
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#800000] text-white' : 'bg-green-50 text-green-600'}`}>
+                          <Clock className="w-6 h-6" />
+                        </div>
+                        <div className="text-left">
+                          <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>Technician Available Now</p>
+                          <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-green-600 font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
+                        </div>
+                      </div>
+
+                      {selectedTime === "instant" && (
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                          <CheckCircle className="w-6 h-6 text-[#800000]" />
+                        </div>
+                      )}
+                    </button>
                   ) : (
-                    <div className="flex items-center gap-4 text-amber-600 bg-amber-50/50 p-4 rounded-2xl">
-                      <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-                      <p className="text-sm font-bold leading-tight">Instant service currently unavailable for this location. Please schedule for later.</p>
+                    <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                      <div className="flex items-center gap-4 text-amber-600 bg-amber-50/50 p-4 rounded-2xl">
+                        <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                        <p className="text-sm font-bold leading-tight">Instant service currently unavailable for this location. Please schedule for later.</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -858,7 +903,7 @@ export default function CartPage() {
                 <div className="space-y-4 pt-2">
                   <button
                     onClick={handleCheckout}
-                    disabled={isCheckoutLoading || cartItems.length === 0 || !selectedAddressId || (scheduleType === "later" && !selectedTime) || (scheduleType === "instant" && !instant?.available)}
+                    disabled={isCheckoutLoading || cartItems.length === 0 || !selectedAddressId || !selectedTime}
                     className="w-full bg-[#800000] hover:bg-[#600000] text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] shadow-xl shadow-red-900/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#800000] disabled:active:scale-100 disabled:shadow-none"
                   >
                     {isCheckoutLoading ? (
@@ -867,10 +912,8 @@ export default function CartPage() {
                       <AlertTriangle className="w-5 h-5" />
                     ) : !selectedAddressId ? (
                       <MapPin className="w-5 h-5" />
-                    ) : (scheduleType === "later" && !selectedTime) ? (
+                    ) : !selectedTime ? (
                       <Clock className="w-5 h-5" />
-                    ) : (scheduleType === "instant" && !instant?.available) ? (
-                      <AlertTriangle className="w-5 h-5" />
                     ) : (
                       <CheckCircle className="w-5 h-5" />
                     )}
@@ -881,11 +924,9 @@ export default function CartPage() {
                         ? 'Cart is Empty'
                         : !selectedAddressId
                           ? 'Select Address'
-                          : (scheduleType === "later" && !selectedTime)
-                            ? 'Select Time Slot'
-                            : (scheduleType === "instant" && !instant?.available)
-                              ? 'Instant Service Unavailable'
-                              : 'Confirm Booking'}
+                          : !selectedTime
+                            ? 'Select Service Time'
+                            : 'Confirm Booking'}
                   </button>
                   <p className="text-[10px] text-center text-slate-400 font-medium px-4 leading-normal">
                     Inclusive of all taxes and service charges
@@ -904,12 +945,12 @@ export default function CartPage() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-bold mb-2 text-[#1a1c2e]">Payment Successful 🎉</h2>
+            <h2 className="text-xl font-bold mb-2 text-[#1a1c2e]">Payment Successful!</h2>
             <p className="text-sm text-slate-500">
               Your order has been placed successfully
             </p>
             <p className="mt-3 text-xs text-slate-400">
-              Redirecting to order page...
+              Redirecting to order page
             </p>
           </div>
         </div>

@@ -65,7 +65,7 @@ export function LocationProvider({ children }: any) {
         params: { lat, lng }
       })
       if (res?.data) {
-        setZoneData(res.data?.data)
+        setZoneData(res.data?.zone_slot || res.data?.data)
       }
     } catch (err: any) {
       // Silence expected server-side errors to avoid triggering the dev overlay
@@ -167,7 +167,15 @@ export function LocationProvider({ children }: any) {
 
   useEffect(() => {
     if (location?.lat && location?.lng) {
+      // INITIAL FETCH
       fetchZoneData(location.lat, location.lng)
+
+      // BACKGROUND HEARTBEAT (Auto-refresh every 60 seconds)
+      const interval = setInterval(() => {
+        fetchZoneData(location.lat, location.lng)
+      }, 60000)
+
+      return () => clearInterval(interval)
     }
   }, [location?.lat, location?.lng, fetchZoneData])
 
