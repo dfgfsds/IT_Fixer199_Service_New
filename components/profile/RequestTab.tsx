@@ -32,6 +32,7 @@ function RequestSkeleton() {
 }
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { ClipboardList, Clock, CheckCircle, XCircle, AlertCircle, Wrench, ChevronRight, Search, Activity, RotateCcw, CalendarClock } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import axiosInstance from '@/configs/axios-middleware'
@@ -171,7 +172,7 @@ export default function RequestTab() {
             <div className="flex items-center justify-between">
                 <h3 className="text-2xl font-black text-[#1a1c2e]">My Requests</h3>
                 {!loading && requests.length > 0 && (
-                    <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full">
+                    <span className="text-xs font-bold text-white bg-[#800000] px-3 py-1.5 rounded-full">
                         {requests.length} {requests.length === 1 ? 'Request' : 'Requests'}
                     </span>
                 )}
@@ -223,9 +224,10 @@ export default function RequestTab() {
                         }
 
                         return (
-                            <div
+                            <Link
+                                href={`/requests/${req.id}`}
                                 key={req.id}
-                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#800000]/20 group"
+                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#800000]/20 group cursor-pointer"
                             >
                                 {/* Left: icon + info */}
                                 <div className="flex items-start gap-5 min-w-0 flex-1">
@@ -234,25 +236,15 @@ export default function RequestTab() {
                                     >
                                         {typeInfo.icon}
                                     </div>
-                                    <div className="min-w-0 flex-1">
+                                    <div className="min-w-0 flex-1 text-left">
                                         <div className="flex items-center gap-2 mb-1">
                                             <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
-                                                {/* Order ID: {req.order_id?.slice(0, 8)}... */}
                                                 Order ID: {req.order_id}
                                             </p>
-                                            {/* <span className="w-1 h-1 rounded-full bg-slate-200" /> */}
-                                            {/* 
-                                            <span className={`text-[10px] font-black uppercase tracking-widest ${typeInfo.color}`}>
-                                                {typeInfo.label}
-                                            </span> 
-                                            */}
                                         </div>
                                         <h4 className="font-bold text-[#1a1c2e] text-lg leading-tight truncate">
                                             {typeInfo.label}
                                         </h4>
-                                        {/* <p className="text-slate-400 text-[13px] font-bold mt-1">
-                                            {serviceName}
-                                        </p> */}
 
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {req.device_serial_number && (
@@ -267,7 +259,7 @@ export default function RequestTab() {
                                             )}
                                         </div>
 
-                                        <p className="text-slate-400 text-xs font-medium mt-0">
+                                        <p className="text-slate-400 text-xs font-medium mt-1">
                                             Submitted on {formatDate(req.created_at)}
                                         </p>
                                     </div>
@@ -276,7 +268,6 @@ export default function RequestTab() {
                                 {/* Right: status badge + chevron */}
                                 <div className="flex items-center justify-between md:justify-end gap-8 shrink-0">
                                     <div className="text-right flex flex-col items-end gap-2">
-                                        {/* Status badge */}
                                         <span
                                             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest ${statusConfig.badge}`}
                                         >
@@ -290,7 +281,7 @@ export default function RequestTab() {
                                         <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         )
                     })}
                 </div>

@@ -26,7 +26,7 @@ export function Hero() {
             </div>
 
             {/* Search Bar */}
-            <div className="pt-4 space-y-3">
+            {/* <div className="pt-4 space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 flex items-center gap-3 bg-muted rounded-xl p-4 border border-border/50 hover:border-accent/50 transition-colors">
                   <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
@@ -41,7 +41,7 @@ export function Hero() {
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* Trust Indicators */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-border">
