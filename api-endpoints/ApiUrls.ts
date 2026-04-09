@@ -49,6 +49,9 @@ const orderCheckout = `${baseUrl}/api/order/checkout/`;
 // Orders
 const orders = `${baseUrl}/api/order/orders/`;
 
+// Requests
+const requests = `${baseUrl}/api/request/`;
+
 // slotChange
 const slotChange = `${baseUrl}/api/request/slot-change/`;
 
@@ -90,6 +93,7 @@ export default {
     appSettings,
     orderCheckout,
     orders,
+    requests,
     slotChange,
     requestCancellation,
     requestRefund,

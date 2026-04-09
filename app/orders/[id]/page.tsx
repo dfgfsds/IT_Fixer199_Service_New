@@ -6,12 +6,13 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle, FileText, User as UserIcon, Calendar, IndianRupee, Loader2, Phone, MoreVertical, X, Package, Wifi } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle, FileText, User as UserIcon, Calendar, IndianRupee, Loader2, Phone, MoreVertical, X, Package, Wifi, Check } from 'lucide-react'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { formatPrice } from '@/lib/format-price'
+import { useLocation } from '@/context/location-context'
 
 // SSR-safe dynamic import for LiveMap
 const LiveMap = dynamic(
@@ -76,9 +77,16 @@ const cancellationReasons = [
   { value: "DUPLICATE_BOOKING", label: "Duplicate Booking" },
   { value: "AGENT_UNAVAILABLE", label: "Agent Unavailable" },
   { value: "AGENT_RUNNING_LATE", label: "Agent Running Late" },
+  { value: "AGENT_PERSONAL_EMERGENCY", label: "Agent Personal Emergency" },
+  { value: "AGENT_VEHICLE_ISSUE", label: "Agent Vehicle Issue" },
+  { value: "AGENT_UNABLE_TO_CONTACT_CUSTOMER", label: "Unable to Contact Customer" },
   { value: "CUSTOMER_NOT_RESPONDING", label: "Customer Not Responding" },
+  { value: "CUSTOMER_NOT_AVAILABLE_AT_LOCATION", label: "Customer Not Available at Location" },
   { value: "SERVICE_DELAY", label: "Service Delay" },
+  { value: "OUT_OF_STOCK", label: "Out of Stock" },
   { value: "PRICE_DISPUTE", label: "Price Dispute" },
+  { value: "SERVICE_NOT_AVAILABLE", label: "Service Not Available" },
+  { value: "ADDRESS_NOT_SERVICEABLE", label: "Address Not Serviceable" },
   { value: "TECHNICAL_ISSUE", label: "Technical Issue" },
   { value: "OTHER", label: "Other" },
 ]
@@ -87,23 +95,47 @@ const slotChangeReasons = [
   { value: "AGENT_UNAVAILABLE", label: "Agent Unavailable" },
   { value: "RUNNING_LATE", label: "Running Late" },
   { value: "EMERGENCY", label: "Emergency" },
+  { value: "VEHICLE_ISSUE", label: "Vehicle Issue" },
+  { value: "PERSONAL_REASON", label: "Personal Reason" },
   { value: "NOT_AVAILABLE_AT_TIME", label: "Not Available at Selected Time" },
   { value: "DELAY", label: "Delay" },
+  { value: "OVERBOOKED", label: "Overbooked" },
+  { value: "ROUTE_CONFLICT", label: "Route Conflict" },
+  { value: "SERVICE_DELAY", label: "Service Delay" },
+  { value: "PARTS_DELAY", label: "Parts Delay" },
+  { value: "RESOURCE_UNAVAILABLE", label: "Resource Unavailable" },
   { value: "TRAFFIC_DELAY", label: "Traffic Delay" },
   { value: "WEATHER_ISSUE", label: "Weather Issue" },
+  { value: "LOCATION_ACCESS_ISSUE", label: "Location Access Issue" },
   { value: "OTHER", label: "Other" },
 ]
 
 export default function SingleOrderPage() {
   const { id } = useParams()
   const router = useRouter()
+  const { zoneData, setLocation } = useLocation()
 
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const [actionType, setActionType] = useState<'cancel' | 'slot' | 'refund' | null>(null)
+
+  // Slot selection state
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
+  const [selectedSlot, setSelectedSlot] = useState<any>(null)
+
   const [formData, setFormData] = useState({ reason: '', description: '', date: '', slotId: '' })
   const [submitting, setSubmitting] = useState(false)
+
+  const DATES = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() + i)
+    return {
+      value: d.toISOString().split("T")[0],
+      label: i === 0 ? "TODAY" : d.toLocaleDateString("en-IN", { weekday: "short" }),
+      day: d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    }
+  })
 
   // Live Tracking
   const [showTracking, setShowTracking] = useState(false)
@@ -177,6 +209,17 @@ export default function SingleOrderPage() {
         else if (fetchedOrder?.agent_details?.latitude) setAgentLocation({ lat: fetchedOrder.agent_details.latitude, lng: fetchedOrder.agent_details.longitude })
         else if (fetchedOrder?.agent?.latitude) setAgentLocation({ lat: fetchedOrder.agent.latitude, lng: fetchedOrder.agent.longitude })
       }
+
+      // SYNC LOCATION CONTEXT to fetch slots for THIS order's location
+      if (fetchedOrder?.latitude && fetchedOrder?.longitude) {
+        setLocation({
+          lat: Number(fetchedOrder.latitude),
+          lng: Number(fetchedOrder.longitude),
+          city: fetchedOrder.user_details?.city || "Unknown",
+          address: fetchedOrder.address || fetchedOrder.user_address?.full_address || "",
+        })
+      }
+
     } catch {
       toast.error('Failed to load order details.')
       router.push('/profile?tab=orders')
@@ -197,10 +240,21 @@ export default function SingleOrderPage() {
         toast.success('Cancellation request submitted.')
       }
       if (actionType === 'slot') {
+        const item = order.items?.[0]
+        if (!selectedSlot || !item) {
+          toast.error("Please select a new time slot")
+          setSubmitting(false)
+          return
+        }
+
         await axiosInstance.post(Api.slotChange, {
           order_id: order.id,
-          requested_slot_id: formData.slotId,
-          requested_date: formData.date,
+          order_item_id: item.id,
+          // current_slot_id: order.fullData?.slot_id || item.slot_id || "",
+          requested_slot_id: selectedSlot.id,
+          requested_date: selectedDate,
+          requested_start_time: selectedSlot.start_time,
+          requested_end_time: selectedSlot.end_time,
           slot_change_reason_type: formData.reason,
           slot_change_reason_description: formData.description,
         })
@@ -210,21 +264,68 @@ export default function SingleOrderPage() {
         await axiosInstance.post(Api.requestRefund, { order_id: order.id })
         toast.success('Refund request submitted.')
       }
+
+      // RESET STATE AFTER SUCCESS
       setActionType(null)
+      setSelectedSlot(null)
+      setFormData({ reason: '', description: '', date: '', slotId: '' })
+      fetchOrder()
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Request failed. Please try again.')
+      console.error('Action failed:', err?.response?.data || err.message)
+      toast.error(err?.response?.data?.message || 'Action failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
 
+  // Cleanup effect when modal closes
+  useEffect(() => {
+    if (!actionType) {
+      setSelectedSlot(null)
+      setFormData({ reason: '', description: '', date: '', slotId: '' })
+    }
+  }, [actionType])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-12 h-12 text-[#800000] animate-spin" />
+        <main className="flex-1 py-12 lg:py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full animate-pulse">
+          {/* Back Button Skeleton */}
+          <div className="w-32 h-4 bg-slate-200 rounded-full mb-8" />
+
+          {/* Banner Skeleton */}
+          <div className="w-full h-48 bg-white border border-slate-100 rounded-[40px] mb-10 p-10 flex flex-col justify-center gap-4">
+            <div className="w-1/4 h-3 bg-slate-100 rounded-full" />
+            <div className="w-1/2 h-10 bg-slate-200 rounded-2xl" />
+            <div className="w-1/3 h-4 bg-slate-100 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            {/* Left Column Skeletons */}
+            <div className="lg:col-span-2 space-y-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-[40px] p-8 border border-slate-100 h-40 flex flex-col justify-center gap-4">
+                  <div className="w-1/3 h-4 bg-slate-200 rounded-full mb-2" />
+                  <div className="flex items-center gap-4 bg-slate-50 rounded-3xl p-5 h-20">
+                    <div className="w-12 h-12 bg-white rounded-2xl" />
+                    <div className="flex-1 space-y-2">
+                      <div className="w-1/4 h-2 bg-slate-200 rounded-full" />
+                      <div className="w-1/2 h-4 bg-slate-200 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right Column Skeletons */}
+            <div className="space-y-8">
+              <div className="bg-[#1a1c2e] rounded-[40px] p-8 h-48 opacity-20" />
+              <div className="bg-white rounded-[40px] p-8 border border-slate-100 h-60" />
+            </div>
+          </div>
         </main>
+        <Footer />
       </div>
     )
   }
@@ -293,11 +394,13 @@ export default function SingleOrderPage() {
                           <Calendar className="w-4 h-4" /> Change Slot
                         </button>
                       )}
+                      {/* 
                       {showRefund && (
                         <button onClick={() => { setActionType('refund'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#1a1c2e] hover:bg-slate-50 transition flex items-center gap-3">
                           <IndianRupee className="w-4 h-4" /> Request Refund
                         </button>
-                      )}
+                      )} 
+                      */}
                     </div>
                   )}
                 </div>
@@ -474,9 +577,9 @@ export default function SingleOrderPage() {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="max-h-[60vh] overflow-y-auto pr-2 scrollbar-hide space-y-6">
               {actionType === 'cancel' && (
-                <>
+                <div className="space-y-4">
                   <select
                     className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
@@ -490,35 +593,90 @@ export default function SingleOrderPage() {
                     className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 resize-none placeholder:font-medium"
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
-                </>
+                </div>
               )}
 
               {actionType === 'slot' && (
-                <>
-                  <input
-                    type="date"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  />
-                  <input
-                    placeholder="Slot ID"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 placeholder:font-medium"
-                    onChange={(e) => setFormData({ ...formData, slotId: e.target.value })}
-                  />
-                  <select
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
-                    onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  >
-                    <option value="">Select Reason</option>
-                    {slotChangeReasons.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
-                  </select>
-                  <textarea
-                    placeholder="Additional description (optional)"
-                    rows={3}
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 resize-none placeholder:font-medium"
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </>
+                <div className="space-y-6">
+                  {/* Fixed Date Indicator */}
+                  <div className="flex items-center gap-3 p-4 bg-[#800000]/5 border border-[#800000]/10 rounded-2xl">
+                    <Calendar className="w-5 h-5 text-[#800000]" />
+                    <div>
+                      <p className="text-[10px] font-black text-[#800000] uppercase tracking-widest">Scheduling For</p>
+                      <p className="font-bold text-[#1a1c2e]">Today, {new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'long' })}</p>
+                    </div>
+                  </div>
+
+                  {/* Current Slot Reference */}
+                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Appointment</p>
+                        <p className="font-bold text-[#1a1c2e] text-sm">{order.slot || 'Not assigned'}</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black text-[#800000] uppercase bg-red-50 px-2 py-1 rounded-full">Selected</span>
+                  </div>
+
+                  {/* Slot Selection */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Select New Time</p>
+                      {selectedSlot && (
+                        <button onClick={() => setSelectedSlot(null)} className="text-[10px] font-black text-[#800000] uppercase underline">Clear</button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {zoneData?.slots && zoneData.slots.length > 0 ? (
+                        zoneData.slots.map((slot: any) => (
+                          <button
+                            key={slot.id}
+                            onClick={() => setSelectedSlot(slot)}
+                            className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${selectedSlot?.id === slot.id
+                              ? 'border-[#800000] bg-red-50/30'
+                              : 'border-slate-100 bg-slate-50 hover:bg-white'
+                              }`}
+                          >
+                            <div className="text-left">
+                              <p className={`font-bold text-sm ${selectedSlot?.id === slot.id ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>
+                                {slot.name}
+                              </p>
+                              <p className={`text-[11px] font-medium ${selectedSlot?.id === slot.id ? 'text-[#800000]/70' : 'text-slate-400'}`}>
+                                {slot.start_time} - {slot.end_time}
+                              </p>
+                            </div>
+                            {selectedSlot?.id === slot.id && <CheckCircle className="w-5 h-5 text-[#800000]" />}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="col-span-2 text-center py-10 bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-slate-400 text-sm font-medium">
+                          No slots available for today
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Reason Selection */}
+                  <div className="space-y-3 pt-2">
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Reason for Change</p>
+                    <select
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
+                      onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                    >
+                      <option value="">Select Reason</option>
+                      {slotChangeReasons.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
+                    <textarea
+                      placeholder="Additional description (optional)"
+                      rows={2}
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 resize-none placeholder:font-medium"
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    />
+                  </div>
+                </div>
               )}
 
               {actionType === 'refund' && (
@@ -529,7 +687,7 @@ export default function SingleOrderPage() {
               )}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 pt-4 border-t border-slate-100">
               <button
                 onClick={() => setActionType(null)}
                 disabled={submitting}
@@ -539,10 +697,10 @@ export default function SingleOrderPage() {
               </button>
               <button
                 onClick={handleAction}
-                disabled={submitting}
-                className="flex-1 py-4 bg-[#800000] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-70 shadow-lg shadow-[#800000]/20"
+                disabled={submitting || (actionType === 'cancel' && !formData.reason) || (actionType === 'slot' && (!formData.reason || !selectedSlot))}
+                className="flex-1 py-4 bg-[#800000] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#800000]/20"
               >
-                {submitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Submit'}
+                {submitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Submit Request'}
               </button>
             </div>
           </div>

@@ -38,7 +38,7 @@ export function Header() {
       const queryLower = query.toLowerCase()
       const lat = location?.lat
       const lng = location?.lng
-      
+
       if (!lat || !lng) {
         setIsSearching(false)
         return
@@ -74,20 +74,20 @@ export function Header() {
       // Parse Services
       const servicesArray = Array.isArray(servicesRes.data) ? servicesRes.data : (servicesRes.data?.services || [])
       const matchedServices = servicesArray
-        .filter((s: any) => 
-          s.status === "ACTIVE" && 
-          (s.name.toLowerCase().includes(queryLower) || 
-           (s.categories?.[0]?.name || '').toLowerCase().includes(queryLower))
+        .filter((s: any) =>
+          s.status === "ACTIVE" &&
+          (s.name.toLowerCase().includes(queryLower) ||
+            (s.categories?.[0]?.name || '').toLowerCase().includes(queryLower))
         )
         .slice(0, 4) // Show top 4 suggestions
 
       // Parse Products
       const productsData = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || productsRes.data?.products || [])
       const matchedProducts = productsData
-        .filter((p: any) => 
+        .filter((p: any) =>
           p.status === "ACTIVE" &&
           (p.name.toLowerCase().includes(queryLower) ||
-           (p.categories?.[0]?.name || '').toLowerCase().includes(queryLower))
+            (p.categories?.[0]?.name || '').toLowerCase().includes(queryLower))
         )
         .slice(0, 4) // Show top 4 suggestions
 
@@ -176,11 +176,10 @@ export function Header() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length > 1 && setShowDropdown(true)}
                   placeholder="Search for services, repairs, accessories..."
-                  className={`w-full transition-all duration-300 py-3 px-6 pr-12 text-sm outline-none ${
-                    showDropdown 
-                      ? 'bg-white border-slate-200 rounded-t-3xl shadow-lg border-b-0' 
+                  className={`w-full transition-all duration-300 py-3 px-6 pr-12 text-sm outline-none ${showDropdown
+                      ? 'bg-white border-slate-200 rounded-t-3xl shadow-lg border-b-0'
                       : 'bg-slate-100/80 border-transparent focus:bg-white focus:border-slate-200 rounded-full'
-                  }`}
+                    }`}
                   autoComplete="off"
                 />
                 <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 group-focus-within:text-[#800000] hover:text-[#800000] transition-colors">
@@ -203,12 +202,12 @@ export function Header() {
                                 className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
                               >
                                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-                                  <Image 
-                                    src={s.media_files?.[0]?.image_url || '/placeholder-service.jpg'} 
-                                    alt={s.name} 
-                                    width={48} 
-                                    height={48} 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                  <Image
+                                    src={s.media_files?.[0]?.image_url || '/placeholder-service.jpg'}
+                                    alt={s.name}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                   />
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -236,12 +235,12 @@ export function Header() {
                                 className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
                               >
                                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-                                  <Image 
-                                    src={p.media?.[0]?.url || '/placeholder.jpg'} 
-                                    alt={p.name} 
-                                    width={48} 
-                                    height={48} 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                  <Image
+                                    src={p.media?.[0]?.url || '/placeholder.jpg'}
+                                    alt={p.name}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                   />
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -270,7 +269,7 @@ export function Header() {
                       {/* Footer Link if we have results */}
                       {(searchResults.services.length > 0 || searchResults.products.length > 0) && (
                         <div className="px-6 pt-4 border-t border-slate-100 mt-2">
-                          <button 
+                          <button
                             onClick={handleSearchSubmit as any}
                             className="w-full py-3 bg-[#800000]/5 hover:bg-[#800000]/10 text-[#800000] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
                           >
@@ -338,7 +337,7 @@ export function Header() {
               <Link href="/" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Home</Link>
               <Link href="/about" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">About</Link>
               <Link href="/services" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Services</Link>
-              <Link href="/blog" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Blog</Link>
+              {/* <Link href="/blog" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Blog</Link> */}
               <Link href="/categories" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Categories</Link>
               <Link href="/products" className="text-[15px] font-medium text-slate-500 hover:text-[#1a1c2e] transition-colors border-b-2 border-transparent hover:border-[#1a1c2e] h-full flex items-center">Products</Link>
             </nav>
