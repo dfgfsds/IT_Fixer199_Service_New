@@ -30,6 +30,7 @@ function AddressSkeleton() {
   )
 }
 
+import { safeErrorLog } from '@/lib/error-handler'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { MapPin, LogOut, Plus, Map, Loader2 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
@@ -196,7 +197,7 @@ export default function AddressesTab() {
       }, 300);
 
     } catch (error) {
-      console.error("Map initialization failed:", error instanceof Error ? error.message : String(error));
+      safeErrorLog("Map initialization failed", error);
       toast.error("Failed to load Map. Please check your connection.");
     } finally {
       setMapLoading(false);
@@ -213,7 +214,7 @@ export default function AddressesTab() {
         lng: lng.toString()
       }));
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      safeErrorLog("Marker update failed", error);
     }
   };
 
@@ -272,7 +273,7 @@ export default function AddressesTab() {
                 markerRef.current.setPosition({ lat: latitude, lng: longitude });
               }
             } catch (error) {
-              console.error("Reverse geocoding failed:", error instanceof Error ? error.message : String(error));
+              safeErrorLog("Reverse geocoding failed", error);
             } finally {
               setMapLoading(false);
             }
@@ -380,13 +381,11 @@ export default function AddressesTab() {
             state: topAddr.state
           });
         } catch (err) {
-          console.error("Auto-selection failed:", err instanceof Error ? err.message : String(err))
+          safeErrorLog("Auto-selection failed", err)
         }
       }
     } catch (error: any) {
-      if (error.response?.status !== 401) {
-        console.error('Error fetching addresses:', error instanceof Error ? error.message : String(error))
-      }
+      safeErrorLog('Error fetching addresses', error)
     } finally {
       setLoadingAddresses(false)
     }

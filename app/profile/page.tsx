@@ -14,7 +14,9 @@ import RequestTab from '@/components/profile/RequestTab'
 import { toast } from 'sonner'
 import { useRef } from 'react'
 
-export default function ProfilePage() {
+import { Suspense } from 'react'
+
+function ProfileContent() {
   const router = useRouter()
   const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
@@ -148,5 +150,25 @@ export default function ProfilePage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center py-20 p-8 space-y-6">
+            <div className="max-w-md w-full h-[500px] bg-white rounded-[40px] animate-pulse flex items-center justify-center text-slate-300 font-bold uppercase tracking-widest text-sm">
+              Loading Profile...
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <ProfileContent />
+    </Suspense>
   )
 }

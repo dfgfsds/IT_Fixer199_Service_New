@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -48,7 +49,7 @@ export default function ServicesPage() {
                 category: Array.isArray(s.categories) && s.categories.length > 0 ? (s.categories[0]?.name || 'Service') : 'Service',
                 price: Number(sellingPrice),
                 originalPrice: regularPrice ? Number(regularPrice) : undefined,
-                image: s.media_files?.[0]?.image_url || '/placeholder-service.jpg',
+                image: s.media_files?.[0]?.image_url || '/placeholder-image.jpg',
                 inStock: s.status === "ACTIVE",
                 rating: s.rating || 4.5,
                 reviews: s.reviews_count || 100,
@@ -58,12 +59,7 @@ export default function ServicesPage() {
           setServices(mappedServices)
         }
       } catch (err: any) {
-        // Silence console.error for expected 400 "No services" responses
-        // to avoid triggering the Next.js dev overlay button
-        if (err.response?.status !== 400) {
-          console.error("Error fetching services:", err instanceof Error ? err.message : String(err))
-        }
-
+        safeErrorLog("Error fetching services", err)
         if (err.response?.status === 400 && err.response?.data?.message) {
           setError(err.response.data.message)
         } else {

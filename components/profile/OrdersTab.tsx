@@ -39,6 +39,7 @@ import { formatPrice } from '@/lib/format-price'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { useAuth } from '@/context/auth-context'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function OrdersTab() {
   const { user } = useAuth()
@@ -55,9 +56,7 @@ export default function OrdersTab() {
       const res = await axiosInstance.get(Api.orders)
       setOrders(res?.data?.orders || [])
     } catch (error: any) {
-      if (error?.response?.status !== 401) {
-        console.error("Failed to fetch orders:", (error as any)?.message || String(error))
-      }
+      safeErrorLog("Failed to fetch orders", error)
     } finally {
       setLoading(false)
     }

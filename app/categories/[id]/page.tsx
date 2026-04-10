@@ -11,6 +11,7 @@ import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { useRouter } from 'next/navigation'
 import { type Product } from '@/lib/products'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function CategorySinglePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -22,6 +23,14 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
     const [services, setServices] = useState<Product[]>([])
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    // Clear state immediately when ID or Location changes
+    useEffect(() => {
+        setServices([])
+        setProducts([])
+        setError(null)
+    }, [id, location?.lat, location?.lng])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,7 +66,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                         category: s.categories?.[0]?.name || 'Service',
                         price: Number(sellingPrice),
                         originalPrice: regularPrice ? Number(regularPrice) : undefined,
-                        image: s.media_files?.[0]?.image_url || s.media?.[0]?.url || '/placeholder-service.jpg',
+                        image: s.media_files?.[0]?.image_url || s.media?.[0]?.url || '/placeholder-image.jpg',
                         inStock: s.status === "ACTIVE",
                         rating: s.rating || 4.5,
                         reviews: s.reviews_count || 100,
@@ -86,7 +95,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                         category: p.category_name || 'Product',
                         price: Number(sellingPrice),
                         originalPrice: regularPrice ? Number(regularPrice) : undefined,
-                        image: p.media?.[0]?.url || '/placeholder-product.jpg',
+                        image: p.media?.[0]?.url || '/placeholder-image.jpg',
                         inStock: true,
                         rating: p.rating || 4.5,
                         reviews: p.reviews_count || 50,
@@ -95,8 +104,12 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                 })
                 setProducts(mappedProducts)
 
-            } catch (error) {
-                console.error("Error fetching category data:", error instanceof Error ? error.message : String(error))
+            } catch (error: any) {
+                safeErrorLog("Error fetching category data", error)
+                // If API fails (e.g. out of zone), ensure we don't show old data
+                setServices([])
+                setProducts([])
+                setError(error.response?.data?.message || 'Content not available at this location.')
             } finally {
                 setLoading(false)
             }
@@ -197,7 +210,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                                     Available Services ({services.length})
                                 </h2>
                             </div>
-                            
+
                             {services.length > 0 ? (
                                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
                                     {services.map((service: any) => (

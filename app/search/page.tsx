@@ -5,16 +5,17 @@ import { Footer } from '@/components/footer'
 import { ServiceCard } from '@/components/service-card'
 import { ProductCard } from '@/components/product-card'
 import { Search, Loader2 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useLocation } from '@/context/location-context'
 import { useSearchParams } from 'next/navigation'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams()
   const currentQuery = searchParams.get('q') || ''
-  
+
   const [services, setServices] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,20 +29,20 @@ export default function SearchPage() {
       }
       setLoading(true)
       setError(null)
-      
+
       try {
         const queryLower = currentQuery.toLowerCase()
-        
+
         // Fetch services
         const servicesUrl = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}&size=10000`
         const servicesPromise = axiosInstance.get(servicesUrl).catch(e => ({ data: [] }))
-        
+
         // Fetch products
         const productsUrl = `${Api.products}/?include_pricing=true&include_media=true&include_category=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}&size=10000&include_attribute=true`
         const productsPromise = axiosInstance.get(productsUrl).catch(e => ({ data: [] }))
-        
+
         const [servicesRes, productsRes] = await Promise.all([servicesPromise, productsPromise])
-        
+
         // Process Services
         const servicesArray = Array.isArray(servicesRes.data) ? servicesRes.data : (servicesRes.data?.services || [])
         const mappedServices = Array.isArray(servicesArray) ? servicesArray
@@ -55,52 +56,52 @@ export default function SearchPage() {
               category: Array.isArray(s.categories) && s.categories.length > 0 ? (s.categories[0]?.name || 'Service') : 'Service',
               price: Number(sellingPrice),
               originalPrice: regularPrice ? Number(regularPrice) : undefined,
-              image: s.media_files?.[0]?.image_url || '/placeholder-service.jpg',
+              image: s.media_files?.[0]?.image_url || '/placeholder-image.jpg',
               inStock: s.status === "ACTIVE",
               rating: s.rating || 4.5,
               reviews: s.reviews_count || 100,
               badge: s.badge || 'Service'
             }
           }) : []
-          
+
         // Process Products
         const responseData = productsRes.data
         const productsData = Array.isArray(responseData)
-            ? responseData
-            : (responseData?.data || responseData?.products || [])
-            
+          ? responseData
+          : (responseData?.data || responseData?.products || [])
+
         const mappedProducts = productsData.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            category: p.categories?.[0]?.name || p.category_name || p.category?.name || 'Uncategorized',
-            price: Number(p.pricing?.[0]?.price || 0),
-            originalPrice: p.pricing?.[0]?.regular_price ? Number(p.pricing?.[0]?.regular_price) : undefined,
-            image: p.media?.[0]?.url || '/placeholder.jpg',
-            inStock: p.status === 'ACTIVE',
-            rating: p.rating || 4.5,
-            reviews: p.reviews_count || 50,
-            badge: p.badge || 'New'
+          id: p.id,
+          name: p.name,
+          category: p.categories?.[0]?.name || p.category_name || p.category?.name || 'Uncategorized',
+          price: Number(p.pricing?.[0]?.price || 0),
+          originalPrice: p.pricing?.[0]?.regular_price ? Number(p.pricing?.[0]?.regular_price) : undefined,
+          image: p.media?.[0]?.url || '/placeholder-image.jpg',
+          inStock: p.status === 'ACTIVE',
+          rating: p.rating || 4.5,
+          reviews: p.reviews_count || 50,
+          badge: p.badge || 'New'
         }))
 
         // Filter based on query client side
-        const searchedServices = mappedServices.filter((s: any) => 
-            s.name.toLowerCase().includes(queryLower) || s.category.toLowerCase().includes(queryLower)
+        const searchedServices = mappedServices.filter((s: any) =>
+          s.name.toLowerCase().includes(queryLower) || s.category.toLowerCase().includes(queryLower)
         )
-        const searchedProducts = mappedProducts.filter((p: any) => 
-            p.name.toLowerCase().includes(queryLower) || p.category.toLowerCase().includes(queryLower)
+        const searchedProducts = mappedProducts.filter((p: any) =>
+          p.name.toLowerCase().includes(queryLower) || p.category.toLowerCase().includes(queryLower)
         )
 
         setServices(searchedServices)
         setProducts(searchedProducts)
-        
-      } catch (err) {
-        console.error("Search error:", err instanceof Error ? err.message : String(err))
+
+      } catch (err: any) {
+        safeErrorLog("Search error", err)
         setError('An error occurred during search.')
       } finally {
         setLoading(false)
       }
     }
-    
+
     fetchResults()
   }, [location?.lat, location?.lng, currentQuery])
 
@@ -187,5 +188,26 @@ export default function SearchPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center py-20 p-8 space-y-6">
+            <div className="relative">
+              <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
+              <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   )
 }

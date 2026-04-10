@@ -49,6 +49,7 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import { useRouter } from 'next/navigation'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const refresh = data?.tokens?.refresh || data?.refresh_token || data?.refresh;
 
     if (!token) {
-      console.error("Token not found in response structure. Body:", body)
+      safeErrorLog("Token not found in response structure", { body })
       return
     }
 
