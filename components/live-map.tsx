@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Loader2, Target } from 'lucide-react'
+import { safeErrorLog } from '@/lib/error-handler'
 
 // Helper: Handle Google Maps Script loading safely
 const loadGoogleMaps = () => {
@@ -128,7 +129,7 @@ export function LiveMap({
 
       setIsLoaded(true)
     } catch (err: any) {
-      console.error("Map Load Error", err)
+      safeErrorLog("Map Load Error", err)
       setError("Failed to load Google Maps")
     }
   }, [customerLat, customerLng])

@@ -37,6 +37,7 @@ import { ClipboardList, Clock, CheckCircle, XCircle, AlertCircle, Wrench, Chevro
 import { useAuth } from '@/context/auth-context'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
+import { safeErrorLog } from '@/lib/error-handler'
 
 interface ServiceRequest {
     id: string
@@ -150,9 +151,7 @@ export default function RequestTab() {
             const res = await axiosInstance.get(Api.requests)
             setRequests(Array.isArray(res.data) ? res.data : (res.data?.data || []))
         } catch (error: any) {
-            if (error?.response?.status !== 401) {
-                console.error('Failed to fetch requests:', error?.message || String(error))
-            }
+            safeErrorLog("Failed to fetch requests", error)
         } finally {
             setLoading(false)
         }

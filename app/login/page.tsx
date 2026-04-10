@@ -5,13 +5,15 @@ import { Footer } from '@/components/footer'
 import { Mail, Lock, ArrowRight, Phone, Smartphone, Loader2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
+import { safeErrorLog } from '@/lib/error-handler'
 import { useAuth } from '@/context/auth-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login, isLoggedIn } = useAuth()
@@ -56,7 +58,7 @@ export default function LoginPage() {
         const data = await response.json()
         setIpAddress(data.data?.ip || data.ip || '0.0.0.0')
       } catch (error) {
-        console.error('Error fetching IP:', error instanceof Error ? error.message : String(error))
+        safeErrorLog('Error fetching IP', error)
       }
     }
     fetchIp()
@@ -294,5 +296,23 @@ export default function LoginPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center py-20 px-4">
+          <div className="max-w-md w-full h-[500px] bg-white rounded-[40px] animate-pulse flex items-center justify-center text-slate-300 font-bold uppercase tracking-widest text-sm">
+            Loading...
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }

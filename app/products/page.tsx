@@ -8,6 +8,7 @@ import { Package, Loader2, ChevronLeft, ChevronRight, MapPin, Navigation } from 
 import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function AllProductsPage() {
     const { location, setShowLocationModal } = useLocation()
@@ -66,7 +67,7 @@ export default function AllProductsPage() {
                     category: p.categories?.[0]?.name || p.category_name || p.category?.name || 'Uncategorized',
                     price: Number(p.pricing?.[0]?.price || 0),
                     originalPrice: p.pricing?.[0]?.regular_price ? Number(p.pricing?.[0]?.regular_price) : undefined,
-                    image: p.media?.[0]?.url || '/placeholder.jpg',
+                    image: p.media?.[0]?.url || '/placeholder-image.jpg',
                     inStock: p.status === 'ACTIVE',
                     rating: p.rating || 4.5,
                     reviews: p.reviews_count || 50,
@@ -74,9 +75,7 @@ export default function AllProductsPage() {
                 }))
                 setProducts(mappedProducts)
             } catch (error: any) {
-                if (![400, 404, 422, 500].includes(error.response?.status)) {
-                    console.error("Error fetching products:", error instanceof Error ? error.message : String(error))
-                }
+                safeErrorLog("Error fetching products", error)
                 setProducts([])
                 setPaginationData(null)
             } finally {

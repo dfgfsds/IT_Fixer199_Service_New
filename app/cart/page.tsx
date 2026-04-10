@@ -14,6 +14,7 @@ import { formatPrice } from '@/lib/format-price'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/auth-context'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
@@ -86,7 +87,7 @@ export default function CartPage() {
         scheduled_date: selectedDate
       })
     } catch (err) {
-      console.error("Failed to sync slot to cart:", err)
+      safeErrorLog("Failed to sync slot to cart", err)
     }
   }
 
@@ -103,7 +104,7 @@ export default function CartPage() {
         scheduled_date: new Date().toISOString().split('T')[0]
       })
     } catch (err) {
-      console.error("Failed to sync instant slot to cart:", err)
+      safeErrorLog("Failed to sync instant slot to cart", err)
     }
   }
 
@@ -129,7 +130,7 @@ export default function CartPage() {
           setSelectedAddressId(selected.id)
         }
       } catch (err) {
-        console.error("Error fetching addresses:", err instanceof Error ? err.message : String(err))
+        safeErrorLog("Error fetching addresses", err)
       }
     }
 
@@ -201,7 +202,7 @@ export default function CartPage() {
       }
       await fetchCart()
     } catch (error: any) {
-      console.error('Update quantity error:', error?.response?.data, error instanceof Error ? error.message : String(error))
+      safeErrorLog('Update quantity error', error)
       toast.error('Failed to update quantity')
     } finally {
       setUpdatingId(null)
@@ -210,48 +211,16 @@ export default function CartPage() {
 
   const removeItem = async (item: any) => {
     setRemovingId(item.id)
-    const itemType = item.type || item.item_type || (item.product ? 'PRODUCT' : 'SERVICE')
-    const serviceId = item.service?.id || item.service_id
-    const productId = item.product?.id || item.product_id
-
-    const attempts = [
-      // 1. Decrease to 0
-      () => axiosInstance.post(`${Api.cartApi}/item/${item.id}/decrease/`, {
-        type: itemType, quantity: 0,
-        ...(serviceId ? { service_id: serviceId } : {}),
-        ...(productId ? { product_id: productId } : {}),
-      }),
-      // 2. PATCH update quantity to 0
-      () => axiosInstance.patch(`${Api.cartApi}/item/${item.id}/update/`, {
-        type: itemType, quantity: 0,
-        ...(serviceId ? { service_id: serviceId } : {}),
-        ...(productId ? { product_id: productId } : {}),
-      }),
-      // 3. DELETE /item/{id}/
-      () => axiosInstance.delete(`${Api.cartApi}/item/${item.id}/`),
-      // 4. DELETE /items/{id}/
-      () => axiosInstance.delete(`${Api.cartApi}/items/${item.id}/`),
-      // 5. POST /remove/ with item_id in body
-      () => axiosInstance.post(`${Api.cartApi}/remove/`, { item_id: item.id }),
-      // 6. DELETE /{cart_item_id}/ directly
-      () => axiosInstance.delete(`${Api.cartApi}/${item.id}/`),
-    ]
-
-    for (let i = 0; i < attempts.length; i++) {
-      try {
-        const res = await attempts[i]()
-        console.log(`Remove attempt ${i + 1} succeeded:`, res?.data)
-        await fetchCart()
-        toast.success('Item removed from cart')
-        setRemovingId(null)
-        return
-      } catch (err: any) {
-        console.error(`Remove attempt ${i + 1} failed:`, err?.response?.status, err?.response?.data)
-      }
+    try {
+      await axiosInstance.delete(`${Api.cartApi}/item/${item.id}/delete/`)
+      await fetchCart()
+      toast.success('Item removed from cart')
+    } catch (err: any) {
+      safeErrorLog('Failed to delete cart item', err)
+      toast.error('Could not remove item. Please try again.')
+    } finally {
+      setRemovingId(null)
     }
-
-    toast.error('Failed to remove item — check console for details')
-    setRemovingId(null)
   }
 
   const getItemName = (item: any) => item.service?.name || item.product?.name || item.service_name || item.product_name || item.name || 'Item'
@@ -338,6 +307,7 @@ export default function CartPage() {
         payload.slot_time = `${instant.eta_start_time} - ${instant.eta_end_time}`
         payload.slot_name = "Instant"
       }
+
       const res = await axiosInstance.post(Api.orderCheckout, payload)
       if (!res?.data) throw new Error("Payment init failed")
 
@@ -444,7 +414,7 @@ export default function CartPage() {
       setAddresses(sorted)
 
     } catch (err) {
-      console.error("Failed to sync selection to backend:", err instanceof Error ? err.message : String(err))
+      safeErrorLog("Failed to sync selection to backend", err)
     }
   }
 
@@ -548,8 +518,16 @@ export default function CartPage() {
                             <AlertTriangle className="w-3.5 h-3.5" />
                             Unavailable at this Address
                           </div>
+                        ) : item.type === "SERVICE" ? (
+                          /* Highly professional Service Badge */
+                          <div className="flex items-center gap-2.5 bg-[#800000]/5 px-5 py-3 rounded-2xl border border-[#800000]/10 shadow-sm animate-in fade-in zoom-in duration-500">
+                            <CheckCircle className="w-4 h-4 text-[#800000]" />
+                            <span className="text-[11px] font-black text-[#800000] uppercase tracking-[0.15em] whitespace-nowrap">
+                              1 SERVICE
+                            </span>
+                          </div>
                         ) : (
-                          /* Quantity Controls */
+                          /* Quantity Controls for Products */
                           <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                             <button
                               onClick={() => updateQuantity(item, itemQty - 1)}
@@ -744,31 +722,81 @@ export default function CartPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Clear for Instant */}
+                  {selectedTime === "instant" && (
+                    <button
+                      onClick={async () => {
+                        setSelectedTime("");
+                        toast.success("Instant booking unselected");
+                        try {
+                          await axiosInstance.patch(`${Api.cartApi}/update/`, {
+                            slot_id: null,
+                            zone_id: zoneData?.id,
+                            is_instant_slot: false,
+                            scheduled_date: new Date().toISOString().split('T')[0]
+                          })
+                        } catch (err) {
+                          safeErrorLog("Failed to clear instant slot", err)
+                        }
+                      }}
+                      className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#800000]/20 bg-[#800000]/5 text-[#800000] hover:bg-[#800000]/10 transition-all text-xs font-black uppercase tracking-widest"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Clear Instant Selection
+                    </button>
+                  )}
                 </div>
               )}
 
               {/* Slots & Date Selection View */}
               {scheduleType === "later" && (
                 <div className="space-y-6 animate-in slide-in-from-top-2">
-                  {/* Date Picker */}
-                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-                    {DATES.map((d) => (
+                  {/* Date Picker row with Clear on far right */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+                      {DATES.map((d) => (
+                        <button
+                          key={d.value}
+                          onClick={() => { setSelectedDate(d.value); setSelectedTime(""); }}
+                          className={`flex flex-col items-center min-w-[70px] p-3 rounded-2xl border-2 transition-all ${selectedDate === d.value
+                            ? "border-[#800000] bg-red-50/20 shadow-sm"
+                            : "border-slate-50 bg-white hover:border-slate-200"
+                            }`}
+                        >
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#800000]" : "text-slate-400"}`}>
+                            {d.label}
+                          </span>
+                          <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#800000]" : "text-[#1a1c2e]"}`}>
+                            {d.day}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Clear Button - Fixed on the right */}
+                    {selectedTime && selectedTime !== "instant" && (
                       <button
-                        key={d.value}
-                        onClick={() => { setSelectedDate(d.value); setSelectedTime(""); }}
-                        className={`flex flex-col items-center min-w-[70px] p-3 rounded-2xl border-2 transition-all ${selectedDate === d.value
-                          ? "border-[#800000] bg-red-50/20 shadow-sm"
-                          : "border-slate-50 bg-white hover:border-slate-200"
-                          }`}
+                        onClick={async () => {
+                          setSelectedTime("");
+                          toast.success("Timing unselected");
+                          try {
+                            await axiosInstance.patch(`${Api.cartApi}/update/`, {
+                              slot_id: null,
+                              zone_id: zoneData?.id,
+                              is_instant_slot: false,
+                              scheduled_date: selectedDate
+                            })
+                          } catch (err) {
+                            safeErrorLog("Failed to clear slot in cart", err)
+                          }
+                        }}
+                        className="flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-2xl border-2 border-[#800000]/20 bg-[#800000]/5 text-[#800000] hover:bg-[#800000]/10 transition-all group shrink-0"
                       >
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#800000]" : "text-slate-400"}`}>
-                          {d.label}
-                        </span>
-                        <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#800000]" : "text-[#1a1c2e]"}`}>
-                          {d.day}
-                        </span>
+                        <Trash2 className="w-4 h-4 mb-1" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Clear</span>
                       </button>
-                    ))}
+                    )}
                   </div>
 
                   {/* Time Slots */}
@@ -870,10 +898,28 @@ export default function CartPage() {
                         </div>
                       )}
 
+                      {!hasInactiveItems && !selectedAddressId && (
+                        <div className="p-4 mt-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3 text-amber-700 animate-in fade-in slide-in-from-top-2">
+                          <MapPin className="w-5 h-5 shrink-0" />
+                          <p className="text-[11px] font-bold leading-tight">
+                            Please select a service location to proceed with your order.
+                          </p>
+                        </div>
+                      )}
+
+                      {!hasInactiveItems && selectedAddressId && !selectedTime && (
+                        <div className="p-4 mt-4 bg-blue-50 rounded-2xl border border-blue-100 flex gap-3 text-blue-700 animate-in fade-in slide-in-from-top-2">
+                          <Clock className="w-5 h-5 shrink-0" />
+                          <p className="text-[11px] font-bold leading-tight">
+                            Please select an Instant Service or Schedule a slot to proceed.
+                          </p>
+                        </div>
+                      )}
+
                       <button
                         onClick={handleCheckout}
-                        disabled={isCheckoutLoading || hasInactiveItems || !selectedAddressId || !selectedTime}
-                        className={`w-full mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${hasInactiveItems
+                        disabled={isCheckoutLoading || hasInactiveItems}
+                        className={`w-full mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${hasInactiveItems || !selectedAddressId || !selectedTime
                           ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                           : 'bg-[#800000] text-white hover:bg-[#600000] shadow-none'
                           }`}

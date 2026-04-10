@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function CategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -26,13 +27,13 @@ export default function CategoriesPage() {
         const mappedCategories = categoriesData.map((cat: any) => ({
           id: cat.id,
           name: cat.name,
-          image: cat.media?.[0]?.url || '/placeholder-category.jpg',
+          image: cat.media?.[0]?.url || '/placeholder-image.jpg',
           count: cat.services_count || 'Explore'
         }))
 
         setCategories(mappedCategories)
-      } catch (error) {
-        console.error("Error fetching categories:", error instanceof Error ? error.message : String(error))
+      } catch (error: any) {
+        safeErrorLog("Error fetching categories", error)
       } finally {
         setLoading(false)
       }

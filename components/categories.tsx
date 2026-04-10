@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export function Categories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -28,8 +29,8 @@ export function Categories() {
         }))
 
         setCategories(mappedCategories)
-      } catch (error) {
-        console.error("Error fetching categories:", error instanceof Error ? error.message : String(error))
+      } catch (error: any) {
+        safeErrorLog("Error fetching categories", error)
       } finally {
         setLoading(false)
       }

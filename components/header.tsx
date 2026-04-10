@@ -12,6 +12,7 @@ import { useLocation } from '@/context/location-context'
 import { useAuth } from '@/context/auth-context'
 import { formatPrice } from '@/lib/format-price'
 import { useCartItem } from '@/context/CartItemContext'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export function Header() {
   const { location, setShowLocationModal } = useLocation()
@@ -93,7 +94,7 @@ export function Header() {
 
       setSearchResults({ services: matchedServices, products: matchedProducts })
     } catch (error) {
-      console.error("Header search error:", error instanceof Error ? error.message : String(error))
+      safeErrorLog("Header search error", error)
     } finally {
       setIsSearching(false)
     }
@@ -203,7 +204,7 @@ export function Header() {
                               >
                                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
                                   <Image
-                                    src={s.media_files?.[0]?.image_url || '/placeholder-service.jpg'}
+                                    src={s.media_files?.[0]?.image_url || '/placeholder-image.jpg'}
                                     alt={s.name}
                                     width={48}
                                     height={48}
@@ -236,7 +237,7 @@ export function Header() {
                               >
                                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
                                   <Image
-                                    src={p.media?.[0]?.url || '/placeholder.jpg'}
+                                    src={p.media?.[0]?.url || '/placeholder-image.jpg'}
                                     alt={p.name}
                                     width={48}
                                     height={48}

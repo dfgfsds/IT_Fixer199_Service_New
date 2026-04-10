@@ -11,6 +11,7 @@ import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import { safeErrorLog } from '@/lib/error-handler'
 
 interface RequestDetail {
     id: string
@@ -97,7 +98,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                 }
             }
         } catch (error: any) {
-            console.error('Failed to fetch requests:', error)
+            safeErrorLog('Failed to fetch request details', error)
             toast.error('Failed to load request details')
         } finally {
             setLoading(false)

@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import Image from 'next/image'
 import { formatPrice } from '@/lib/format-price'
 import { useLocation } from '@/context/location-context'
+import { safeErrorLog } from '@/lib/error-handler'
 
 // SSR-safe dynamic import for LiveMap
 const LiveMap = dynamic(
@@ -220,7 +221,8 @@ export default function SingleOrderPage() {
         })
       }
 
-    } catch {
+    } catch (err: any) {
+      safeErrorLog('Failed to load order details', err)
       toast.error('Failed to load order details.')
       router.push('/profile?tab=orders')
     } finally {
@@ -271,6 +273,7 @@ export default function SingleOrderPage() {
       setFormData({ reason: '', description: '', date: '', slotId: '' })
       fetchOrder()
     } catch (err: any) {
+      safeErrorLog('Action failed', err)
       const data = err?.response?.data
       const errMsg =
         (typeof data === 'string' ? data : null) ||
@@ -280,11 +283,6 @@ export default function SingleOrderPage() {
         (Array.isArray(data?.non_field_errors) ? data.non_field_errors[0] : null) ||
         err?.message ||
         'Action failed. Please try again.'
-      if (data && Object.keys(data).length > 0) {
-        console.warn('Action failed:', data)
-      } else {
-        console.warn('Action failed:', err?.message || err)
-      }
       toast.error(errMsg)
     } finally {
       setSubmitting(false)
