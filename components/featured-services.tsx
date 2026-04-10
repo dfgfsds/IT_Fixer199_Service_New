@@ -6,6 +6,7 @@ import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { ServiceCard } from '@/components/service-card'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export function FeaturedServices() {
   const [services, setServices] = useState<any[]>([])
@@ -52,18 +53,14 @@ export function FeaturedServices() {
               originalPrice: regularPrice ? Number(regularPrice) : undefined,
               discount: discount,
               time: s.eta || '1-2 hours',
-              image: s.media_files?.[0]?.image_url || '/placeholder-service.jpg',
+              image: s.media_files?.[0]?.image_url || '/placeholder-image.jpg',
               verified: true,
             }
           })
 
         setServices(activeServices)
       } catch (err: any) {
-        // Silence console.error for expected 400 "No services" responses
-        // to avoid triggering the Next.js dev overlay button
-        if (err.response?.status !== 400) {
-          console.error("Error fetching featured services:", err instanceof Error ? err.message : String(err))
-        }
+        safeErrorLog("Error fetching featured services", err)
       } finally {
         setLoading(false)
       }

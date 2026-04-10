@@ -13,6 +13,7 @@ import { useCartItem } from '@/context/CartItemContext'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -48,26 +49,35 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       setLoading(true)
       setError(null)
       try {
-        // 1. Fetch Single Service Detail
+        // Fetch Single Service Detail
         const url = `${Api.services}/${id}/?include_categories=true&include_media=true&include_pricing=true&lat=${location.lat}&lng=${location.lng}`
         const response = await axiosInstance.get(url)
         const serviceData = response.data?.service || response.data
+        console.log("Full Service Data (url):", serviceData)
+
+        // Zone Availability Check
+        const checkUrl = `${Api.services}/?id=${id}&lat=${location.lat}&lng=${location.lng}&status=ACTIVE&size=1`
+        const checkRes = await axiosInstance.get(checkUrl)
+        const servicesArray = Array.isArray(checkRes.data) ? checkRes.data : (checkRes.data?.services || [])
+        console.log("Zone Availability Check (checkUrl) - services array:", servicesArray)
+
+        if (!serviceData || servicesArray.length === 0) {
+          throw new Error('This service is not available in your location.')
+        }
+
         setService(serviceData)
 
-        // 2. Fetch Related Services in same category
-        if (serviceData?.categories?.[0]?.id) {
-          // Use the 'category' field for filtering if 'category_id' doesn't work directly with the junction object ID
-          const categoryId = serviceData.categories[0].category || serviceData.categories[0].id
+        // Fetch Related Services
+        const categoryId = serviceData.categories?.[0]?.category || serviceData.categories?.[0]?.id
+        if (categoryId) {
           const relatedUrl = `${Api.services}/?category_id=${categoryId}&lat=${location.lat}&lng=${location.lng}&size=3`
           const relatedRes = await axiosInstance.get(relatedUrl)
           const rs = Array.isArray(relatedRes.data) ? relatedRes.data : (relatedRes.data?.services || [])
           setRelatedServices(rs.filter((s: any) => s.id !== id))
         }
       } catch (err: any) {
-        if (err.response?.status !== 400) {
-          console.error("Error fetching service details:", err instanceof Error ? err.message : String(err))
-        }
-        setError(err.response?.data?.message || 'Service details not available at your location.')
+        safeErrorLog("Error fetching service details", err)
+        setError(err.response?.data?.message || err.message || 'Service not available at this location.')
       } finally {
         setLoading(false)
       }
@@ -76,11 +86,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     fetchServiceDetails()
   }, [location?.lat, location?.lng, id])
 
-  // Clear service data only when switching to a different ID
+  // Clear service data and errors when switching ID or Location to ensure fresh state
   useEffect(() => {
     setService(null)
     setRelatedServices([])
-  }, [id])
+    setError(null)
+  }, [id, location?.lat, location?.lng])
 
   const currentCartItem = useMemo(() => {
     return cartItem?.find((item: any) => String(item.service_id) === String(id) || String(item.service?.id) === String(id))
@@ -122,13 +133,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await fetchCart()
       toast.success("Service added to cart!")
     } catch (error: any) {
-      if (error?.response?.status === 401) {
-        toast.error('Please login to book this service')
-        router.push('/login')
-      } else {
-        console.error("Add to cart error:", error instanceof Error ? error.message : String(error))
-        toast.error("Failed to add to cart. Please try again.")
-      }
+      safeErrorLog("Add to cart error", error)
+      toast.error(error.response?.data?.message || 'Failed to add to cart')
     } finally {
       setIsAdding(false)
     }
@@ -144,8 +150,9 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       }
       await axiosInstance.patch(`${Api.cartApi}/item/${currentCartItem.id}/update/`, payload)
       await fetchCart()
-    } catch (error) {
-      console.error("Increase qty error:", error instanceof Error ? error.message : String(error))
+    } catch (error: any) {
+      safeErrorLog("Increase qty error", error)
+      toast.error('Failed to update quantity')
     }
   }
 
@@ -160,7 +167,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await axiosInstance.post(`${Api.cartApi}/item/${currentCartItem.id}/decrease/`, payload)
       await fetchCart()
     } catch (error) {
-      console.error("Decrease qty error:", error instanceof Error ? error.message : String(error))
+      safeErrorLog("Decrease qty error", error)
     }
   }
 
@@ -217,17 +224,38 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center py-32 p-8 text-center space-y-8">
-          <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
-            <Star className="w-12 h-12" />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
+            <div className="relative">
+              <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+                <AlertTriangle className="w-10 h-10" />
+              </div>
+              <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+            </div>
+            <div className="space-y-3 max-w-sm mx-auto">
+              <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">
+                {error ? "Service Unavailable" : "Service Not Found"}
+              </h3>
+              <p className="text-slate-500 font-medium">
+                {error || "We couldn't find the service you're looking for. It might not be available in your area or at your selected location."}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => setShowLocationModal(true)}
+                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center justify-center gap-3"
+              >
+                <MapPin className="w-5 h-5 text-white/50" />
+                Change Location
+              </button>
+              <Link
+                href="/services"
+                className="px-10 py-4 bg-slate-50 text-slate-900 border border-slate-100 rounded-2xl font-black tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center"
+              >
+                Back to Services
+              </Link>
+            </div>
           </div>
-          <h2 className="text-3xl font-black text-[#1a1c2e]">{error || "Service Not Found"}</h2>
-          <p className="text-slate-500 max-w-sm font-medium">
-            {error ? "Please try a different location" : "We couldn't find the service you're looking for. It might not be available in your area or coordinates are missing."}
-          </p>
-          <Link href="/services" className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl transition-all active:scale-95">
-            View All Services
-          </Link>
         </main>
         <Footer />
       </div>
@@ -236,7 +264,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
   const sellingPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
   const regularPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Regular Price")?.price
-  const serviceImage = service.media_files?.[0]?.image_url || '/placeholder-service.jpg'
+  const serviceImage = service.media_files?.[0]?.image_url || '/placeholder-image.jpg'
   const serviceCategory = service.categories?.[0]?.category_name || service.categories?.[0]?.name || 'Service'
 
   // Default includes if not provided by API
@@ -421,7 +449,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
               {relatedServices.map((rs: any) => {
                 const rsPrice = rs.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
-                const rsImage = rs.media_files?.[0]?.image_url || '/placeholder-service.jpg'
+                const rsImage = rs.media_files?.[0]?.image_url || '/placeholder-image.jpg'
 
                 return (
                   <div

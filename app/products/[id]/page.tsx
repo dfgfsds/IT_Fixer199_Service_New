@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, MapPin, Navigation } from 'lucide-react'
+import { Star, Check, ArrowRight, Share2, Heart, Loader2, Minus, Plus, MapPin, Navigation, Package } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, use, useMemo } from 'react'
@@ -14,6 +14,7 @@ import { useCartItem } from '@/context/CartItemContext'
 import { ProductCard } from '@/components/product-card'
 import { toast } from 'sonner'
 import { formatPrice } from '@/lib/format-price'
+import { safeErrorLog } from '@/lib/error-handler'
 
 export default function ProductDetailPage({
     params,
@@ -101,9 +102,7 @@ export default function ProductDetailPage({
                     }
                 }
             } catch (error: any) {
-                if (![400, 404, 422].includes(error.response?.status)) {
-                    console.error("Error fetching product details:", error instanceof Error ? error.message : String(error))
-                }
+                safeErrorLog("Error fetching product details", error)
                 setProduct(null)
             } finally {
                 setLoading(false)
@@ -155,13 +154,8 @@ export default function ProductDetailPage({
             await fetchCart()
             toast.success('Product added to cart!')
         } catch (error: any) {
-            if (error?.response?.status === 401) {
-                toast.error('Please login to add to cart')
-                router.push('/login')
-            } else {
-                console.error('Error adding to cart:', error instanceof Error ? error.message : String(error))
-                toast.error('Failed to add to cart')
-            }
+            safeErrorLog('Error adding to cart', error)
+            toast.error('Failed to add to cart')
         } finally {
             setAddingToCart(false)
         }
@@ -208,10 +202,10 @@ export default function ProductDetailPage({
                 <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
                     <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
                         <div className="relative">
-                            <div className="w-24 h-24 bg-primary/5 text-primary rounded-full flex items-center justify-center mx-auto">
+                            <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
                                 <MapPin className="w-10 h-10" />
                             </div>
-                            <div className="absolute inset-0 blur-xl bg-primary/5 rounded-full"></div>
+                            <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
                         </div>
                         <div className="space-y-3 max-w-sm mx-auto">
                             <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
@@ -251,11 +245,36 @@ export default function ProductDetailPage({
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-background flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col">
                 <Header />
-                <main className="flex-1 flex flex-col items-center justify-center py-32 space-y-4">
-                    <p className="text-muted-foreground font-bold">Product not found</p>
-                    <Link href="/products" className="text-primary hover:underline">Back to products</Link>
+                <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
+                    <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
+                        <div className="relative">
+                            <div className="w-24 h-24 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto">
+                                <Package className="w-10 h-10" />
+                            </div>
+                            <div className="absolute inset-0 blur-xl bg-red-50 rounded-full shadow-inner"></div>
+                        </div>
+                        <div className="space-y-3 max-w-sm mx-auto">
+                            <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Product Unavailable</h3>
+                            <p className="text-slate-500 font-medium">This product is unfortunately not available at your current location</p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <button
+                                onClick={() => setShowLocationModal(true)}
+                                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                            >
+                                <MapPin className="w-5 h-5 text-white" />
+                                Change Location
+                            </button>
+                            <Link
+                                href="/products"
+                                className="px-10 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black tracking-widest uppercase border border-slate-100 hover:bg-slate-100 transition-all active:scale-95 flex items-center gap-3"
+                            >
+                                Explore Others
+                            </Link>
+                        </div>
+                    </div>
                 </main>
                 <Footer />
             </div>
@@ -265,7 +284,7 @@ export default function ProductDetailPage({
     console.log(product, 'jkhgjkgjhgjh')
     const price = product.pricing?.[0]?.price || 0
     const regularPrice = product.pricing?.[0]?.regular_price
-    const imageUrl = product.media?.[0]?.url || '/placeholder.jpg'
+    const imageUrl = product.media?.[0]?.url || '/placeholder-image.jpg'
     const attributes = product.attributes?.length > 0
         ? product.attributes.map((attr: any) => attr.value)
         : ['High Quality Guaranteed', 'Professional Service', '90-Day Warranty', 'Verified Product']
@@ -438,7 +457,7 @@ export default function ProductDetailPage({
                             {relatedProducts.map((p) => {
                                 const relPrice = p.pricing?.[0]?.price || 0
                                 const relRegularPrice = p.pricing?.[0]?.regular_price
-                                const relImage = p.media?.[0]?.url || '/placeholder.jpg'
+                                const relImage = p.media?.[0]?.url || '/placeholder-image.jpg'
 
                                 return (
                                     <ProductCard key={p.id} product={{
