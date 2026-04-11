@@ -19,7 +19,7 @@ import { safeErrorLog } from '@/lib/error-handler'
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
   const { location, setLocation, zoneData } = useLocation()
-  const { user } = useAuth()
+  const { user, isLoggedIn } = useAuth()
   const router = useRouter()
 
   const [scheduleType, setScheduleType] = useState<"instant" | "later">("instant")
@@ -455,7 +455,7 @@ export default function CartPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
-                href="/services"
+                href={isLoggedIn ? "/services" : "/login"}
                 className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-[#800000] hover:shadow-xl hover:shadow-red-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -475,7 +475,7 @@ export default function CartPage() {
               </Link>
 
               <Link
-                href="/products"
+                href={isLoggedIn ? "/products" : "/login"}
                 className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-slate-800 hover:shadow-xl hover:shadow-slate-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-50/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
