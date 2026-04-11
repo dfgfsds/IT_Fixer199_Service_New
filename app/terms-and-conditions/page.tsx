@@ -270,7 +270,7 @@ export default function TermsConditionsPage() {
                     <Globe className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Website</span>
                   </div>
-                  <a href="https://itfixer.in" target="_blank" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors">itfixer.in</a>
+                  <a href="https://www.itfixer199.com" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
                 </div>
 
                 <div className="space-y-1">
