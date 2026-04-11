@@ -5,6 +5,7 @@ import { LocationProvider } from '@/context/location-context'
 import { CartItemProvider } from '@/context/CartItemContext'
 import type { ReactNode } from 'react'
 import { Toaster } from 'sonner'
+import { MobileBottomNav } from './mobile-bottom-nav'
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <LocationProvider>
         <CartItemProvider>
           {children}
+          <MobileBottomNav />
           <Toaster position="top-center" richColors />
         </CartItemProvider>
       </LocationProvider>
