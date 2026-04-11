@@ -44,7 +44,7 @@ export function WhyUs() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
-                Why Choose Urban?
+                Why Choose IT Fixer?
               </h2>
               <p className="text-lg text-muted-foreground">
                 We make professional home services accessible, affordable, and convenient for everyone.
