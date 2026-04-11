@@ -1,53 +1,56 @@
 'use client'
 
+import Image from 'next/image'
 import { Check, Zap, Smartphone, MapPin, CreditCard, Shield } from 'lucide-react'
 
 const BENEFITS = [
   {
     icon: Zap,
-    title: 'Super Fast',
-    description: 'Get services booked in under 30 seconds',
+    title: 'Same-Day Service',
+    description: 'Get your laptop or PC repaired on the same day',
   },
   {
     icon: Smartphone,
-    title: 'Easy Booking',
-    description: 'Simple mobile-first experience',
+    title: 'Instant Diagnosis',
+    description: 'Quick and accurate issue identification',
   },
   {
     icon: MapPin,
-    title: 'Nearby Experts',
-    description: 'Verified professionals near you',
+    title: 'Doorstep Support',
+    description: 'Technicians available across Chennai',
   },
   {
     icon: CreditCard,
     title: 'Flexible Payment',
-    description: 'Pay cash, card, or wallet',
+    description: 'Pay via cash, card, or UPI',
   },
   {
     icon: Shield,
-    title: 'Verified & Safe',
-    description: 'All experts verified and insured',
+    title: 'Genuine Parts',
+    description: 'High-quality and original spare parts used',
   },
   {
     icon: Check,
-    title: 'Satisfaction',
-    description: '100% satisfaction guaranteed',
+    title: 'Reliable Service',
+    description: 'Trusted by hundreds of happy customers',
   },
 ]
 
 export function WhyUs() {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-10 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
+
           {/* Left Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
-                Why Choose IT Fixer?
+              <h2 className="text-3xl sm:text-5xl font-bold text-foreground">
+                Why Choose Us
               </h2>
               <p className="text-lg text-muted-foreground">
-                We make professional home services accessible, affordable, and convenient for everyone.
+                Fast & Reliable Same-Day Laptop and PC Repair Services in Chennai.
+                We ensure quick solutions with minimum downtime using genuine parts and expert technicians.
               </p>
             </div>
 
@@ -57,14 +60,14 @@ export function WhyUs() {
                 const IconComponent = benefit.icon
                 return (
                   <div key={benefit.title} className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-accent/10 text-accent">
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                    </div>
+
                     <div>
-                      <h3 className="font-semibold text-foreground">{benefit.title}</h3>
-                      <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                      <h3 className="font-bold text-lg text-foreground">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {benefit.description}
+                      </p>
                     </div>
                   </div>
                 )
@@ -72,64 +75,30 @@ export function WhyUs() {
             </div>
           </div>
 
-          {/* Right Visual */}
+          {/* Right Image */}
           <div className="hidden lg:flex items-center justify-center">
-            <div className="relative w-full max-w-sm">
-              {/* Main Card */}
-              <div className="bg-gradient-to-br from-secondary to-secondary/80 text-white rounded-3xl p-8 shadow-2xl">
-                <div className="space-y-8">
-                  <div className="space-y-2">
-                    <p className="text-sm font-semibold opacity-80">Your Booking</p>
-                    <h3 className="text-2xl font-bold">Home Cleaning</h3>
-                  </div>
+            <div className="relative w-full  group">
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="opacity-80">Expert</span>
-                      <span className="font-semibold">Rajesh Kumar</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="opacity-80">Rating</span>
-                      <span className="font-semibold">⭐ 4.9 (2456)</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="opacity-80">Time</span>
-                      <span className="font-semibold">2-3 Hours</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="opacity-80">Date</span>
-                      <span className="font-semibold">Tomorrow, 10 AM</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-white/20 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm opacity-80">Subtotal</span>
-                      <span>₹499</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm opacity-80">Discount</span>
-                      <span className="text-accent font-semibold">-₹99</span>
-                    </div>
-                    <div className="flex items-center justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span>₹400</span>
-                    </div>
-                  </div>
-
-                  <button className="w-full bg-accent hover:bg-accent/90 text-secondary font-semibold py-3 rounded-xl transition-colors">
-                    Confirm Booking
-                  </button>
-                </div>
+              <div className="relative h-[420px] w-full rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="/serviceimage.png"
+                  alt="Laptop Repair Service"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
 
-              {/* Floating Element */}
-              <div className="absolute -bottom-6 -right-6 bg-accent text-white rounded-2xl p-4 shadow-lg">
-                <p className="font-bold text-2xl">₹400</p>
-                <p className="text-xs opacity-90">Total Cost</p>
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-[#101242]/40 to-transparent"></div>
+
+              {/* Floating Badge */}
+              <div className="absolute -bottom-6 -right-6 bg-[#101242] text-white rounded-2xl px-5 py-3 shadow-lg">
+                <p className="font-bold text-sm">Starts at ₹199</p>
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
     </section>
