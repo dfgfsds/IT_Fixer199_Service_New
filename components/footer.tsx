@@ -126,8 +126,8 @@ export function Footer() {
             <p>&copy; 2026 IT Fixer @ 199. All rights reserved.</p>
           </div>
           <div className="flex gap-8">
-            <Link href="/" className="hover:text-slate-600 font-medium transition-colors">Privacy Policy</Link>
-            <Link href="/" className="hover:text-slate-600 font-medium transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="hover:text-slate-600 font-medium transition-colors">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-slate-600 font-medium transition-colors">Terms & Conditions</Link>
           </div>
         </div>
       </div>
