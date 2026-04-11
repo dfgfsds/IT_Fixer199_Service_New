@@ -72,15 +72,15 @@ export function FeaturedServices() {
   if (!loading && services.length === 0) return null
 
   return (
-    <section className="py-20 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-10 md:py-20 bg-background">
+      <div className="max-w-7xl mx-auto px-4 ">
         <div className="space-y-12">
           <div className="space-y-3 max-w-2xl">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight">
-              Top Trending
-              <span className="block text-primary">Services Today</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-[#101242] text-foreground leading-tight">
+              Premium Services
+
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-gary-700 text-muted-foreground">
               Browse our most popular and highly-rated services in {location?.city || 'your area'} with instant booking
             </p>
           </div>

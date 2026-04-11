@@ -85,26 +85,22 @@ export default function ServicesPage() {
   })
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
 
       <main className="flex-1 pb-24">
         {/* Hero Section */}
-        <section className="bg-white py-20 px-4 border-b border-slate-100">
+        <section className="bg-white py-10 md:py-20 px-4 border-b border-slate-100">
           <div className="max-w-7xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest shadow-sm">
-              <Sparkles className="w-4 h-4" />
-              Professional Experts in {location?.city || 'your city'}
-            </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight leading-tight">
-              All Professional <span className="text-[#800000]">Services</span>
+            <h1 className="text-3xl sm:text-5xl font-black text-[#101242]  tracking-tight leading-tight">
+              All Services
             </h1>
             <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
               Find the right expert for your home needs in {location?.city || 'your area'}. Verified, reliable, and affordable.
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-2xl mx-auto relative group pt-4">
+            {/* <div className="max-w-2xl mx-auto relative group pt-4">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#800000] w-6 h-6 transition-colors" />
               <input
                 type="text"
@@ -113,12 +109,12 @@ export default function ServicesPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#800000]/20 focus:ring-4 focus:ring-[#800000]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
               />
-            </div>
+            </div> */}
           </div>
         </section>
 
         {/* Content Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:py-16 space-y-12">
           {!location?.lat || !location?.lng ? (
             <div className="flex flex-col items-center justify-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 shadow-sm">
               <div className="relative">
@@ -158,7 +154,7 @@ export default function ServicesPage() {
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-8 py-3.5 rounded-2xl text-sm font-black tracking-widest uppercase transition-all whitespace-nowrap border-2 ${selectedCategory === cat
-                      ? 'bg-[#800000] border-[#800000] text-white shadow-xl shadow-[#800000]/20 scale-105'
+                      ? 'bg-[#101242] border-[#101242] text-white shadow-xl shadow-[#101242]/20 scale-105'
                       : 'bg-white border-white text-slate-500 hover:border-slate-100 hover:bg-slate-50'
                       }`}
                   >
