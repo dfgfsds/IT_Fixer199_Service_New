@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Trash2, Plus, Minus, MapPin, Zap, Calendar, CreditCard, Wallet, Smartphone, CheckCircle, Clock, ShoppingCart, Loader2, AlertTriangle } from 'lucide-react'
+import { Trash2, Plus, Minus, MapPin, Zap, Calendar, CreditCard, Wallet, Smartphone, CheckCircle, Clock, ShoppingCart, Loader2, AlertTriangle, Wrench, PackageSearch, ArrowRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -439,21 +439,61 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Header />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center space-y-6 bg-white p-12 rounded-3xl shadow-xl max-w-lg w-full">
-            <div className="flex items-center justify-center">
-              <ShoppingCart className="w-24 h-24 text-[#800000] animate-bounce" />
+        <div className="flex-1 flex flex-col items-center justify-center p-4 py-12 relative z-10">
+          <div className="text-center bg-white p-8 md:p-12 rounded-[40px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-slate-100 max-w-2xl w-full mx-auto relative overflow-hidden">
+            {/* Background embellishment */}
+            <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-slate-50/80 to-white -z-10" />
+
+            <div className="w-24 h-24 bg-slate-50 border border-slate-100/80 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner transform -rotate-6">
+              <ShoppingCart className="w-10 h-10 text-slate-300" />
             </div>
-            <h2 className="text-3xl font-black text-[#1a1c2e]">Your cart is empty</h2>
-            <p className="text-slate-500 text-lg">
-              Start adding services or products to get professional help at your doorstep
+
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">Your cart is empty</h2>
+            <p className="text-slate-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+              Looks like your cart is feeling a bit light! Let's get began by exploring our catalogue.
             </p>
-            <Link
-              href="/services"
-              className="inline-block bg-[#800000] text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-[#600000] transition-all transform active:scale-95 shadow-lg shadow-red-900/20"
-            >
-              Browse Services
-            </Link>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Link
+                href="/services"
+                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-[#800000] hover:shadow-xl hover:shadow-red-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#800000] group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
+                  <Wrench className="w-5 h-5" />
+                </div>
+                <div className="relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#800000] transition-colors mb-1 pr-8">Book a Service</h3>
+                  <p className="text-sm text-slate-500 font-medium">Expert doorstep repair & diagnostics.</p>
+                </div>
+                <div className="absolute top-7 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                  <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#800000]">
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+
+              <Link
+                href="/products"
+                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-slate-800 hover:shadow-xl hover:shadow-slate-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-50/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-slate-800 group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
+                  <PackageSearch className="w-5 h-5" />
+                </div>
+                <div className="relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-slate-800 transition-colors mb-1 pr-8">Browse Products</h3>
+                  <p className="text-sm text-slate-500 font-medium">Genuine spare parts & accessories.</p>
+                </div>
+                <div className="absolute top-7 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-800">
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
         <Footer />
