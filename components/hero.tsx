@@ -6,22 +6,34 @@ import Image from 'next/image'
 export function Hero() {
   return (
     <section className="relative bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <div className="max-w-7xl mx-auto px-4  py-10 sm:py-20">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8 order-2 md:order-1">
-            <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full">
-              <Zap className="w-4 h-4" />
-              <span className="text-sm font-semibold">Trending Today</span>
-            </div>
+            <div className="flex justify-center md:justify-start">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full 
+    bg-gradient-to-r from-[#101242]/10 to-[#821616]/10 
+    border border-[#821616]/20 backdrop-blur-sm">
 
+                <span className="text-sm font-semibold bg-gradient-to-r from-[#101242] to-[#821616] bg-clip-text text-transparent text-center">
+                  Doorstep Repair · Service starts at ₹199
+                </span>
+
+              </div>
+            </div>
             <div className="space-y-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-tight text-pretty">
-                Professional Services
-                <span className="block text-primary">Made Simple</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center lg:text-left">
+                <span className="block bg-[#101242]  bg-clip-text text-transparent">
+                  Chennai’s Smart
+                </span>
+
+                <span className="block mt-2 bg-gradient-to-r from-[#101242] to-[#821616] bg-clip-text text-transparent">
+                  Choice for Laptop & PC Repairs
+                </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
-                Book trusted home service experts instantly. From cleaning to repairs, get quality work done right at your doorstep.
+                Affordable doorstep laptop & computer repair.
+                Expert technicians. Same-day service @ ₹199
               </p>
             </div>
 
@@ -47,15 +59,15 @@ export function Hero() {
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-border">
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-secondary">10M+</p>
-                <p className="text-sm text-muted-foreground mt-1">Happy Customers</p>
+                <p className="text-sm font-bold text-[#101242] text-muted-foreground mt-1">Happy Customers</p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-secondary">50K+</p>
-                <p className="text-sm text-muted-foreground mt-1">Verified Experts</p>
+                <p className="text-sm font-bold text-[#101242] text-muted-foreground mt-1">Verified Experts</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-accent">4.8★</p>
-                <p className="text-sm text-muted-foreground mt-1">Top Rated</p>
+                <p className="text-2xl sm:text-3xl font-bold text-[#101242]">4.8★</p>
+                <p className="text-sm font-bold text-[#101242] text-muted-foreground mt-1">Top Rated</p>
               </div>
             </div>
           </div>

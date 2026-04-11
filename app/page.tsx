@@ -6,6 +6,8 @@ import { FeaturedServices } from '@/components/featured-services'
 import { WhyUs } from '@/components/why-us'
 import { Testimonials } from '@/components/testimonials'
 import { Footer } from '@/components/footer'
+import AboutSection from '@/components/AboutSection'
+import Brands from '@/components/Brands'
 
 export default function Home() {
   return (
@@ -15,7 +17,9 @@ export default function Home() {
       <Categories />
       {/* <AllProducts /> */}
       <FeaturedServices />
+      <AboutSection />
       <WhyUs />
+      <Brands />
       <Testimonials />
       <Footer />
     </div>
