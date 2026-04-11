@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { MapPin, Search, ShoppingCart, User, ChevronDown, Menu, X, Loader2, Package, Star } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
@@ -98,7 +99,7 @@ export function Header() {
     } finally {
       setIsSearching(false)
     }
-  }, [])
+  }, [location])
 
   // Handle input change with debounce
   useEffect(() => {
@@ -106,11 +107,13 @@ export function Header() {
 
     if (searchQuery.length > 1) {
       setShowDropdown(true)
+      setIsSearching(true)
       timeoutRef.current = setTimeout(() => {
         fetchResults(searchQuery)
       }, 300)
     } else {
       setShowDropdown(false)
+      setIsSearching(false)
       setSearchResults({ services: [], products: [] })
     }
 
@@ -143,15 +146,15 @@ export function Header() {
       <header className="bg-white sticky top-0 z-40 w-full shadow-sm">
         {/* Main Header Row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24 gap-8">
+          <div className="flex flex-wrap items-center justify-between h-auto py-4 md:py-0 md:h-[90px] gap-y-4 gap-x-4 lg:gap-8">
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0 flex items-center transition-transform hover:scale-105">
+            <Link href="/" className="flex-shrink-0 flex items-center transition-transform">
               <Image
                 src="/logo.png"
                 alt="IT FIXER"
                 width={100}
                 height={100}
-                className="h-full w-auto object-contain"
+                className="h-[60px] w-auto object-contain"
                 priority
               />
             </Link>
@@ -159,17 +162,17 @@ export function Header() {
             {/* Location Picker */}
             <button
               onClick={() => setShowLocationModal(true)}
-              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#800000]/40 hover:shadow-lg transition-all text-slate-600 shadow-sm max-w-[280px] group"
+              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/40 hover:shadow-lg transition-all text-slate-600 shadow-sm max-w-[200px] lg:max-w-[280px] group"
             >
-              <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-[13px] font-bold truncate text-[#1a1c2e]">
+              <MapPin className="w-4 h-4 text-[#101242] flex-shrink-0 group-hover:scale-110 transition-transform" />
+              <span className="text-[13px] font-bold truncate text-[#101242]">
                 {location?.address || location?.city || 'Select Location'}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 group-hover:translate-y-0.5 transition-transform" />
             </button>
 
             {/* Search Bar Container */}
-            <div className="flex-1 max-w-2xl hidden md:block" ref={searchRef}>
+            <div className="w-full md:flex-1 md:w-auto md:max-w-2xl order-last md:order-none" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
                 <input
                   type="text"
@@ -177,120 +180,149 @@ export function Header() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length > 1 && setShowDropdown(true)}
                   placeholder="Search for services, repairs, accessories..."
-                  className={`w-full transition-all duration-300 py-3 px-6 pr-12 text-sm outline-none ${showDropdown
+                  className={`w-full transition-all duration-300 py-3 px-6 pr-12 text-sm outline-none border ${showDropdown
                     ? 'bg-white border-slate-200 rounded-t-3xl shadow-lg border-b-0'
-                    : 'bg-slate-100/80 border-transparent focus:bg-white focus:border-slate-200 rounded-full'
+                    : 'bg-slate-100 border-transparent focus:bg-white focus:border-slate-200 rounded-full'
                     }`}
                   autoComplete="off"
                 />
-                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 group-focus-within:text-[#800000] hover:text-[#800000] transition-colors">
-                  {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 group-focus-within:text-[#101242] hover:text-[#101242] transition-colors">
+                  <Search className="w-5 h-5" />
                 </button>
 
                 {/* Dropdown Results */}
-                {showDropdown && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 border-t-0 rounded-b-3xl shadow-2xl shadow-slate-200/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="max-h-[70vh] overflow-y-auto scrollbar-hide py-4">
-                      {/* Services Section */}
-                      {searchResults.services.length > 0 && (
-                        <div className="px-6 py-3 space-y-3">
-                          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Services</h4>
-                          <div className="grid gap-2">
-                            {searchResults.services.map((s) => (
-                              <button
-                                key={s.id}
-                                onClick={() => { router.push(`/services/${s.id}`); setShowDropdown(false); }}
-                                className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
-                              >
-                                <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-                                  <Image
-                                    src={s.media_files?.[0]?.image_url || '/placeholder-image.jpg'}
-                                    alt={s.name}
-                                    width={48}
-                                    height={48}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                  />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-bold text-[#1a1c2e] line-clamp-1">{s.name}</p>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{s.categories?.[0]?.name || 'Service'}</p>
-                                </div>
-                                <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#800000]">₹{formatPrice(s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0)}</p>
-                                </div>
-                              </button>
-                            ))}
+                <AnimatePresence>
+                  {showDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute top-full left-0 right-0 bg-white border border-slate-200 border-t-0 rounded-b-3xl shadow-2xl shadow-slate-200/50 overflow-hidden z-50 origin-top"
+                    >
+                      <div className="max-h-[70vh] overflow-y-auto scrollbar-hide py-4">
+                        {/* Services Section */}
+                        {searchResults.services.length > 0 && (
+                          <div className="px-6 py-3 space-y-3">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Services</h4>
+                            <div className="grid gap-2">
+                              {searchResults.services.map((s) => (
+                                <button
+                                  key={s.id}
+                                  onClick={() => { router.push(`/services/${s.id}`); setShowDropdown(false); }}
+                                  className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
+                                >
+                                  <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                                    <Image
+                                      src={s.media_files?.[0]?.image_url || '/placeholder-image.jpg'}
+                                      alt={s.name}
+                                      width={48}
+                                      height={48}
+                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-bold text-[#1a1c2e] line-clamp-1">{s.name}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{s.categories?.[0]?.name || 'Service'}</p>
+                                  </div>
+                                  <div className="text-right shrink-0">
+                                    <p className="text-sm font-black text-[#101242]">₹{formatPrice(s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0)}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Products Section */}
-                      {searchResults.products.length > 0 && (
-                        <div className="px-6 py-3 space-y-3 mt-2">
-                          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Products</h4>
-                          <div className="grid gap-2">
-                            {searchResults.products.map((p) => (
-                              <button
-                                key={p.id}
-                                onClick={() => { router.push(`/products/${p.id}`); setShowDropdown(false); }}
-                                className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
-                              >
-                                <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-                                  <Image
-                                    src={p.media?.[0]?.url || '/placeholder-image.jpg'}
-                                    alt={p.name}
-                                    width={48}
-                                    height={48}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                  />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-bold text-[#1a1c2e] line-clamp-1">{p.name}</p>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{p.categories?.[0]?.name || 'Product'}</p>
-                                </div>
-                                <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#1a1c2e]">₹{formatPrice(p.pricing?.[0]?.price || 0)}</p>
-                                </div>
-                              </button>
-                            ))}
+                        {/* Products Section */}
+                        {searchResults.products.length > 0 && (
+                          <div className="px-6 py-3 space-y-3 mt-2">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Products</h4>
+                            <div className="grid gap-2">
+                              {searchResults.products.map((p) => (
+                                <button
+                                  key={p.id}
+                                  onClick={() => { router.push(`/products/${p.id}`); setShowDropdown(false); }}
+                                  className="flex items-center gap-4 p-2.5 rounded-2xl hover:bg-slate-50 transition-all text-left group"
+                                >
+                                  <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                                    <Image
+                                      src={p.media?.[0]?.url || '/placeholder-image.jpg'}
+                                      alt={p.name}
+                                      width={48}
+                                      height={48}
+                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-bold text-[#1a1c2e] line-clamp-1">{p.name}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{p.categories?.[0]?.name || 'Product'}</p>
+                                  </div>
+                                  <div className="text-right shrink-0">
+                                    <p className="text-sm font-black text-[#1a1c2e]">₹{formatPrice(p.pricing?.[0]?.price || 0)}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* No Results or Searching state */}
-                      {searchQuery.length > 1 && !isSearching && searchResults.services.length === 0 && searchResults.products.length === 0 && (
-                        <div className="px-6 py-10 text-center space-y-3">
-                          <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
-                            <Search className="w-6 h-6" />
+                        {/* Loading State */}
+                        {isSearching && (
+                          <div className="px-6 py-10 text-center space-y-3">
+                            <div className="w-12 h-12 bg-[#101242]/5 rounded-full flex items-center justify-center mx-auto text-[#101242]">
+                              <Loader2 className="w-6 h-6 animate-spin" />
+                            </div>
+                            <p className="text-sm font-bold text-[#101242] animate-pulse">Searching</p>
                           </div>
-                          <p className="text-sm font-bold text-slate-400">No services or products found</p>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Footer Link if we have results */}
-                      {(searchResults.services.length > 0 || searchResults.products.length > 0) && (
-                        <div className="px-6 pt-4 border-t border-slate-100 mt-2">
-                          <button
-                            onClick={handleSearchSubmit as any}
-                            className="w-full py-3 bg-[#800000]/5 hover:bg-[#800000]/10 text-[#800000] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
-                          >
-                            See All Search Results
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                        {/* No Results state */}
+                        {searchQuery.length > 1 && !isSearching && searchResults.services.length === 0 && searchResults.products.length === 0 && (
+                          <div className="px-6 py-10 text-center space-y-3">
+                            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
+                              <Search className="w-6 h-6" />
+                            </div>
+                            <p className="text-sm font-bold text-slate-400">No services or products found</p>
+                          </div>
+                        )}
+
+                        {/* Footer Link if we have results */}
+                        {(searchResults.services.length > 0 || searchResults.products.length > 0) && (
+                          <div className="px-6 pt-4 border-t border-slate-100 mt-2">
+                            <button
+                              onClick={handleSearchSubmit as any}
+                              className="w-full py-3 bg-[#101242]/5 hover:bg-[#101242]/10 text-[#101242] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                            >
+                              See All Search Results
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </form>
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Mobile Location Picker */}
+              <button
+                onClick={() => setShowLocationModal(true)}
+                className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 hover:border-[#101242]/30 hover:bg-slate-100 transition-all shadow-sm active:scale-95"
+              >
+                <MapPin className="w-3.5 h-3.5 text-[#101242] shrink-0" />
+                <span className="text-[11px] font-bold text-[#101242] max-w-[70px] truncate">
+                  {location?.address || location?.city || 'Select Location'}
+                </span>
+                <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
+              </button>
               {/* Cart - Only visible if logged in */}
               {isLoggedIn && (
                 <Link
                   href="/cart"
-                  className="relative p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#800000] hover:text-white transition-all shadow-sm group"
+                  className="relative hidden md:flex p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#101242] hover:text-white transition-all shadow-sm group"
                 >
                   <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-110" />
                   {totalItems > 0 && (
@@ -313,7 +345,7 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#800000] hover:bg-[#600000] text-white font-semibold transition-all shadow-md active:scale-95"
+                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#101242] hover:bg-[#800000] text-white font-semibold transition-all shadow-md active:scale-95"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm">Login</span>
@@ -322,7 +354,7 @@ export function Header() {
 
               {/* Mobile Menu Button */}
               <button
-                className="lg:hidden p-2 text-slate-600"
+                className="md:hidden p-2 text-slate-600"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -349,15 +381,18 @@ export function Header() {
         {isMenuOpen && (
           <div className="lg:hidden border-t border-slate-100 bg-white px-4 py-4 space-y-1">
             {/* Mobile Location */}
+            {/* 
             <button
               onClick={() => { setShowLocationModal(true); setIsMenuOpen(false) }}
               className="w-full flex items-center gap-2.5 px-3 py-3 rounded-xl hover:bg-slate-50 text-[13px] font-bold text-[#1a1c2e]"
             >
-              <MapPin className="w-4 h-4 text-[#800000] shrink-0" />
+              <MapPin className="w-4 h-4 text-[#101242] shrink-0" />
               <span className="truncate flex-1 text-left">
                 {location?.address || location?.city || 'Select Location'}
               </span>
-            </button>
+            </button> 
+            */}
+
             {[
               { href: '/', label: 'Home' },
               { href: '/about', label: 'About' },
@@ -369,21 +404,24 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-medium text-slate-700"
+                className="block px-3 py-2 rounded-xl text-center hover:bg-slate-50 text-md font-medium text-slate-700"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
+
+            {/*
             {isLoggedIn ? (
               <Link href="/profile" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 text-sm font-bold text-[#1a1c2e]" onClick={() => setIsMenuOpen(false)}>
                 <User className="w-4 h-4" /> {user?.name || 'Profile'}
               </Link>
             ) : (
-              <Link href="/login" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#800000] text-white text-sm font-bold" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/login" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#101242] text-white text-sm font-bold" onClick={() => setIsMenuOpen(false)}>
                 <User className="w-4 h-4" /> Login
               </Link>
             )}
+            */}
           </div>
         )}
       </header>
