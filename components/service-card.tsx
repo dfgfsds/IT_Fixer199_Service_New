@@ -34,7 +34,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
     : 0
 
   return (
-    <Link href={`/${basePath}/${service.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-[#101242]/30 transition-all duration-300 block">
+    <Link href={`/${basePath}/${service.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-[#101242]/30 transition-all shadow-[0px_8px_16px_rgba(27,30,36,0.1)] duration-300 block">
       {/* Image Section */}
       <div className="relative h-32 sm:h-56 overflow-hidden bg-white">
         {service.image.length <= 4 ? (

@@ -127,7 +127,7 @@ export default function AllProductsPage() {
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wide whitespace-nowrap transition-all duration-200 ${selectedCategory === cat
                                     ? 'bg-[#101242] text-white shadow-lg shadow-[0_10px_30px_rgba(16,18,66,0.2)] scale-105'
-                                    : 'bg-white text-muted-foreground border border-border hover:border-[rgba(16,18,66,0.4)] hover:text-[#101242]'
+                                    : 'bg-white text-muted-foreground border-2 border-border hover:border-[rgba(16,18,66,0.4)] hover:text-[#101242]'
                                     }`}
                             >
                                 {cat}
@@ -168,10 +168,10 @@ export default function AllProductsPage() {
                     ) : (
                         <>
                             {/* Showing Info Banner */}
-                            {totalItems > 0 && (
+                            {/* {totalItems > 0 && (
                                 <div className="mb-8 flex justify-end">
                                     <div className="inline-flex items-center gap-3 bg-white border border-border rounded-xl px-4 py-2.5 shadow-sm overflow-hidden relative">
-                                        {/* Left accent bar */}
+                                
                                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl" />
                                         <Package className="w-3.5 h-3.5 text-primary shrink-0 ml-1" />
                                         <p className="text-xs font-black text-foreground uppercase tracking-[1.5px] whitespace-nowrap">
@@ -186,7 +186,7 @@ export default function AllProductsPage() {
                                         </span>
                                     </div>
                                 </div>
-                            )}
+                            )} */}
 
                             {/* Product Grid */}
                             {filtered.length > 0 ? (

@@ -62,7 +62,7 @@ export function Categories() {
                 <Link
                   href={`/categories/${category.id}`}
                   key={category.id}
-                  className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-sm"
+                  className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden shadow-[0px_8px_16px_rgba(27,30,36,0.1)] hover:shadow-2xl transition-all duration-500 flex flex-col"
                 >
                   {/* Image Container */}
                   <div className="relative h-40 sm:h-64 overflow-hidden flex-shrink-0 bg-white">
@@ -83,7 +83,7 @@ export function Categories() {
                     </div>
 
                     <div className="flex items-center justify-between mt-auto">
-                      <span className="text-gray-700 text-[10px] sm:text-base font-medium">Viwe More</span>
+                      <span className="text-gray-700 text-[10px] sm:text-base font-medium">View More</span>
                       <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 text-gray-700 group-hover:bg-[#101242] group-hover:text-white flex items-center justify-center transition-all duration-500 group-hover:rotate-[-45deg]">
                         <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
                       </div>
