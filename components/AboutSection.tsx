@@ -76,7 +76,7 @@ export default function AboutSection() {
                                     key={item}
                                     className="flex items-center gap-3 bg-gray-50 hover:bg-gray-100 transition p-3 rounded-xl"
                                 >
-                                    <CheckCircle className="w-5 h-5 text-[#821616]" />
+                                    <CheckCircle className="w-5 h-5 text-[#101242]" />
                                     <span className="text-sm font-medium text-gray-700">
                                         {item}
                                     </span>
