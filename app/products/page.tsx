@@ -149,7 +149,7 @@ export default function AllProductsPage() {
                             </div>
                             <button
                                 onClick={() => setShowLocationModal(true)}
-                                className="px-10 py-4 bg-primary text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-3"
+                                className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-3"
                             >
                                 <Navigation className="w-5 h-5 text-white/50" />
                                 Select Your Location

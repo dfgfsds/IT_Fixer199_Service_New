@@ -303,7 +303,7 @@ export default function ProductDetailPage({
                             alt={product.name}
                             width={800}
                             height={600}
-                            className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute top-6 right-6 flex gap-3">
                             <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
@@ -453,7 +453,7 @@ export default function ProductDetailPage({
                             </Link>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
                             {relatedProducts.map((p) => {
                                 const relPrice = p.pricing?.[0]?.price || 0
                                 const relRegularPrice = p.pricing?.[0]?.regular_price
