@@ -303,21 +303,21 @@ export default function ProductDetailPage({
                             alt={product.name}
                             width={800}
                             height={600}
-                            className="w-full h-full md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full md:h-[500px] object-contain transition-transform duration-700 group-hover:scale-105"
                         />
-                        <div className="absolute top-6 right-6 flex gap-3">
+                        {/* <div className="absolute top-6 right-6 flex gap-3">
                             <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
                                 <Heart className="w-5 h-5 text-slate-600" />
                             </button>
                             <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
                                 <Share2 className="w-5 h-5 text-slate-600" />
                             </button>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Right: Details */}
                     <div className="space-y-8 py-4">
-                        <div className="space-y-4">
+                        <div className="space-y-4 mb-2">
                             <div className="flex items-center gap-2">
                                 <span className="bg-[rgba(16,18,66)] text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                     {product.category_name || product.category?.name || 'Product'}
@@ -332,17 +332,17 @@ export default function ProductDetailPage({
                         </div>
 
                         {/* Rating & Verified */}
-                        <div className="flex items-center gap-6">
+                        {/* <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2">
                                 <Star className="w-6 h-6 fill-[#ffbb00] text-[#ffbb00]" />
                                 <span className="text-xl font-bold text-[#1a1c2e]">{product.rating || 4.5}</span>
                                 <span className="text-slate-400 font-medium">({product.reviews_count || 120} reviews)</span>
                             </div>
-                            {/* <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                                 <span className="text-sm font-semibold text-green-700">Verified Product</span>
-                            </div> */}
-                        </div>
+                            </div>
+                        </div> */}
 
                         {/* Price Card */}
                         <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
@@ -356,7 +356,7 @@ export default function ProductDetailPage({
                             <p className="text-sm text-slate-400">Inclusive of all taxes</p>
                         </div>
 
-                        {/* Key Features/Attributes */}
+
                         <div className="space-y-4">
                             <h3 className="text-xl font-bold text-[#1a1c2e]">Key Features</h3>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-8">
@@ -371,7 +371,7 @@ export default function ProductDetailPage({
                             </div>
                         </div>
 
-                        {/* Dynamic Product Attributes Selection */}
+
                         {attributeGroups && (
                             <div className="space-y-6 pt-2">
                                 {Object.keys(attributeGroups).map((groupName) => (
@@ -385,7 +385,7 @@ export default function ProductDetailPage({
                                                         key={attr.value_id}
                                                         onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
                                                         className={`px-5 py-2.5 rounded-xl border-2 transition-all font-bold text-sm ${isSelected
-                                                            ? 'border-primary bg-[rgba(16,18,66,0.1)] text-primary scale-[1.02] shadow-sm'
+                                                            ? 'border-[#101242] bg-[rgba(16,18,66,0.1)] text-[#101242] scale-[1.02] shadow-sm'
                                                             : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                                                             }`}
                                                     >
@@ -399,7 +399,7 @@ export default function ProductDetailPage({
                             </div>
                         )}
 
-                        {/* Action Buttons */}
+
                         <div className="pt-4 flex flex-col sm:flex-row gap-4">
                             {currentCartItem ? (
                                 <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-3xl border border-border/50 shadow-inner w-full sm:w-auto">
