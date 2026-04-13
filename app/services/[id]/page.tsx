@@ -300,7 +300,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               alt={service.name}
               width={800}
               height={600}
-              className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-full md:h-[500px] object-cantain transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute top-6 right-6 flex gap-3">
               <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
@@ -432,21 +432,32 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         {/* Related Services Section */}
         {relatedServices.length > 0 && (
           <div className="space-y-10 py-24 border-t border-slate-100">
-            <div className="flex items-end justify-between">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-black text-[#1a1c2e] tracking-tight">Related Services</h2>
-                <p className="text-slate-500 font-medium">Popular services frequently booked by our customers in your area</p>
+            <div className="py-24 border-t border-slate-100">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+                {/* Left Side */}
+                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                  <h2 className="text-2xl md:text-3xl font-black text-[#1a1c2e]">
+                    Related Services
+                  </h2>
+                  <p className="text-slate-500 font-medium text-sm md:text-base">
+                    Popular services frequently booked by our customers in your area
+                  </p>
+                </div>
+
+                {/* Right Side */}
+                <Link
+                  href="/services"
+                  className="flex items-center gap-2 text-[#101242] font-bold hover:gap-3 transition-all group"
+                >
+                  <span>See All</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
               </div>
-              <Link
-                href="/services"
-                className="flex items-center gap-2 text-[#101242] font-bold hover:gap-3 transition-all group p-2"
-              >
-                <span className="uppercase tracking-widest text-sm">See All</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
               {relatedServices.map((rs: any) => {
                 const rsPrice = rs.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
                 const rsImage = rs.media_files?.[0]?.image_url || '/placeholder-image.jpg'
