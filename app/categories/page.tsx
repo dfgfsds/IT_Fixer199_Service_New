@@ -14,6 +14,7 @@ export default function CategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'ALL' | 'PRODUCT' | 'SERVICE'>('ALL')
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -28,7 +29,8 @@ export default function CategoriesPage() {
           id: cat.id,
           name: cat.name,
           image: cat.media?.[0]?.url || '/placeholder-image.jpg',
-          count: cat.services_count || 'Explore'
+          count: cat.services_count || 'Explore',
+          type: cat.type || 'ALL'
         }))
 
         setCategories(mappedCategories)
@@ -43,17 +45,19 @@ export default function CategoriesPage() {
   }, [])
 
   const filteredCategories = useMemo(() => {
-    return categories.filter(cat =>
-      cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [categories, searchQuery])
+    return categories.filter(cat => {
+      const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesTab = activeTab === 'ALL' || cat.type === activeTab
+      return matchesSearch && matchesTab
+    })
+  }, [categories, searchQuery, activeTab])
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-white py-15 md:py-20 px-4 border-b border-slate-100">
+      <section className="bg-white py-10 md:py-15 px-4 border-b border-slate-100">
         <div className="max-w-7xl mx-auto text-center space-y-8">
           <h1 className="text-4xl md:text-6xl font-black text-[#101242] tracking-tight leading-tight">
             All Categories
@@ -77,6 +81,26 @@ export default function CategoriesPage() {
 
       {/* Main Content */}
       <main className="flex-1 py-10 md:py-20 px-4  max-w-7xl mx-auto w-full">
+        {/* Tabs */}
+        {!loading && categories.length > 0 && (
+          <div className="flex justify-center mb-10 overflow-x-auto no-scrollbar">
+            <div className="inline-flex bg-slate-50 border border-slate-100 p-1.5 rounded-2xl gap-1 whitespace-nowrap shadow-sm">
+              {['ALL', 'PRODUCT', 'SERVICE'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`px-6 sm:px-8 py-3 rounded-xl text-sm font-black tracking-wide transition-all duration-300 ${activeTab === tab
+                    ? 'bg-white text-[#101242] shadow-sm transform scale-[1.02] border border-slate-100'
+                    : 'text-slate-500 hover:text-[#101242] hover:bg-slate-100/50'
+                    }`}
+                >
+                  {tab === 'ALL' ? 'All Categories' : tab === 'PRODUCT' ? 'Products' : 'Services'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
             <Loader2 className="w-12 h-12 text-[#101242] animate-spin" />
@@ -117,7 +141,7 @@ export default function CategoriesPage() {
                   </div>
 
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-gray-700 text-[10px] sm:text-base font-medium">Viwe More</span>
+                    <span className="text-gray-700 text-[10px] sm:text-base font-medium">View More</span>
                     <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 text-gray-700 group-hover:bg-[#101242] group-hover:text-white flex items-center justify-center transition-all duration-500 group-hover:rotate-[-45deg]">
                       <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
                     </div>

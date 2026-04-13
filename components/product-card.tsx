@@ -20,7 +20,7 @@ export function ProductCard({ product, basePath = 'products' }: Props) {
     : null
 
   return (
-    <Link href={`/${basePath}/${product.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300 block">
+    <Link href={`/${basePath}/${product.id}`} className="group bg-white rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:border-primary/30 shadow-[0px_8px_16px_rgba(27,30,36,0.1)] transition-all duration-300 block">
       {/* Image Section */}
       <div className="relative h-32 sm:h-56 overflow-hidden bg-muted">
         <Image
