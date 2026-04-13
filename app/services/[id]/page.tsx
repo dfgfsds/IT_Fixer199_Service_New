@@ -436,11 +436,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
                 {/* Left Side */}
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <h2 className="text-2xl md:text-3xl font-black text-[#1a1c2e]">
+                <div className="flex flex-col items-start md:items-start gap-1 md:gap-2 text-left md:text-left">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#1a1c2e] leading-tight">
                     Related Services
                   </h2>
-                  <p className="text-slate-500 font-medium text-sm md:text-base">
+
+                  <p className="text-slate-500 font-medium text-xs sm:text-sm md:text-base max-w-xs sm:max-w-md md:max-w-none">
                     Popular services frequently booked by our customers in your area
                   </p>
                 </div>
