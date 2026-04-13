@@ -136,7 +136,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                         </div>
                         <button
                             onClick={() => setShowLocationModal(true)}
-                            className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                            className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center gap-3"
                         >
                             <Navigation className="w-5 h-5 text-white/50" />
                             Select Your Location
@@ -170,12 +170,12 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                 {/* Hero Section */}
                 <section className="bg-white py-20 px-4 border-b border-slate-100">
                     <div className="max-w-7xl mx-auto text-center space-y-8">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest shadow-sm">
                             <Sparkles className="w-4 h-4" />
                             {categoryName} Experts in {location?.city || 'your city'}
                         </div>
                         <h1 className="text-5xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight leading-tight capitalize">
-                            {categoryName} <span className="text-[#800000]">Collection</span>
+                            {categoryName} <span className="text-[#101242]">Collection</span>
                         </h1>
                         <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
                             Handpicked professional services and high-quality products specifically for your {categoryName.toLowerCase()} needs.
@@ -188,7 +188,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                                     key={cat.id}
                                     onClick={() => router.push(`/categories/${cat.id}`)}
                                     className={`px-8 py-3.5 rounded-2xl text-sm font-black tracking-widest uppercase transition-all whitespace-nowrap border-2 ${cat.id.toString() === id
-                                        ? 'bg-[#800000] border-[#800000] text-white shadow-xl shadow-[#800000]/20 scale-105'
+                                        ? 'bg-[#101242] border-[#101242] text-white shadow-xl shadow-[#101242]/20 scale-105'
                                         : 'bg-white border-white text-slate-500 hover:border-slate-100 hover:bg-slate-50'
                                         }`}
                                 >

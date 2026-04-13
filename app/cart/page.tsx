@@ -362,7 +362,7 @@ export default function CartPage() {
         },
 
         theme: {
-          color: "#800000",
+          color: "#101242",
         },
       }
 
@@ -425,7 +425,7 @@ export default function CartPage() {
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-4">
-            <Loader2 className="w-12 h-12 text-[#800000] animate-spin mx-auto" />
+            <Loader2 className="w-12 h-12 text-[#101242] animate-spin mx-auto" />
             <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Loading your cart...</p>
           </div>
         </div>
@@ -460,15 +460,15 @@ export default function CartPage() {
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#800000] group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
+                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#101242] group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
                   <Wrench className="w-5 h-5" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#800000] transition-colors mb-1 pr-8">Book a Service</h3>
+                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#101242] transition-colors mb-1 pr-8">Book a Service</h3>
                   <p className="text-sm text-slate-500 font-medium">Expert doorstep repair & diagnostics.</p>
                 </div>
                 <div className="absolute top-7 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                  <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#800000]">
+                  <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#101242]">
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -560,9 +560,9 @@ export default function CartPage() {
                           </div>
                         ) : item.type === "SERVICE" ? (
                           /* Highly professional Service Badge */
-                          <div className="flex items-center gap-2.5 bg-[#800000]/5 px-5 py-3 rounded-2xl border border-[#800000]/10 shadow-sm animate-in fade-in zoom-in duration-500">
-                            <CheckCircle className="w-4 h-4 text-[#800000]" />
-                            <span className="text-[11px] font-black text-[#800000] uppercase tracking-[0.15em] whitespace-nowrap">
+                          <div className="flex items-center gap-2.5 bg-[#101242]/5 px-5 py-3 rounded-2xl border border-[#101242]/10 shadow-sm animate-in fade-in zoom-in duration-500">
+                            <CheckCircle className="w-4 h-4 text-[#101242]" />
+                            <span className="text-[11px] font-black text-[#101242] uppercase tracking-[0.15em] whitespace-nowrap">
                               1 SERVICE
                             </span>
                           </div>
@@ -572,7 +572,7 @@ export default function CartPage() {
                             <button
                               onClick={() => updateQuantity(item, itemQty - 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#101242] transition-colors disabled:opacity-50"
                             >
                               {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
                             </button>
@@ -582,7 +582,7 @@ export default function CartPage() {
                             <button
                               onClick={() => updateQuantity(item, itemQty + 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#800000] transition-colors disabled:opacity-50"
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#101242] transition-colors disabled:opacity-50"
                             >
                               <Plus className="w-4 h-4" />
                             </button>
@@ -623,7 +623,7 @@ export default function CartPage() {
                       router.push('/profile?tab=addresses&action=add');
                     }
                   }}
-                  className="px-6 py-2.5 bg-[#800000] text-white text-sm font-black rounded-2xl shadow-lg shadow-red-900/20 hover:bg-[#600000] transition-all active:scale-95 whitespace-nowrap"
+                  className="px-6 py-2.5 bg-[#101242] text-white text-sm font-black rounded-2xl shadow-lg shadow-red-900/20 hover:bg-[#600000] transition-all active:scale-95 whitespace-nowrap"
                 >
                   Add New
                 </button>
@@ -636,21 +636,21 @@ export default function CartPage() {
                       <label
                         key={addr.id}
                         className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${selectedAddressId === addr.id
-                          ? 'border-[#800000] shadow-md bg-red-50/10'
+                          ? 'border-[#101242] shadow-md bg-red-50/10'
                           : 'border-slate-100 hover:border-slate-200 shadow-sm'
                           }`}
                       >
                         <input
                           type="radio"
                           name="address"
-                          className="mt-1 w-4 h-4 text-[#800000] focus:ring-[#800000] border-gray-300"
+                          className="mt-1 w-4 h-4 text-[#101242] focus:ring-[#101242] border-gray-300"
                           checked={selectedAddressId === addr.id}
                           onChange={() => handleAddressSelectSync(addr)}
                         />
                         <div className="flex-1">
                           <p className="font-bold text-[#1a1c2e] flex items-center gap-2">
                             {addr.name || (addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Saved Address')}
-                            {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#800000] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
+                            {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#101242] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
                           </p>
                           <p className="text-sm text-slate-500 mt-1 line-clamp-2">
                             {addr.full_address || [addr.door_no, addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ')}
@@ -661,7 +661,7 @@ export default function CartPage() {
                     {addresses.length > 4 && (
                       <Link
                         href="/profile?tab=addresses"
-                        className="sm:col-span-2 w-full flex items-center justify-center rounded-2xl py-3 text-sm font-bold text-[#800000] bg-red-50 hover:bg-red-100 transition-colors"
+                        className="sm:col-span-2 w-full flex items-center justify-center rounded-2xl py-3 text-sm font-bold text-[#101242] bg-red-50 hover:bg-red-100 transition-colors"
                       >
                         {/* See all {addresses.length} addresses */}
                         See all addresses
@@ -696,7 +696,7 @@ export default function CartPage() {
                 <button
                   onClick={() => setScheduleType("instant")}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "instant"
-                    ? "bg-[#800000] text-white shadow-lg shadow-red-900/20"
+                    ? "bg-[#101242] text-white shadow-lg shadow-red-900/20"
                     : "text-slate-500 hover:bg-slate-50"
                     }`}
                 >
@@ -707,7 +707,7 @@ export default function CartPage() {
                 <button
                   onClick={() => setScheduleType("later")}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "later"
-                    ? "bg-[#800000] text-white shadow-lg shadow-red-900/20"
+                    ? "bg-[#101242] text-white shadow-lg shadow-red-900/20"
                     : "text-slate-500 hover:bg-slate-50"
                     }`}
                 >
@@ -734,23 +734,23 @@ export default function CartPage() {
                     <button
                       onClick={handleInstantSelect}
                       className={`w-full bg-white p-5 rounded-3xl border-2 transition-all shadow-sm relative overflow-hidden group ${selectedTime === "instant"
-                        ? 'border-[#800000] bg-red-50/30'
+                        ? 'border-[#101242] bg-red-50/30'
                         : 'border-slate-100 hover:border-slate-200'
                         }`}
                     >
                       <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#800000] text-white' : 'bg-green-50 text-green-600'}`}>
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#101242] text-white' : 'bg-green-50 text-green-600'}`}>
                           <Clock className="w-6 h-6" />
                         </div>
                         <div className="text-left">
-                          <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>Technician Available Now</p>
+                          <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>Technician Available Now</p>
                           <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-green-600 font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
                         </div>
                       </div>
 
                       {selectedTime === "instant" && (
                         <div className="absolute right-5 top-1/2 -translate-y-1/2">
-                          <CheckCircle className="w-6 h-6 text-[#800000]" />
+                          <CheckCircle className="w-6 h-6 text-[#101242]" />
                         </div>
                       )}
                     </button>
@@ -780,7 +780,7 @@ export default function CartPage() {
                           safeErrorLog("Failed to clear instant slot", err)
                         }
                       }}
-                      className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#800000]/20 bg-[#800000]/5 text-[#800000] hover:bg-[#800000]/10 transition-all text-xs font-black uppercase tracking-widest"
+                      className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all text-xs font-black uppercase tracking-widest"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Clear Instant Selection
@@ -800,14 +800,14 @@ export default function CartPage() {
                           key={d.value}
                           onClick={() => { setSelectedDate(d.value); setSelectedTime(""); }}
                           className={`flex flex-col items-center min-w-[70px] p-3 rounded-2xl border-2 transition-all ${selectedDate === d.value
-                            ? "border-[#800000] bg-red-50/20 shadow-sm"
+                            ? "border-[#101242] bg-red-50/20 shadow-sm"
                             : "border-slate-50 bg-white hover:border-slate-200"
                             }`}
                         >
-                          <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#800000]" : "text-slate-400"}`}>
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#101242]" : "text-slate-400"}`}>
                             {d.label}
                           </span>
-                          <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#800000]" : "text-[#1a1c2e]"}`}>
+                          <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#101242]" : "text-[#1a1c2e]"}`}>
                             {d.day}
                           </span>
                         </button>
@@ -831,7 +831,7 @@ export default function CartPage() {
                             safeErrorLog("Failed to clear slot in cart", err)
                           }
                         }}
-                        className="flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-2xl border-2 border-[#800000]/20 bg-[#800000]/5 text-[#800000] hover:bg-[#800000]/10 transition-all group shrink-0"
+                        className="flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-2xl border-2 border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all group shrink-0"
                       >
                         <Trash2 className="w-4 h-4 mb-1" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Clear</span>
@@ -846,19 +846,19 @@ export default function CartPage() {
                         key={slot.id}
                         onClick={() => handleSlotSelect(slot)}
                         className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden group ${selectedTime === slot.id
-                          ? 'border-[#800000] bg-red-50/30'
+                          ? 'border-[#101242] bg-red-50/30'
                           : 'border-white bg-white shadow-sm hover:border-slate-100'
                           }`}
                       >
                         <div className="relative z-10">
                           <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">{slot.name}</p>
-                          <p className={`font-bold ${selectedTime === slot.id ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>
+                          <p className={`font-bold ${selectedTime === slot.id ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>
                             {slot.start_time} - {slot.end_time}
                           </p>
                         </div>
                         {selectedTime === slot.id && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <CheckCircle className="w-5 h-5 text-[#800000]" />
+                            <CheckCircle className="w-5 h-5 text-[#101242]" />
                           </div>
                         )}
                       </button>
@@ -890,7 +890,7 @@ export default function CartPage() {
                     key={pm.id}
                     onClick={() => setSelectedPayment(pm.id)}
                     className={`p-5 rounded-2xl border-2 transition-all flex items-center gap-4 font-bold ${selectedPayment === pm.id
-                      ? 'border-[#800000] bg-red-50/30 text-[#800000]'
+                      ? 'border-[#101242] bg-red-50/30 text-[#101242]'
                       : 'border-white bg-white shadow-sm text-slate-500 hover:border-slate-100'
                       }`}
                   >
@@ -961,7 +961,7 @@ export default function CartPage() {
                         disabled={isCheckoutLoading || hasInactiveItems}
                         className={`w-full mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${hasInactiveItems || !selectedAddressId || !selectedTime
                           ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-                          : 'bg-[#800000] text-white hover:bg-[#600000] shadow-none'
+                          : 'bg-[#101242] text-white hover:bg-[#600000] shadow-none'
                           }`}
                       >
                         {isCheckoutLoading ? (

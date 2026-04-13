@@ -116,7 +116,7 @@ export default function OrdersTab() {
             const serviceName = order?.items?.[0]?.item_details?.name || "Service Booking"
 
             return (
-              <div key={order.id} className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#800000]/20">
+              <div key={order.id} className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#101242]/20">
                 <div className="flex items-center gap-5">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${context.bg}`}>
                     {context.icon}
@@ -129,12 +129,12 @@ export default function OrdersTab() {
                 </div>
                 <div className="flex items-center justify-between md:justify-end gap-10">
                   <div className="text-right">
-                    <p className="text-2xl font-black text-[#800000]">₹{formatPrice(order?.total_price)}</p>
+                    <p className="text-2xl font-black text-[#101242]">₹{formatPrice(order?.total_price)}</p>
                     <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${context.text}`}>
                       {statusLabel(order?.order_status)}
                     </p>
                   </div>
-                  <Link href={`/orders/${order.id}`} className="group p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-[#800000] hover:text-white transition-all flex items-center justify-center shrink-0">
+                  <Link href={`/orders/${order.id}`} className="group p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-[#101242] hover:text-white transition-all flex items-center justify-center shrink-0">
                     <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </div>

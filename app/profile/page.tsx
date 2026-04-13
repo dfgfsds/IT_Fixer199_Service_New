@@ -84,7 +84,7 @@ function ProfileContent() {
             <nav className="bg-white p-4 rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-100 divide-y divide-slate-50">
               <button
                 onClick={() => handleTabChange('profile')}
-                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'profile' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'profile' ? 'bg-[#101242]/5 text-[#101242]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <div className="flex items-center gap-4">
                   <User className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -95,7 +95,7 @@ function ProfileContent() {
 
               <button
                 onClick={() => handleTabChange('addresses')}
-                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'addresses' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'addresses' ? 'bg-[#101242]/5 text-[#101242]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <div className="flex items-center gap-4">
                   <MapPin className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -106,7 +106,7 @@ function ProfileContent() {
 
               <button
                 onClick={() => handleTabChange('orders')}
-                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'orders' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'orders' ? 'bg-[#101242]/5 text-[#101242]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <div className="flex items-center gap-4">
                   <Package className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -117,7 +117,7 @@ function ProfileContent() {
 
               <button
                 onClick={() => handleTabChange('requests')}
-                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'requests' ? 'bg-[#800000]/5 text-[#800000]' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group ${activeTab === 'requests' ? 'bg-[#101242]/5 text-[#101242]' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <div className="flex items-center gap-4">
                   <ClipboardList className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -128,7 +128,7 @@ function ProfileContent() {
 
               <button
                 onClick={logout}
-                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group text-[#800000] hover:bg-red-50`}
+                className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300 group text-[#101242] hover:bg-red-50`}
               >
                 <div className="flex items-center gap-4">
                   <LogOut className="w-5 h-5 transition-transform group-hover:scale-110" />

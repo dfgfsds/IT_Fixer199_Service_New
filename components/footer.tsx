@@ -50,11 +50,11 @@ export function Footer() {
           <div className="text-left lg:mx-auto">
             <h3 className="text-lg mb-4 font-bold text-slate-900">Company</h3>
             <ul className="space-y-3">
-              <li><Link href="/" className="text-slate-500 hover:text-[#800000] font-semibold transition-colors text-sm">Home</Link></li>
-              <li><Link href="/about" className="text-slate-500 hover:text-[#800000] font-semibold transition-colors text-sm">About us</Link></li>
-              <li><Link href="/categories" className="text-slate-500 hover:text-[#800000] font-semibold transition-colors text-sm">Categories</Link></li>
-              <li><Link href="/services" className="text-slate-500 hover:text-[#800000] font-semibold transition-colors text-sm">Services</Link></li>
-              <li><Link href="/products" className="text-slate-500 hover:text-[#800000] font-semibold transition-colors text-sm">Products</Link></li>
+              <li><Link href="/" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Home</Link></li>
+              <li><Link href="/about" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">About us</Link></li>
+              <li><Link href="/categories" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Categories</Link></li>
+              <li><Link href="/services" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Services</Link></li>
+              <li><Link href="/products" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Products</Link></li>
             </ul>
           </div>
 
@@ -69,11 +69,11 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-start gap-3 hover:opacity-80 transition-opacity group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:bg-[#800000]/5 group-hover:border-[#800000]/20 transition-colors">
-                    <MapPin className="w-5 h-5 text-[#800000]" />
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:bg-[#101242]/5 group-hover:border-[#101242]/20 transition-colors">
+                    <MapPin className="w-5 h-5 text-[#101242]" />
                   </div>
                   <div className="text-sm">
-                    <p className="text-slate-500 font-semibold group-hover:text-[#800000] transition-colors">
+                    <p className="text-slate-500 font-semibold group-hover:text-[#101242] transition-colors">
                       No.91, Ground Floor, <br />Kothari Nagar
                       2nd Main Road, <br />Ramapuram, <br />
                       Chennai - 600089
@@ -83,15 +83,15 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-[#800000]" />
+                  <Phone className="w-5 h-5 text-[#101242]" />
                 </div>
-                <a href="tel:+919385939985" className="text-sm font-semibold text-slate-500 hover:text-[#800000] transition-colors">+91 9385939985</a>
+                <a href="tel:+919385939985" className="text-sm font-semibold text-slate-500 hover:text-[#101242] transition-colors">+91 9385939985</a>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5 text-[#800000]" />
+                  <Mail className="w-5 h-5 text-[#101242]" />
                 </div>
-                <a href="mailto:info@itfixer199.com" className="text-sm font-semibold text-slate-500 hover:text-[#800000] transition-colors">info@itfixer199.com</a>
+                <a href="mailto:info@itfixer199.com" className="text-sm font-semibold text-slate-500 hover:text-[#101242] transition-colors">info@itfixer199.com</a>
               </li>
             </ul>
           </div>
