@@ -142,7 +142,7 @@ export default function CategoriesPage() {
 
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-gray-700 text-[10px] sm:text-base font-medium">View More</span>
-                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 text-gray-700 group-hover:bg-[#101242] group-hover:text-white flex items-center justify-center transition-all duration-500 group-hover:rotate-[-45deg]">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 text-gray-700 group-hover:bg-[#101242] group-hover:text-white flex items-center justify-center transition-all ">
                       <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
                     </div>
                   </div>
