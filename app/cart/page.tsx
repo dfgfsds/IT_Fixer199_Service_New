@@ -505,18 +505,20 @@ export default function CartPage() {
     <div className="min-h-screen bg-slate-50/50">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-10 md:py-12">
         <h1 className="text-3xl font-black text-[#1a1c2e] mb-10">Your Cart</h1>
 
-        <div className="grid lg:grid-cols-3 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 items-start">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-10">
+
             {/* Items Section */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-500 uppercase tracking-wider ml-1">
+            <div className="space-y-3 sm:space-y-4">
+              <h2 className="text-base sm:text-lg font-bold text-slate-500 uppercase tracking-wider ml-1">
                 Items ({cartItems.length})
               </h2>
-              <div className="space-y-4">
+
+              <div className="space-y-3 sm:space-y-4">
                 {cartItems.map((item: any) => {
                   const isUpdating = updatingId === item.id
                   const isRemoving = removingId === item.id
@@ -527,62 +529,71 @@ export default function CartPage() {
                   return (
                     <div
                       key={item.id}
-                      className={`relative bg-white p-5 rounded-3xl border transition-all duration-300 flex items-center gap-6 group ${isInactive
-                        ? 'border-red-100 bg-slate-50 opacity-80 desaturate-[0.5]'
-                        : 'border-slate-100 shadow-sm hover:shadow-md'
-                        } ${isRemoving ? 'opacity-50' : ''}`}
+                      className={`relative bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 group
+          ${isInactive
+                          ? 'border-red-100 bg-slate-50 opacity-80 desaturate-[0.5]'
+                          : 'border-slate-100 shadow-sm hover:shadow-md'}
+          ${isRemoving ? 'opacity-50' : ''}`}
                     >
+
                       {/* Image */}
-                      <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-100">
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-100">
                         <Image
                           src={getItemImage(item)}
                           alt={getItemName(item)}
                           fill
-                          className={`transition-transform duration-500 group-hover:scale-110 ${isInactive ? '' : 'group-hover:scale-110'
-                            } ${getItemImage(item) === '/logo.png' ? 'object-contain p-2' : 'object-cover'}`}
+                          className={`transition-transform duration-500 group-hover:scale-110
+              ${getItemImage(item) === '/logo.png' ? 'object-contain p-2' : 'object-cover'}`}
                           onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png' }}
                         />
                       </div>
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-[#1a1c2e] truncate">{getItemName(item)}</h3>
-                        <p className="text-sm text-slate-400 font-medium mb-1 capitalize">{getItemCategory(item).toLowerCase()}</p>
-                        <p className={`text-xl font-black mt-1 ${isInactive ? 'text-slate-400' : 'text-[#1a1c2e]'}`}>₹{formatPrice(itemPrice)}</p>
+                        <h3 className="text-base sm:text-lg font-bold text-[#1a1c2e]">
+                          {getItemName(item)}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-400 font-medium mb-1 capitalize">
+                          {getItemCategory(item).toLowerCase()}
+                        </p>
+                        <p className={`text-lg sm:text-xl font-black mt-1 ${isInactive ? 'text-slate-400' : 'text-[#1a1c2e]'}`}>
+                          ₹{formatPrice(itemPrice)}
+                        </p>
                       </div>
 
-                      {/* Right Side Actions */}
-                      <div className="flex items-center gap-2">
+                      {/* Right Side */}
+                      <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+
                         {isInactive ? (
-                          <div className="px-4 py-2 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-red-100 flex items-center gap-2 whitespace-nowrap animate-in fade-in zoom-in duration-300">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            Unavailable at this Address
+                          <div className="px-3 sm:px-4 py-2 bg-red-50 text-red-600 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-xl sm:rounded-2xl border border-red-100 flex items-center gap-2 whitespace-nowrap">
+                            <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            Unavailable
                           </div>
                         ) : item.type === "SERVICE" ? (
-                          /* Highly professional Service Badge */
-                          <div className="flex items-center gap-2.5 bg-[#101242]/5 px-5 py-3 rounded-2xl border border-[#101242]/10 shadow-sm animate-in fade-in zoom-in duration-500">
+                          <div className="flex items-center gap-2 bg-[#101242]/5 px-3 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#101242]/10">
                             <CheckCircle className="w-4 h-4 text-[#101242]" />
-                            <span className="text-[11px] font-black text-[#101242] uppercase tracking-[0.15em] whitespace-nowrap">
+                            <span className="text-[10px] sm:text-[11px] font-black text-[#101242] uppercase whitespace-nowrap">
                               1 SERVICE
                             </span>
                           </div>
                         ) : (
-                          /* Quantity Controls for Products */
-                          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                          <div className="flex items-center gap-2 sm:gap-4 bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-100">
                             <button
                               onClick={() => updateQuantity(item, itemQty - 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#101242] transition-colors disabled:opacity-50"
+                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl bg-white text-slate-600"
                             >
                               {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
                             </button>
-                            <span className="text-lg font-black text-[#1a1c2e] w-6 text-center">
+
+                            <span className="text-base sm:text-lg font-black text-[#1a1c2e] w-5 sm:w-6 text-center">
                               {itemQty}
                             </span>
+
                             <button
                               onClick={() => updateQuantity(item, itemQty + 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm hover:text-[#101242] transition-colors disabled:opacity-50"
+                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl bg-white text-slate-600"
                             >
                               <Plus className="w-4 h-4" />
                             </button>
@@ -593,17 +604,19 @@ export default function CartPage() {
                         <button
                           onClick={() => removeItem(item)}
                           disabled={isRemoving}
-                          className="p-3 text-slate-600 hover:text-red-600 transition-colors disabled:opacity-50"
+                          className="p-2 sm:p-3 text-slate-600 hover:text-red-600"
                         >
-                          {isRemoving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                          {isRemoving
+                            ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                            : <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
+
                       </div>
                     </div>
                   )
                 })}
               </div>
             </div>
-
             {/* Service Address */}
             <div className="space-y-4">
               <div className="flex items-center justify-between ml-1">
@@ -739,12 +752,12 @@ export default function CartPage() {
                         }`}
                     >
                       <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#101242] text-white' : 'bg-green-50 text-green-600'}`}>
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#7d1719] text-white' : 'bg-[#7d1719]/10 text-[#7d1719]'}`}>
                           <Clock className="w-6 h-6" />
                         </div>
                         <div className="text-left">
                           <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>Technician Available Now</p>
-                          <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-green-600 font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
+                          <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-[#7d1719] font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
                         </div>
                       </div>
 
@@ -882,7 +895,7 @@ export default function CartPage() {
                 <CreditCard className="w-5 h-5" />
                 Payment Method
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {[
                   { id: 'upi', name: 'UPI / Online', icon: Smartphone },
                 ].map((pm) => (
@@ -900,7 +913,9 @@ export default function CartPage() {
                 ))}
               </div>
             </div>
-          </div>          {/* Right Column: Order Summary */}
+          </div>
+
+          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             {(() => {
               const hasInactiveItems = cartItems.some(item => item.is_active === false)
@@ -914,9 +929,9 @@ export default function CartPage() {
                       <span>Subtotal</span>
                       <span className="font-bold text-[#1a1c2e]">₹{formatPrice(subtotal)}</span>
                     </div>
-                    <div className="flex justify-between text-slate-500 font-medium">
+                    <div className="flex justify-between text-[#7d1719] font-medium">
                       <span>Service Charge</span>
-                      <span className="font-bold text-emerald-600">₹{formatPrice(serviceCharge)}</span>
+                      <span className="font-bold text-[#7d1719]">₹{formatPrice(serviceCharge)}</span>
                     </div>
                     <div className="flex justify-between text-slate-500 font-medium">
                       <span>GST (5%)</span>
