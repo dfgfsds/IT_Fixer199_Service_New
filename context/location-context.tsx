@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react"
 import axiosInstance from "@/configs/axios-middleware"
 import Api from "@/api-endpoints/ApiUrls"
 import { useAuth } from "./auth-context"
@@ -57,6 +57,8 @@ export function LocationProvider({ children }: any) {
   const [location, setLocationState] = useState<LocationData | null>(null)
   const [showLocationModal, setShowLocationModal] = useState(false)
   const [zoneData, setZoneData] = useState<any>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const isInitializingRef = useRef(false)
   const { user } = useAuth()
 
   const fetchZoneData = useCallback(async (lat: number, lng: number) => {
@@ -68,7 +70,6 @@ export function LocationProvider({ children }: any) {
         setZoneData(res.data?.zone_slot || res.data?.data)
       }
     } catch (err: any) {
-      // Silence expected server-side errors to avoid triggering the dev overlay
       if (err.response?.status !== 500) {
         console.warn("Zone fetch error", err)
       }
@@ -91,7 +92,7 @@ export function LocationProvider({ children }: any) {
       async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords
         try {
-          // Reverse geocode via Nominatim (Free, no key needed)
+          // Reverse geocode via Nominatim
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
           )
@@ -116,52 +117,73 @@ export function LocationProvider({ children }: any) {
         }
       },
       () => {
-        // GPS permission denied or failed but we keep it silent
         console.log("No location detected from GPS.")
       }
     )
   }
 
-  // INIT FLOW: Implements the exact priority: 1. Selected Address -> 2. GPS Fallback
   const initLocation = async () => {
-    try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (isInitializingRef.current) return
+    isInitializingRef.current = true
 
-      // STEP 1: PRIORITIZE SELECTED ADDRESS (Server Profile)
+    try {
+      // STEP 0: IMMEDIATELY LOAD FROM LOCAL STORAGE
+      const savedLocation = localStorage.getItem("user_location")
+      if (savedLocation && !location) {
+        try {
+          const parsed = JSON.parse(savedLocation)
+          if (parsed?.lat && parsed?.lng) {
+            setLocationState(parsed)
+          }
+        } catch (e) {
+          localStorage.removeItem("user_location")
+        }
+      }
+
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+
+      // STEP 1: PRIORITIZE SELECTED ADDRESS
       if (token) {
         try {
-          const res = await axiosInstance.get(Api?.selectedAddress);
-          const selected = res?.data?.data;
+          const res = await axiosInstance.get(Api?.selectedAddress)
+          const selected = res?.data?.data || res?.data
 
           if (selected && selected?.lat && selected?.lng) {
-            setLocation({
+            const serverLoc = {
               lat: Number(selected.lat),
               lng: Number(selected.lng),
-              city: selected.district || "Unknown",
+              city: selected.district || selected.city || "Unknown",
               state: selected.state || "",
               pincode: selected.pincode || "",
-              address: selected.full_address || "",
-            });
-            return; // Found server-side address. STOP HERE. (No GPS prompt shown)
+              address: selected.full_address || selected.address || "",
+            }
+            setLocation(serverLoc)
+            setIsInitialized(true)
+            isInitializingRef.current = false
+            return
           }
         } catch (e: any) {
-          // Silent 404 is allowed here.
           if (e.response?.status !== 401 && e.response?.status !== 404) {
             console.warn("Init location fetch error", e)
           }
         }
       }
 
-      // STEP 2: GPS FALLBACK (If profile is empty)
-      // This will trigger the browser permission popup only if step 1 found nothing.
-      handleCurrentLocation();
+      // STEP 2: GPS FALLBACK
+      if (!localStorage.getItem("user_location")) {
+        handleCurrentLocation()
+      }
 
+      setIsInitialized(true)
     } catch (error: any) {
-      // Final fallback if everything fails
+      console.error("Critical error in location init", error)
+    } finally {
+      isInitializingRef.current = false
     }
-  };
+  }
 
   useEffect(() => {
+    // Only run if we haven't successfully loaded a location yet OR user changed
     initLocation()
   }, [user?.id])
 
