@@ -109,11 +109,11 @@ export default function AllProductsPage() {
             <main className="py-20 bg-muted/20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Heading */}
-                    <div className="mb-10 space-y-2">
-                        <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-                            Home Care <span className="text-primary">Products</span>
+                    <div className="mb-10 md:mb-16 space-y-2">
+                        <h1 className="text-3xl sm:text-5xl font-bold text-[#101242] text-center  text-foreground tracking-tight">
+                            Products
                         </h1>
-                        <p className="text-lg text-muted-foreground font-medium">
+                        <p className="text-lg text-muted-foreground text-center font-medium">
                             Professional-grade supplies and tools for your home
                         </p>
                     </div>
@@ -126,8 +126,8 @@ export default function AllProductsPage() {
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wide whitespace-nowrap transition-all duration-200 ${selectedCategory === cat
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105'
-                                    : 'bg-white text-muted-foreground border border-border hover:border-primary/40 hover:text-primary'
+                                    ? 'bg-[#101242] text-white shadow-lg shadow-[0_10px_30px_rgba(16,18,66,0.2)] scale-105'
+                                    : 'bg-white text-muted-foreground border border-border hover:border-[rgba(16,18,66,0.4)] hover:text-[#101242]'
                                     }`}
                             >
                                 {cat}
@@ -158,8 +158,8 @@ export default function AllProductsPage() {
                     ) : loading ? (
                         <div className="flex flex-col items-center justify-center py-40 p-8 space-y-6">
                             <div className="relative">
-                                <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-                                <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+                                <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+                                <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
                             </div>
                             <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm text-center">
                                 Loading products...
@@ -233,7 +233,7 @@ export default function AllProductsPage() {
                                                                 key={item}
                                                                 onClick={() => handlePageChange(item as number)}
                                                                 className={`w-10 h-10 rounded-xl text-sm font-black transition-all duration-200 active:scale-95 ${currentPage === item
-                                                                    ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+                                                                    ? 'bg-[#101242] text-white shadow-lg shadow-primary/30 scale-105'
                                                                     : 'bg-white border border-border text-foreground hover:border-primary hover:text-primary'
                                                                     }`}
                                                             >

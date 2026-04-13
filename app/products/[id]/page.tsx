@@ -202,10 +202,10 @@ export default function ProductDetailPage({
                 <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
                     <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
                         <div className="relative">
-                            <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+                            <div className="w-24 h-24 bg-[#101242]/5 text-[#101242] rounded-full flex items-center justify-center mx-auto">
                                 <MapPin className="w-10 h-10" />
                             </div>
-                            <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+                            <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
                         </div>
                         <div className="space-y-3 max-w-sm mx-auto">
                             <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
@@ -213,7 +213,7 @@ export default function ProductDetailPage({
                         </div>
                         <button
                             onClick={() => setShowLocationModal(true)}
-                            className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                            className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center gap-3"
                         >
                             <Navigation className="w-5 h-5 text-white/50" />
                             Select Your Location
@@ -231,8 +231,8 @@ export default function ProductDetailPage({
                 <Header />
                 <main className="flex-1 flex flex-col items-center justify-center py-40 p-8 space-y-6">
                     <div className="relative">
-                        <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-                        <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+                        <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+                        <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
                     </div>
                     <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm">
                         Loading product details...
@@ -262,7 +262,7 @@ export default function ProductDetailPage({
                         <div className="flex flex-col sm:flex-row gap-4">
                             <button
                                 onClick={() => setShowLocationModal(true)}
-                                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                                className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center gap-3"
                             >
                                 <MapPin className="w-5 h-5 text-white" />
                                 Change Location
@@ -319,7 +319,7 @@ export default function ProductDetailPage({
                     <div className="space-y-8 py-4">
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
-                                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <span className="bg-[rgba(16,18,66)] text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                     {product.category_name || product.category?.name || 'Product'}
                                 </span>
                             </div>
@@ -338,15 +338,15 @@ export default function ProductDetailPage({
                                 <span className="text-xl font-bold text-[#1a1c2e]">{product.rating || 4.5}</span>
                                 <span className="text-slate-400 font-medium">({product.reviews_count || 120} reviews)</span>
                             </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
+                            {/* <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                                 <span className="text-sm font-semibold text-green-700">Verified Product</span>
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Price Card */}
                         <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
-                            <p className="text-slate-500 font-medium mb-1">Starting from</p>
+                            {/* <p className="text-slate-500 font-medium mb-1">Starting from</p> */}
                             <div className="flex items-baseline gap-3 mb-2">
                                 <span className="text-4xl font-black text-[#1a1c2e]">₹{formatPrice(price)}</span>
                                 {regularPrice && (
@@ -363,7 +363,7 @@ export default function ProductDetailPage({
                                 {attributes.map((item: any, index: number) => (
                                     <div key={index} className="flex items-center gap-3 group">
                                         <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100 transition-colors group-hover:bg-emerald-100">
-                                            <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3px]" />
+                                            <Check className="w-3.5 h-3.5 text-[#101242] stroke-[3px]" />
                                         </div>
                                         <span className="text-[15px] font-medium text-slate-600 leading-tight">{item}</span>
                                     </div>
@@ -385,7 +385,7 @@ export default function ProductDetailPage({
                                                         key={attr.value_id}
                                                         onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
                                                         className={`px-5 py-2.5 rounded-xl border-2 transition-all font-bold text-sm ${isSelected
-                                                            ? 'border-primary bg-primary/10 text-primary scale-[1.02] shadow-sm'
+                                                            ? 'border-primary bg-[rgba(16,18,66,0.1)] text-primary scale-[1.02] shadow-sm'
                                                             : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                                                             }`}
                                                     >
@@ -407,7 +407,7 @@ export default function ProductDetailPage({
                                         <button
                                             onClick={decreaseQty}
                                             disabled={addingToCart}
-                                            className="w-14 h-14 flex items-center justify-center bg-primary rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-[#101242] bg-opacity-20 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
                                         >
                                             {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Minus className="w-6 h-6 text-white stroke-[3px]" />}
                                         </button>
@@ -417,7 +417,7 @@ export default function ProductDetailPage({
                                         <button
                                             onClick={increaseQty}
                                             disabled={addingToCart}
-                                            className="w-14 h-14 flex items-center justify-center bg-primary rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-[#101242] bg-opacity-20 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
                                         >
                                             {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6 text-white stroke-[3px]" />}
                                         </button>
@@ -427,7 +427,7 @@ export default function ProductDetailPage({
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={addingToCart}
-                                    className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white py-4 px-8 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg disabled:opacity-70"
+                                    className="flex-1 bg-[#101242] hover:from-primary/90 hover:to-primary text-white py-4 px-8 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg disabled:opacity-70"
                                 >
                                     {addingToCart ? 'Adding...' : 'Add to Cart'}
                                 </button>
@@ -446,7 +446,7 @@ export default function ProductDetailPage({
                             </div>
                             <Link
                                 href="/products"
-                                className="flex items-center gap-2 text-[#800000] font-bold hover:gap-3 transition-all group"
+                                className="flex items-center gap-2 text-[#101242] font-bold hover:gap-3 transition-all group"
                             >
                                 <span>See All</span>
                                 <ArrowRight className="w-4 h-4" />

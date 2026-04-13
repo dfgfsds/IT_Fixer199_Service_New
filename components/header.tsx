@@ -159,9 +159,9 @@ export function Header() {
             {/* Location Picker */}
             <button
               onClick={() => setShowLocationModal(true)}
-              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#800000]/40 hover:shadow-lg transition-all text-slate-600 shadow-sm max-w-[280px] group"
+              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/40 hover:shadow-lg transition-all text-slate-600 shadow-sm max-w-[280px] group"
             >
-              <MapPin className="w-4 h-4 text-[#800000] flex-shrink-0 group-hover:scale-110 transition-transform" />
+              <MapPin className="w-4 h-4 text-[#101242] flex-shrink-0 group-hover:scale-110 transition-transform" />
               <span className="text-[13px] font-bold truncate text-[#1a1c2e]">
                 {location?.address || location?.city || 'Select Location'}
               </span>
@@ -183,7 +183,7 @@ export function Header() {
                     }`}
                   autoComplete="off"
                 />
-                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 group-focus-within:text-[#800000] hover:text-[#800000] transition-colors">
+                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 group-focus-within:text-[#101242] hover:text-[#101242] transition-colors">
                   {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                 </button>
 
@@ -216,7 +216,7 @@ export function Header() {
                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{s.categories?.[0]?.name || 'Service'}</p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#800000]">₹{formatPrice(s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0)}</p>
+                                  <p className="text-sm font-black text-[#101242]">₹{formatPrice(s.pricing_models?.find((pm: any) => pm.pricing_type_name === "Selling Price")?.price || 0)}</p>
                                 </div>
                               </button>
                             ))}
@@ -272,7 +272,7 @@ export function Header() {
                         <div className="px-6 pt-4 border-t border-slate-100 mt-2">
                           <button
                             onClick={handleSearchSubmit as any}
-                            className="w-full py-3 bg-[#800000]/5 hover:bg-[#800000]/10 text-[#800000] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                            className="w-full py-3 bg-[#101242]/5 hover:bg-[#101242]/10 text-[#101242] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
                           >
                             See All Search Results
                           </button>
@@ -290,7 +290,7 @@ export function Header() {
               {isLoggedIn && (
                 <Link
                   href="/cart"
-                  className="relative p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#800000] hover:text-white transition-all shadow-sm group"
+                  className="relative p-2.5 bg-slate-50 text-[#1a1c2e] rounded-xl hover:bg-[#101242] hover:text-white transition-all shadow-sm group"
                 >
                   <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-110" />
                   {totalItems > 0 && (
@@ -313,7 +313,7 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#800000] hover:bg-[#600000] text-white font-semibold transition-all shadow-md active:scale-95"
+                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#101242] hover:bg-[#600000] text-white font-semibold transition-all shadow-md active:scale-95"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm">Login</span>
@@ -353,7 +353,7 @@ export function Header() {
               onClick={() => { setShowLocationModal(true); setIsMenuOpen(false) }}
               className="w-full flex items-center gap-2.5 px-3 py-3 rounded-xl hover:bg-slate-50 text-[13px] font-bold text-[#1a1c2e]"
             >
-              <MapPin className="w-4 h-4 text-[#800000] shrink-0" />
+              <MapPin className="w-4 h-4 text-[#101242] shrink-0" />
               <span className="truncate flex-1 text-left">
                 {location?.address || location?.city || 'Select Location'}
               </span>
@@ -380,7 +380,7 @@ export function Header() {
                 <User className="w-4 h-4" /> {user?.name || 'Profile'}
               </Link>
             ) : (
-              <Link href="/login" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#800000] text-white text-sm font-bold" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/login" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#101242] text-white text-sm font-bold" onClick={() => setIsMenuOpen(false)}>
                 <User className="w-4 h-4" /> Login
               </Link>
             )}

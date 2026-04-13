@@ -179,10 +179,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
           <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
             <div className="relative">
-              <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+              <div className="w-24 h-24 bg-[#101242]/5 text-[#101242] rounded-full flex items-center justify-center mx-auto">
                 <MapPin className="w-10 h-10" />
               </div>
-              <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+              <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
             </div>
             <div className="space-y-3 max-w-sm mx-auto">
               <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
@@ -190,7 +190,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             </div>
             <button
               onClick={() => setShowLocationModal(true)}
-              className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+              className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center gap-3"
             >
               <Navigation className="w-5 h-5 text-white/50" />
               Select Your Location
@@ -208,8 +208,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center py-40 p-8 space-y-6">
           <div className="relative">
-            <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-            <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+            <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+            <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
           </div>
           <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm">
             Loading service details...
@@ -227,10 +227,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
           <div className="flex flex-col items-center justify-center text-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 w-full max-w-3xl shadow-sm">
             <div className="relative">
-              <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+              <div className="w-24 h-24 bg-[#101242]/5 text-[#101242] rounded-full flex items-center justify-center mx-auto">
                 <AlertTriangle className="w-10 h-10" />
               </div>
-              <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+              <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
             </div>
             <div className="space-y-3 max-w-sm mx-auto">
               <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">
@@ -243,7 +243,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => setShowLocationModal(true)}
-                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center justify-center gap-3"
+                className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center justify-center gap-3"
               >
                 <MapPin className="w-5 h-5 text-white/50" />
                 Change Location
@@ -315,7 +315,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
           {/* Right: Details */}
           <div className="space-y-8 py-4">
             <div className="space-y-4">
-              <span className="inline-flex px-4 py-1.5 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest border border-[#800000]/10">
+              <span className="inline-flex px-4 py-1.5 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest border border-[#101242]/10">
                 {serviceCategory}
               </span>
               <h1 className="text-5xl font-extrabold text-[#1a1c2e] tracking-tight">
@@ -333,19 +333,19 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 <span className="text-xl font-bold text-[#1a1c2e]">{service.rating || 4.5}</span>
                 <span className="text-slate-400 font-medium">({service.reviews_count || 120} reviews)</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
+              {/* <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-sm font-semibold text-green-700">Verified Professionals</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Price Card */}
             <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-1">Starting from</p>
+              {/* <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-1">Starting from</p> */}
               <div className="flex items-baseline gap-3 mb-2">
                 <span className="text-4xl font-black text-[#1a1c2e]">₹{formatPrice(sellingPrice)}</span>
                 {regularPrice && (
-                  <span className="text-lg font-bold text-slate-300 line-through decoration-[#800000]/30">₹{formatPrice(regularPrice)}</span>
+                  <span className="text-lg font-bold text-slate-300 line-through decoration-[#101242]/30">₹{formatPrice(regularPrice)}</span>
                 )}
               </div>
               <p className="text-xs text-slate-400 font-medium tracking-wide">Inclusive of all taxes & service charges</p>
@@ -357,10 +357,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8">
                 {includes.map((item: string, index: number) => (
                   <div key={index} className="flex items-center gap-4 group">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-100 transition-all group-hover:bg-emerald-500 group-hover:border-emerald-500">
-                      <Check className="w-4 h-4 text-emerald-600 transition-colors group-hover:text-white stroke-[3px]" />
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-100 transition-all ">
+                      <Check className="w-4 h-4 text-[#101242] transition-colors stroke-[3px]" />
                     </div>
-                    <span className="text-[15px] font-bold text-slate-600 leading-tight group-hover:text-[#1a1c2e] transition-colors">{item}</span>
+                    <span className="text-[15px] font-bold text-slate-600 leading-tight  transition-colors">{item}</span>
                   </div>
                 ))}
               </div>
@@ -385,12 +385,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                             key={attr.value_id}
                             onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
                             className={`relative flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border-2 transition-all duration-300 font-bold text-sm overflow-hidden ${isSelected
-                              ? 'border-[#800000] bg-white text-[#1a1c2e] shadow-md scale-[1.02]'
+                              ? 'border-[#101242] bg-white text-[#1a1c2e] shadow-md scale-[1.02]'
                               : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-[#1a1c2e]'
                               }`}
                           >
-                            {isSelected && <span className="absolute inset-0 bg-[#800000]/5" />}
-                            {isSelected && <Check className="w-4 h-4 text-[#800000] relative z-10" />}
+                            {isSelected && <span className="absolute inset-0 bg-[#101242]/5" />}
+                            {isSelected && <Check className="w-4 h-4 text-[#101242] relative z-10" />}
                             <span className="relative z-10">{attr.value}</span>
                           </button>
                         )
@@ -415,7 +415,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 <button
                   onClick={addToCartApi}
                   disabled={loading || !!error || isAdding}
-                  className="w-full bg-[#800000] hover:bg-[#600000] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-[#800000]/20 uppercase tracking-widest disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:transform-none"
+                  className="w-full bg-[#101242] hover:bg-[#600000] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-[#101242]/20 uppercase tracking-widest disabled:bg-slate-300 disabled:text-black disabled:shadow-none disabled:transform-none"
                 >
                   {isAdding ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
@@ -439,7 +439,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               </div>
               <Link
                 href="/services"
-                className="flex items-center gap-2 text-[#800000] font-bold hover:gap-3 transition-all group p-2"
+                className="flex items-center gap-2 text-[#101242] font-bold hover:gap-3 transition-all group p-2"
               >
                 <span className="uppercase tracking-widest text-sm">See All</span>
                 <ArrowRight className="w-4 h-4" />
@@ -454,36 +454,37 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 return (
                   <div
                     key={rs.id}
-                    className="group bg-white rounded-[32px] border border-slate-100 overflow-hidden hover:border-[#800000]/10 hover:shadow-2xl transition-all duration-500 flex flex-col"
+                    className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-sm"
                   >
-                    <div className="relative h-64 overflow-hidden bg-slate-50">
+                    <div className="relative h-40 sm:h-64 overflow-hidden flex-shrink-0 bg-white">
                       <Image
                         src={rsImage}
                         alt={rs.name}
                         width={400}
                         height={300}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="object-contain w-full h-full transition-transform duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute top-5 right-5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-lg border border-white/20">
+                      {/* <div className="absolute top-5 right-5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-lg border border-white/20">
                         <Star className="w-3.5 h-3.5 fill-[#ffbb00] text-[#ffbb00]" />
                         <span className="text-xs font-black text-[#1a1c2e]">{rs.rating || 4.5}</span>
-                      </div>
+                      </div> */}
                     </div>
-                    <div className="p-8 space-y-6 flex flex-col flex-1">
-                      <div className="space-y-2">
-                        <span className="text-[10px] font-bold text-[#800000] uppercase tracking-widest bg-[#800000]/5 px-3 py-1 rounded-lg">
+                    <div className="p-4 sm:p-8 flex flex-col flex-1 justify-between gap-4 sm:gap-6">
+                      <div className="space-y-1">
+                        <span className="text-[12px] font-bold text-gray-700 uppercase  py-2">
                           {rs.categories?.[0]?.category_name || rs.categories?.[0]?.name || 'Service'}
                         </span>
-                        <h3 className="text-xl font-bold text-[#1a1c2e] line-clamp-1 group-hover:text-[#800000] transition-colors">
+                        <h3 className="text-lg sm:text-2xl font-black text-[#1a1c2e] leading-tight group-hover:text-[#101242] transition-colors duration-300 capitalize">
+
                           {rs.name}
                         </h3>
                       </div>
-                      <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50">
+                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-100">
                         <div>
-                          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Starting at</p>
+
                           <p className="text-2xl font-black text-[#1a1c2e]">₹{formatPrice(rsPrice)}</p>
                         </div>
-                        <Link href={`/services/${rs.id}`} className="p-4 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-[#800000] group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:scale-105">
+                        <Link href={`/services/${rs.id}`} className="p-4 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-[#101242] group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:scale-105">
                           <ArrowRight className="w-5 h-5 stroke-[2.5px]" />
                         </Link>
                       </div>

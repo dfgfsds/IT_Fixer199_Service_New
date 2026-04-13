@@ -163,7 +163,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     <div className="pt-0">
                         <button
                             onClick={() => router.push('/profile?tab=requests')}
-                            className="w-full py-4 bg-[#800000] text-white rounded-2xl font-bold text-sm hover:bg-[#600000] shadow-lg shadow-[#800000]/20 transition-all active:scale-[0.98]"
+                            className="w-full py-4 bg-[#101242] text-white rounded-2xl font-bold text-sm hover:bg-[#600000] shadow-lg shadow-[#101242]/20 transition-all active:scale-[0.98]"
                         >
                             Return to Dashboard
                         </button>
@@ -187,7 +187,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             <main className="flex-1 py-12 lg:py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
 
                 {/* Back */}
-                <Link href="/profile?tab=requests" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#800000] font-bold text-sm tracking-widest uppercase transition-colors mb-8 group">
+                <Link href="/profile?tab=requests" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#101242] font-bold text-sm tracking-widest uppercase transition-colors mb-8 group">
                     <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                     Back to Requests
                 </Link>
@@ -308,11 +308,11 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
 
                             {request.review_notes && (
                                 <div className="flex items-start gap-4 bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#800000] shadow-sm flex items-center justify-center shrink-0">
+                                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#101242] shadow-sm flex items-center justify-center shrink-0">
                                         <MessageSquare className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold text-[#800000] uppercase tracking-widest mb-1">Review Notes from Team</p>
+                                        <p className="text-xs font-bold text-[#101242] uppercase tracking-widest mb-1">Review Notes from Team</p>
                                         <p className="text-slate-600 font-medium italic">"{request.review_notes}"</p>
                                     </div>
                                 </div>
@@ -376,7 +376,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                         <p className="font-bold text-[#1a1c2e] truncate">{itemDetails.name || 'Service'}</p>
                                         <p className="text-xs text-slate-400 font-medium mt-0.5">Quantity: {request.order_item_details?.quantity || 1}</p>
                                     </div>
-                                    <p className="font-black text-[#800000] text-lg shrink-0">₹{request.order_item_details?.price || '0.00'}</p>
+                                    <p className="font-black text-[#101242] text-lg shrink-0">₹{request.order_item_details?.price || '0.00'}</p>
                                 </div>
                             </div>
                         )}

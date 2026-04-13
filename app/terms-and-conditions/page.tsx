@@ -6,19 +6,19 @@ import { Scale, Shield, AlertCircle, CreditCard, FileText, Globe, Package, User,
 
 export default function TermsConditionsPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col selection:bg-[#800000]/10 selection:text-[#800000]">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-[#101242]/10 selection:text-[#101242]">
       <Header />
 
       <main className="flex-1">
         {/* Intro Section */}
         <section className="relative pt-20 pb-16 bg-slate-50 border-b border-slate-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest shadow-sm border border-[#800000]/10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest shadow-sm border border-[#101242]/10">
               <Scale className="w-4 h-4" />
               Legal Document
             </div>
             <h1 className="text-4xl sm:text-5xl font-black text-[#1a1c2e] tracking-tight leading-tight">
-              Terms & <span className="text-[#800000]">Conditions</span>
+              Terms & <span className="text-[#101242]">Conditions</span>
             </h1>
             <p className="text-lg text-slate-500 font-medium leading-relaxed italic">
               Please read these terms carefully before using our services
@@ -49,7 +49,7 @@ export default function TermsConditionsPage() {
               {/* Block 1 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Globe className="w-6 h-6 text-[#800000]" />
+                  <Globe className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">1. Use of Website</h2>
@@ -60,7 +60,7 @@ export default function TermsConditionsPage() {
                       'Unauthorized use may result in legal action'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -71,7 +71,7 @@ export default function TermsConditionsPage() {
               {/* Block 2 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Package className="w-6 h-6 text-[#800000]" />
+                  <Package className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">2. Products and Services</h2>
@@ -83,7 +83,7 @@ export default function TermsConditionsPage() {
                       'We reserve the right to correct pricing or description errors'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -94,7 +94,7 @@ export default function TermsConditionsPage() {
               {/* Block 3 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <User className="w-6 h-6 text-[#800000]" />
+                  <User className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">3. User Information</h2>
@@ -106,7 +106,7 @@ export default function TermsConditionsPage() {
                       'Usage is governed by our Privacy Policy'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -117,7 +117,7 @@ export default function TermsConditionsPage() {
               {/* Block 4 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <CreditCard className="w-6 h-6 text-[#800000]" />
+                  <CreditCard className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">4. Payments and Billing</h2>
@@ -128,7 +128,7 @@ export default function TermsConditionsPage() {
                       'Failed payments may result in service cancellation'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -139,7 +139,7 @@ export default function TermsConditionsPage() {
               {/* Block 5 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <RefreshCw className="w-6 h-6 text-[#800000]" />
+                  <RefreshCw className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">5. Cancellation and Refund Policy</h2>
@@ -150,7 +150,7 @@ export default function TermsConditionsPage() {
                       'We may refuse refunds if terms are violated'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -161,7 +161,7 @@ export default function TermsConditionsPage() {
               {/* Block 6 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Award className="w-6 h-6 text-[#800000]" />
+                  <Award className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">6. Intellectual Property</h2>
@@ -174,7 +174,7 @@ export default function TermsConditionsPage() {
               {/* Block 7 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-6 h-6 text-[#800000]" />
+                  <AlertCircle className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">7. Limitation of Liability</h2>
@@ -185,7 +185,7 @@ export default function TermsConditionsPage() {
                       'Use of website is at your own risk'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -196,7 +196,7 @@ export default function TermsConditionsPage() {
               {/* Block 8 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <LinkIcon className="w-6 h-6 text-[#800000]" />
+                  <LinkIcon className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">8. Third-Party Links</h2>
@@ -209,7 +209,7 @@ export default function TermsConditionsPage() {
               {/* Block 9 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Shield className="w-6 h-6 text-[#800000]" />
+                  <Shield className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">9. Security</h2>
@@ -222,7 +222,7 @@ export default function TermsConditionsPage() {
               {/* Block 10 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Scale className="w-6 h-6 text-[#800000]" />
+                  <Scale className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">10. Governing Law</h2>
@@ -235,7 +235,7 @@ export default function TermsConditionsPage() {
               {/* Block 11 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <FileText className="w-6 h-6 text-[#800000]" />
+                  <FileText className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">11. Changes to Terms</h2>
@@ -248,8 +248,8 @@ export default function TermsConditionsPage() {
             </div>
 
             {/* Support Box */}
-            <div className="bg-[#800000]/5 border border-[#800000]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#800000]/10">
+            <div className="bg-[#101242]/5 border border-[#101242]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#101242]/10">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">Contact Information</h2>
                   <p className="text-slate-500 font-medium">
@@ -258,7 +258,7 @@ export default function TermsConditionsPage() {
                 </div>
                 <a
                   href="mailto:ftdigitalsolutionspvtltd@gmail.com"
-                  className="inline-block bg-[#800000] text-center text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all transform active:scale-95 shadow-md shadow-red-900/10"
+                  className="inline-block bg-[#101242] text-center text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all transform active:scale-95 shadow-md shadow-red-900/10"
                 >
                   Contact Support
                 </a>
@@ -270,7 +270,7 @@ export default function TermsConditionsPage() {
                     <Globe className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Website</span>
                   </div>
-                  <a href="https://www.itfixer199.com" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
+                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
                 </div>
 
                 <div className="space-y-1">
@@ -278,7 +278,7 @@ export default function TermsConditionsPage() {
                     <Phone className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Phone</span>
                   </div>
-                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#800000] transition-colors">8754844270</a>
+                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#101242] transition-colors">8754844270</a>
                 </div>
 
                 <div className="space-y-1">
@@ -286,7 +286,7 @@ export default function TermsConditionsPage() {
                     <Mail className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Email</span>
                   </div>
-                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
+                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
                 </div>
               </div>
             </div>

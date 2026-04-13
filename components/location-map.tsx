@@ -61,9 +61,9 @@ export function LocationMap({ center, onMoveEnd }: LocationMapProps) {
           center={{ lat: center[0], lng: center[1] }}
           radius={2500} // 2.5 km service radius visualization
           options={{
-            fillColor: '#800000',
+            fillColor: '#101242',
             fillOpacity: 0.1,
-            strokeColor: '#800000',
+            strokeColor: '#101242',
             strokeOpacity: 0.3,
             strokeWeight: 1,
             clickable: false,
@@ -75,7 +75,7 @@ export function LocationMap({ center, onMoveEnd }: LocationMapProps) {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-10 pointer-events-none pb-1">
         {/* Bouncing Animation Wrapper for Zepto Feel */}
         <div className="animate-bounce">
-          <div className="w-10 h-10 bg-[#800000] rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(128,0,0,0.4)] transform origin-bottom after:content-[''] after:absolute after:-bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[8px] after:border-t-[#800000]">
+          <div className="w-10 h-10 bg-[#101242] rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(128,0,0,0.4)] transform origin-bottom after:content-[''] after:absolute after:-bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[8px] after:border-t-[#101242]">
             <div className="w-4 h-4 rounded-full bg-white shadow-inner" />
           </div>
         </div>

@@ -55,13 +55,13 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
 
         {/* Badge Overlays */}
         {service.discount > 0 && (
-          <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-[#800000] text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[8px] sm:text-sm font-bold shadow-lg">
+          <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-[#101242] text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[8px] sm:text-sm font-bold shadow-lg">
             Save {service.discount}%
           </div>
         )}
 
         {/* <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm text-[#1a1c2e] px-1.5 py-1 sm:px-3 sm:py-2 rounded-full flex items-center gap-1 shadow-lg">
-          <CheckCircle className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-[#800000]" />
+          <CheckCircle className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-[#101242]" />
           <span className="text-[8px] sm:text-xs font-semibold">Verified</span>
         </div> */}
       </div>
@@ -84,7 +84,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
             <div className="flex items-center gap-3">
               <span className="text-lg sm:text-2xl font-bold text-[#1a1c2e]">₹{formatPrice(service.price)}</span>
               {originalPrice > service.price && (
-                <span className="text-sm font-medium text-slate-400 line-through decoration-[#800000]/30 underline-offset-2">
+                <span className="text-sm font-medium text-slate-400 line-through decoration-[#101242]/30 underline-offset-2">
                   ₹{formatPrice(originalPrice)}
                 </span>
               )}
@@ -103,7 +103,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
                 router.push(`/${basePath}/${service.id}`)
               }
             }}
-            className="flex justify-center items-center bg-[#101242] hover:from-[#800000]/90 hover:to-[#800000] text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-md hover:shadow-lg active:scale-95"
+            className="flex justify-center items-center bg-[#101242] hover:from-[#101242]/90 hover:to-[#101242] text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-md hover:shadow-lg active:scale-95"
           >
             Book
           </button>

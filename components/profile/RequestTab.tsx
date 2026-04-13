@@ -171,7 +171,7 @@ export default function RequestTab() {
             <div className="flex items-center justify-between">
                 <h3 className="text-2xl font-black text-[#1a1c2e]">My Requests</h3>
                 {!loading && requests.length > 0 && (
-                    <span className="text-xs font-bold text-white bg-[#800000] px-3 py-1.5 rounded-full">
+                    <span className="text-xs font-bold text-white bg-[#101242] px-3 py-1.5 rounded-full">
                         {requests.length} {requests.length === 1 ? 'Request' : 'Requests'}
                     </span>
                 )}
@@ -226,7 +226,7 @@ export default function RequestTab() {
                             <Link
                                 href={`/requests/${req.id}`}
                                 key={req.id}
-                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#800000]/20 group cursor-pointer"
+                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#101242]/20 group cursor-pointer"
                             >
                                 {/* Left: icon + info */}
                                 <div className="flex items-start gap-5 min-w-0 flex-1">
@@ -252,7 +252,7 @@ export default function RequestTab() {
                                                 </span>
                                             )}
                                             {req.request_type === 'REFUND' && req.refund_amount && (
-                                                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#800000] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
+                                                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#101242] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
                                                     Refund: ₹{req.refund_amount}
                                                 </span>
                                             )}
@@ -276,7 +276,7 @@ export default function RequestTab() {
                                     </div>
 
                                     {/* Chevron */}
-                                    <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-[#800000] group-hover:text-white transition-all flex items-center justify-center shrink-0">
+                                    <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-[#101242] group-hover:text-white transition-all flex items-center justify-center shrink-0">
                                         <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
                                     </div>
                                 </div>

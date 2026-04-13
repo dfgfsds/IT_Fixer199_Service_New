@@ -92,7 +92,7 @@ export default function ServicesPage() {
         {/* Hero Section */}
         <section className="bg-white py-10 md:py-20 px-4 border-b border-slate-100">
           <div className="max-w-7xl mx-auto text-center space-y-8">
-            <h1 className="text-3xl sm:text-5xl font-black text-[#101242]  tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-black text-[#101242] tracking-tight leading-tight">
               All Services
             </h1>
             <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
@@ -101,13 +101,13 @@ export default function ServicesPage() {
 
             {/* Search Bar */}
             {/* <div className="max-w-2xl mx-auto relative group pt-4">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#800000] w-6 h-6 transition-colors" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#101242] w-6 h-6 transition-colors" />
               <input
                 type="text"
                 placeholder="Search for services (e.g., Cleaning, Plumbing)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#800000]/20 focus:ring-4 focus:ring-[#800000]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
+                className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
               />
             </div> */}
           </div>
@@ -118,10 +118,10 @@ export default function ServicesPage() {
           {!location?.lat || !location?.lng ? (
             <div className="flex flex-col items-center justify-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 shadow-sm">
               <div className="relative">
-                <div className="w-24 h-24 bg-[#800000]/5 text-[#800000] rounded-full flex items-center justify-center mx-auto">
+                <div className="w-24 h-24 bg-[#101242]/5 text-[#101242] rounded-full flex items-center justify-center mx-auto">
                   <MapPin className="w-10 h-10" />
                 </div>
-                <div className="absolute inset-0 blur-xl bg-[#800000]/5 rounded-full"></div>
+                <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
               </div>
               <div className="text-center space-y-3 max-w-sm mx-auto">
                 <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
@@ -129,7 +129,7 @@ export default function ServicesPage() {
               </div>
               <button
                 onClick={() => setShowLocationModal(true)}
-                className="px-10 py-4 bg-[#800000] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#800000]/20 hover:bg-[#800000]/90 transition-all active:scale-95 flex items-center gap-3"
+                className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl shadow-[#101242]/20 hover:bg-[#101242]/90 transition-all active:scale-95 flex items-center gap-3"
               >
                 <Navigation className="w-5 h-5 text-white/50" />
                 Select Your Location
@@ -138,8 +138,8 @@ export default function ServicesPage() {
           ) : loading ? (
             <div className="flex flex-col items-center justify-center py-40 p-8 space-y-6">
               <div className="relative">
-                <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-                <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+                <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+                <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
               </div>
               <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse ml-2 text-sm text-center">
                 Finding best services near you...

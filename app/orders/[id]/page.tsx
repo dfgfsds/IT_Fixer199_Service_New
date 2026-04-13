@@ -363,7 +363,7 @@ export default function SingleOrderPage() {
       <main className="flex-1 py-12 lg:py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
 
         {/* Back */}
-        <Link href="/profile?tab=orders" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#800000] font-bold text-sm tracking-widest uppercase transition-colors mb-8 group">
+        <Link href="/profile?tab=orders" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#101242] font-bold text-sm tracking-widest uppercase transition-colors mb-8 group">
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           Back to Orders
         </Link>
@@ -449,7 +449,7 @@ export default function SingleOrderPage() {
               {order.agent ? (
                 <div className="flex items-center justify-between bg-slate-50 rounded-3xl p-5 border border-slate-100 gap-4 flex-wrap">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-[#800000]/10 text-[#800000] flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-2xl bg-[#101242]/10 text-[#101242] flex items-center justify-center shrink-0">
                       <UserIcon className="w-7 h-7" />
                     </div>
                     <div>
@@ -467,7 +467,7 @@ export default function SingleOrderPage() {
                     {showTrackBtn && (
                       <button
                         onClick={() => setShowTracking(true)}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#800000] text-white font-bold text-sm hover:bg-[#600000] transition-all shadow-lg shadow-[#800000]/20"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#101242] text-white font-bold text-sm hover:bg-[#600000] transition-all shadow-lg shadow-[#101242]/20"
                       >
                         <Wifi className="w-4 h-4" /> Track Live
                       </button>
@@ -514,7 +514,7 @@ export default function SingleOrderPage() {
                         <p className="text-xs text-slate-400 font-medium mt-0.5">{item.item_details.full_details.categories}</p>
                       )}
                     </div>
-                    <p className="font-black text-[#800000] text-lg shrink-0">₹{formatPrice(item.price)}</p>
+                    <p className="font-black text-[#101242] text-lg shrink-0">₹{formatPrice(item.price)}</p>
                   </div>
                 ))}
               </div>
@@ -547,7 +547,7 @@ export default function SingleOrderPage() {
                 <div className="w-full h-px bg-slate-200" />
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-slate-500 text-md">Total Paid</span>
-                  <span className="font-black text-[#800000] text-md tracking-tight">₹{formatPrice(order.amount)}</span>
+                  <span className="font-black text-[#101242] text-md tracking-tight">₹{formatPrice(order.amount)}</span>
                 </div>
               </div>
             </div>
@@ -595,7 +595,7 @@ export default function SingleOrderPage() {
               {actionType === 'cancel' && (
                 <div className="space-y-4">
                   <select
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30"
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                   >
                     <option value="">Select Cancellation Reason</option>
@@ -604,7 +604,7 @@ export default function SingleOrderPage() {
                   <textarea
                     placeholder="Additional description (optional)"
                     rows={3}
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 resize-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>
@@ -613,10 +613,10 @@ export default function SingleOrderPage() {
               {actionType === 'slot' && (
                 <div className="space-y-6">
                   {/* Fixed Date Indicator */}
-                  <div className="flex items-center gap-3 p-4 bg-[#800000]/5 border border-[#800000]/10 rounded-2xl">
-                    <Calendar className="w-5 h-5 text-[#800000]" />
+                  <div className="flex items-center gap-3 p-4 bg-[#101242]/5 border border-[#101242]/10 rounded-2xl">
+                    <Calendar className="w-5 h-5 text-[#101242]" />
                     <div>
-                      <p className="text-[10px] font-black text-[#800000] uppercase tracking-widest">Scheduling For</p>
+                      <p className="text-[10px] font-black text-[#101242] uppercase tracking-widest">Scheduling For</p>
                       <p className="font-bold text-[#1a1c2e]">Today, {new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'long' })}</p>
                     </div>
                   </div>
@@ -632,7 +632,7 @@ export default function SingleOrderPage() {
                         <p className="font-bold text-[#1a1c2e] text-sm">{order.slot || 'Not assigned'}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black text-[#800000] uppercase bg-red-50 px-2 py-1 rounded-full">Selected</span>
+                    <span className="text-[10px] font-black text-[#101242] uppercase bg-red-50 px-2 py-1 rounded-full">Selected</span>
                   </div>
 
                   {/* Slot Selection */}
@@ -640,7 +640,7 @@ export default function SingleOrderPage() {
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Select New Time</p>
                       {selectedSlot && (
-                        <button onClick={() => setSelectedSlot(null)} className="text-[10px] font-black text-[#800000] uppercase underline">Clear</button>
+                        <button onClick={() => setSelectedSlot(null)} className="text-[10px] font-black text-[#101242] uppercase underline">Clear</button>
                       )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -650,19 +650,19 @@ export default function SingleOrderPage() {
                             key={slot.id}
                             onClick={() => setSelectedSlot(slot)}
                             className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${selectedSlot?.id === slot.id
-                              ? 'border-[#800000] bg-red-50/30'
+                              ? 'border-[#101242] bg-red-50/30'
                               : 'border-slate-100 bg-slate-50 hover:bg-white'
                               }`}
                           >
                             <div className="text-left">
-                              <p className={`font-bold text-sm ${selectedSlot?.id === slot.id ? 'text-[#800000]' : 'text-[#1a1c2e]'}`}>
+                              <p className={`font-bold text-sm ${selectedSlot?.id === slot.id ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>
                                 {slot.name}
                               </p>
-                              <p className={`text-[11px] font-medium ${selectedSlot?.id === slot.id ? 'text-[#800000]/70' : 'text-slate-400'}`}>
+                              <p className={`text-[11px] font-medium ${selectedSlot?.id === slot.id ? 'text-[#101242]/70' : 'text-slate-400'}`}>
                                 {slot.start_time} - {slot.end_time}
                               </p>
                             </div>
-                            {selectedSlot?.id === slot.id && <CheckCircle className="w-5 h-5 text-[#800000]" />}
+                            {selectedSlot?.id === slot.id && <CheckCircle className="w-5 h-5 text-[#101242]" />}
                           </button>
                         ))
                       ) : (
@@ -677,7 +677,7 @@ export default function SingleOrderPage() {
                   <div className="space-y-3 pt-2">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Reason for Change</p>
                     <select
-                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30"
                       onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     >
                       <option value="">Select Reason</option>
@@ -686,7 +686,7 @@ export default function SingleOrderPage() {
                     <textarea
                       placeholder="Additional description (optional)"
                       rows={2}
-                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#800000]/30 resize-none placeholder:font-medium"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
@@ -712,7 +712,7 @@ export default function SingleOrderPage() {
               <button
                 onClick={handleAction}
                 disabled={submitting || (actionType === 'cancel' && !formData.reason) || (actionType === 'slot' && (!formData.reason || !selectedSlot))}
-                className="flex-1 py-4 bg-[#800000] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#800000]/20"
+                className="flex-1 py-4 bg-[#101242] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#101242]/20"
               >
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Submit Request'}
               </button>
@@ -727,7 +727,7 @@ export default function SingleOrderPage() {
           <div className="bg-white w-full max-w-xl rounded-[40px] p-8 shadow-2xl border border-slate-100 space-y-6 animate-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#800000]/10 text-[#800000] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-[#101242]/10 text-[#101242] flex items-center justify-center">
                   <Wifi className="w-5 h-5 animate-pulse" />
                 </div>
                 <div>
