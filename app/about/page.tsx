@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col selection:bg-[#800000]/10 selection:text-[#800000]">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-[#101242]/10 selection:text-[#101242]">
       <Header />
 
       <main className="flex-1">
@@ -34,7 +34,7 @@ export default function AboutPage() {
                 { label: 'Spare Parts', value: '3000+' },
                 { label: 'Starting Price', value: '₹199' }
               ].map((stat, idx) => (
-                <div key={idx} className="bg-slate-50 p-6 sm:p-8 rounded-3xl text-center space-y-2 border border-slate-100 hover:border-[#800000]/20 transition-all shadow-sm">
+                <div key={idx} className="bg-slate-50 p-6 sm:p-8 rounded-3xl text-center space-y-2 border border-slate-100 hover:border-[#101242]/20 transition-all shadow-sm">
                   <p className="text-3xl sm:text-4xl font-black text-[#1a1c2e]">{stat.value}</p>
                   <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
                 </div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c2e]/80 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 text-white space-y-1 sm:space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest bg-[#800000] px-3 py-1.5 sm:px-4 sm:py-2 rounded-full inline-block shadow-lg">IT Fixer Team</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest bg-[#101242] px-3 py-1.5 sm:px-4 sm:py-2 rounded-full inline-block shadow-lg">IT Fixer Team</p>
                     <p className="text-2xl sm:text-3xl font-black">Trusted Service</p>
                     <p className="text-xs sm:text-sm font-bold opacity-80 uppercase tracking-widest">5000+ happy customers</p>
                   </div>
@@ -138,7 +138,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-[10px] sm:rounded-[20px] p-8 sm:p-20 text-center space-y-10 sm:space-y-14 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden group">
 
-              <div className="absolute top-0 right-0 -m-20 w-64 h-64 bg-[#800000]/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
+              <div className="absolute top-0 right-0 -m-20 w-64 h-64 bg-[#101242]/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
 
               <div className="relative z-10 space-y-6 sm:space-y-8">
                 <div className="space-y-3">
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
                 <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto pt-4">
                   {['Device inspection', 'Issue diagnosis', 'Basic repair service', 'Technical consultation'].map((item) => (
-                    <div key={item} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 text-[#1a1c2e] font-black text-sm tracking-wide transition-all hover:border-[#800000]/30 hover:shadow-md">
+                    <div key={item} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 text-[#1a1c2e] font-black text-sm tracking-wide transition-all hover:border-[#101242]/30 hover:shadow-md">
                       <div className="w-8 h-8 bg-[#101242]/5 rounded-lg flex items-center justify-center">
                         <CheckCircle className="w-5 h-5 text-[#101242]" />
                       </div>
@@ -256,7 +256,7 @@ export default function AboutPage() {
                 { title: 'Genuine Spare Parts', desc: 'Original components from our 3000+ parts inventory.' },
                 { title: 'Fast & Reliable', desc: 'Most repairs resolved on the same visit, same day.' }
               ].map((item, idx) => (
-                <div key={idx} className="bg-slate-50 p-6 sm:p-10 rounded-[30px] sm:rounded-[40px] border border-slate-100 space-y-4 hover:border-[#800000]/30 transition-all">
+                <div key={idx} className="bg-slate-50 p-6 sm:p-10 rounded-[30px] sm:rounded-[40px] border border-slate-100 space-y-4 hover:border-[#101242]/30 transition-all">
                   <div className="w-10 h-10 sm:w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-slate-100">
                     <Star className="w-5 h-5 sm:w-6 h-6 text-[#101242]" />
                   </div>

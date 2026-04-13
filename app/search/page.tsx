@@ -114,7 +114,7 @@ function SearchContent() {
         <section className="bg-white py-12 px-4 border-b border-slate-100">
           <div className="max-w-7xl mx-auto space-y-4">
             <h1 className="text-3xl sm:text-4xl font-black text-[#1a1c2e] tracking-tight">
-              Search Results for <span className="text-[#800000]">"{currentQuery}"</span>
+              Search Results for <span className="text-[#101242]">"{currentQuery}"</span>
             </h1>
             <p className="text-slate-500 font-medium">
               Found {services.length} services and {products.length} products
@@ -126,8 +126,8 @@ function SearchContent() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 p-8 space-y-6">
               <div className="relative">
-                <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-                <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+                <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+                <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
               </div>
               <p className="text-slate-500 font-black uppercase tracking-[0.2em] animate-pulse text-sm">
                 Searching...
@@ -199,8 +199,8 @@ export default function SearchPage() {
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center">
           <div className="flex flex-col items-center justify-center py-20 p-8 space-y-6">
             <div className="relative">
-              <Loader2 className="w-16 h-16 text-[#800000] animate-spin" />
-              <div className="absolute inset-0 blur-xl bg-[#800000]/10 rounded-full animate-pulse"></div>
+              <Loader2 className="w-16 h-16 text-[#101242] animate-spin" />
+              <div className="absolute inset-0 blur-xl bg-[#101242]/10 rounded-full animate-pulse"></div>
             </div>
           </div>
         </main>

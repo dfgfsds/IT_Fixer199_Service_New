@@ -220,8 +220,8 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
         {step === "search" && (
           <div className="flex-1 overflow-y-auto pb-10">
             {!location && (
-              <div className="mx-5 mt-4 flex items-start gap-3 rounded-2xl bg-[#800000]/5 p-4 border border-[#800000]/10 border-dashed">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#800000] text-white">
+              <div className="mx-5 mt-4 flex items-start gap-3 rounded-2xl bg-[#101242]/5 p-4 border border-[#101242]/10 border-dashed">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#101242] text-white">
                   <MapPin className="h-3.5 w-3.5" />
                 </div>
                 <div>
@@ -274,7 +274,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
 
                   {(geoError.includes("denied") || geoError.includes("permission")) && (
                     <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200">
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#800000] text-white text-[10px] font-bold">!</div>
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#101242] text-white text-[10px] font-bold">!</div>
                       <p className="text-[11px] font-medium text-slate-600">
                         Click the <span className="font-bold underline">Lock Icon</span> in your browser's address bar to reset.
                       </p>

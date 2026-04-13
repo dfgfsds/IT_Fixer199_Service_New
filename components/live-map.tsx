@@ -301,7 +301,7 @@ export function LiveMap({
     <div className="w-full h-full relative group">
       {!isLoaded && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-sm rounded-3xl space-y-3">
-          <Loader2 className="w-8 h-8 text-[#800000] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#101242] animate-spin" />
           <p className="text-[#1a1c2e] font-bold text-xs uppercase tracking-widest">Initializing Route...</p>
         </div>
       )}

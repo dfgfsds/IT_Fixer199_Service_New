@@ -50,7 +50,7 @@ export default function ProfileTab() {
         {!isEditing && (
           <button
             onClick={startEditing}
-            className="flex items-center gap-2 text-[#800000] font-bold text-sm tracking-widest uppercase hover:underline"
+            className="flex items-center gap-2 text-[#101242] font-bold text-sm tracking-widest uppercase hover:underline"
           >
             <Edit2 className="w-4 h-4" />
             Edit
@@ -66,7 +66,7 @@ export default function ProfileTab() {
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="block w-full p-4 bg-slate-50 border border-[#800000]/10 rounded-2xl focus:bg-white focus:border-[#800000]/30 outline-none font-bold text-[#1a1c2e]"
+              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e]"
               placeholder="Full Name"
             />
           ) : (
@@ -83,7 +83,7 @@ export default function ProfileTab() {
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="block w-full p-4 bg-slate-50 border border-[#800000]/10 rounded-2xl focus:bg-white focus:border-[#800000]/30 outline-none font-bold text-[#1a1c2e]"
+              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e]"
               placeholder="Email Address"
             />
           ) : (
@@ -102,11 +102,11 @@ export default function ProfileTab() {
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 disabled={user?.mobile_number?.toString().length >= 10}
-                className="block w-full p-4 bg-slate-50 border border-[#800000]/10 rounded-2xl focus:bg-white focus:border-[#800000]/30 outline-none font-bold text-[#1a1c2e] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e] disabled:opacity-60 disabled:cursor-not-allowed"
                 placeholder="Phone Number"
               />
               {user?.mobile_number?.toString().length >= 10 && (
-                <p className="text-[9px] text-[#800000] font-bold uppercase tracking-tighter ml-1">Verified phone number cannot be changed</p>
+                <p className="text-[9px] text-[#101242] font-bold uppercase tracking-tighter ml-1">Verified phone number cannot be changed</p>
               )}
             </div>
           ) : (
@@ -121,7 +121,7 @@ export default function ProfileTab() {
             <button
               onClick={handleUpdate}
               disabled={loading}
-              className="flex-1 py-4 bg-[#800000] text-white rounded-2xl font-bold shadow-lg shadow-[#800000]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm disabled:opacity-75"
+              className="flex-1 py-4 bg-[#101242] text-white rounded-2xl font-bold shadow-lg shadow-[#101242]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm disabled:opacity-75"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>

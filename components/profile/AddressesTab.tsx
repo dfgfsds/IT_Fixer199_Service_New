@@ -542,7 +542,7 @@ export default function AddressesTab() {
           <h3 className="text-2xl font-black text-[#1a1c2e]">Addresses</h3>
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-6 py-3 bg-[#800000] text-white rounded-2xl font-bold shadow-lg shadow-[#800000]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
+            className="flex items-center gap-2 px-6 py-3 bg-[#101242] text-white rounded-2xl font-bold shadow-lg shadow-[#101242]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
           >
             <Plus className="w-5 h-5" />
             Add New
@@ -566,15 +566,15 @@ export default function AddressesTab() {
             userAddresses.map((addr) => (
               <div
                 key={addr.id}
-                className={`p-6 rounded-[32px] border ${addr.selected_address ? 'border-[#800000] bg-red-50/40 shadow-lg shadow-[#800000]/10' : 'bg-white border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}
+                className={`p-6 rounded-[32px] border ${addr.selected_address ? 'border-[#101242] bg-red-50/40 shadow-lg shadow-[#101242]/10' : 'bg-white border-slate-100'} space-y-3 relative group transition-all hover:shadow-xl`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <MapPin className={`w-5 h-5 ${addr.selected_address ? 'text-[#800000]' : 'text-slate-400'}`} />
+                    <MapPin className={`w-5 h-5 ${addr.selected_address ? 'text-[#101242]' : 'text-slate-400'}`} />
                     <span className="font-bold text-[#1a1c2e]">{addr.name || 'Saved Address'}</span>
                   </div>
                   {addr.selected_address && (
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#800000] bg-white border border-red-100 shadow-sm px-3 py-1.5 rounded-full">Active</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#101242] bg-white border border-red-100 shadow-sm px-3 py-1.5 rounded-full">Active</span>
                   )}
                 </div>
                 <div className="space-y-1">
@@ -586,7 +586,7 @@ export default function AddressesTab() {
                 <div className="flex gap-4 pt-2">
                   <button
                     onClick={() => openEditModal(addr)}
-                    className="text-xs font-bold text-[#800000] tracking-widest uppercase hover:underline"
+                    className="text-xs font-bold text-[#101242] tracking-widest uppercase hover:underline"
                   >
                     Edit
                   </button>
@@ -600,7 +600,7 @@ export default function AddressesTab() {
                     <button
                       onClick={() => handleSetPrimary(addr)}
                       disabled={loading}
-                      className="text-xs font-black text-white bg-slate-900 hover:bg-[#800000] px-4 py-2 rounded-xl tracking-widest uppercase transition-all ml-auto disabled:opacity-50 shadow-md"
+                      className="text-xs font-black text-white bg-slate-900 hover:bg-[#101242] px-4 py-2 rounded-xl tracking-widest uppercase transition-all ml-auto disabled:opacity-50 shadow-md"
                     >
                       Set Active
                     </button>
@@ -627,7 +627,7 @@ export default function AddressesTab() {
               <button
                 onClick={handleDeleteAddress}
                 disabled={loading}
-                className="w-full py-4 bg-[#800000] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-70"
+                className="w-full py-4 bg-[#101242] text-white rounded-2xl font-bold hover:bg-[#600000] transition-all disabled:opacity-70"
               >
                 {loading ? 'Removing...' : 'Remove'}
               </button>
@@ -675,7 +675,7 @@ export default function AddressesTab() {
                     value={newAddress.name}
                     onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
                     placeholder="Your Name or Recipient Name"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
                   />
                 </div>
                 <div className="space-y-2">
@@ -687,7 +687,7 @@ export default function AddressesTab() {
                     value={newAddress.contact}
                     onChange={(e) => setNewAddress({ ...newAddress, contact: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     placeholder="10-digit number"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
                   />
                 </div>
               </div>
@@ -700,7 +700,7 @@ export default function AddressesTab() {
                   value={newAddress.full_address}
                   onChange={(e) => setNewAddress({ ...newAddress, full_address: e.target.value })}
                   placeholder="Flat No, Wing, Building Name, Area"
-                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none resize-none placeholder:font-medium"
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none resize-none placeholder:font-medium"
                 />
               </div>
 
@@ -729,7 +729,7 @@ export default function AddressesTab() {
                     <div ref={mapRef} className="w-full h-full" />
                     {mapLoading && (
                       <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-[#800000] animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#101242] animate-spin" />
                       </div>
                     )}
                   </div>
@@ -744,7 +744,7 @@ export default function AddressesTab() {
                     value={newAddress.district}
                     onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })}
                     placeholder="City/District"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -754,7 +754,7 @@ export default function AddressesTab() {
                     value={newAddress.state}
                     onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
                     placeholder="State"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
                   />
                 </div>
                 <div className="col-span-2 md:col-span-1 space-y-2">
@@ -765,7 +765,7 @@ export default function AddressesTab() {
                     value={newAddress.pincode}
                     onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
                     placeholder="6 digits"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#800000]/30 outline-none"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
                   />
                 </div>
               </div>
@@ -773,7 +773,7 @@ export default function AddressesTab() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-[#800000] text-white rounded-[24px] font-bold shadow-xl shadow-[#800000]/20 hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-70 mt-4"
+                className="w-full py-4 bg-[#101242] text-white rounded-[24px] font-bold shadow-xl shadow-[#101242]/20 hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-70 mt-4"
               >
                 {loading ? 'Saving Address...' : 'Save Address Details'}
               </button>

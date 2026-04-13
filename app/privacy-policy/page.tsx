@@ -6,19 +6,19 @@ import { ShieldAlert, Info, Settings, Lock, FileText, Smartphone, Mail, Globe, P
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col selection:bg-[#800000]/10 selection:text-[#800000]">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-[#101242]/10 selection:text-[#101242]">
       <Header />
 
       <main className="flex-1">
         {/* Intro Section */}
         <section className="relative pt-20 pb-16 bg-slate-50 border-b border-slate-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#800000]/5 text-[#800000] text-xs font-black uppercase tracking-widest shadow-sm border border-[#800000]/10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest shadow-sm border border-[#101242]/10">
               <ShieldAlert className="w-4 h-4" />
               Privacy Policy
             </div>
             <h1 className="text-4xl sm:text-5xl font-black text-[#1a1c2e] tracking-tight leading-tight">
-              Privacy & <span className="text-[#800000]">Data Protection</span>
+              Privacy & <span className="text-[#101242]">Data Protection</span>
             </h1>
             <p className="text-lg text-slate-500 font-medium leading-relaxed italic">
               Your privacy matters to us at IT Fixer @199.
@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
               {/* Block 1 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Info className="w-6 h-6 text-[#800000]" />
+                  <Info className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">1. Information We Collect</h2>
@@ -60,7 +60,7 @@ export default function PrivacyPolicyPage() {
                       'Other information relevant to customer surveys and/or offers'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
               {/* Block 2 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Settings className="w-6 h-6 text-[#800000]" />
+                  <Settings className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">2. How We Use Your Information</h2>
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
                       'Customize the website based on your interests'
                     ].map((item, idx) => (
                       <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         <span className="text-sm font-bold text-slate-700">{item}</span>
                       </div>
                     ))}
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
               {/* Block 3 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Lock className="w-6 h-6 text-[#800000]" />
+                  <Lock className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">3. Data Security</h2>
@@ -108,7 +108,7 @@ export default function PrivacyPolicyPage() {
               {/* Block 4 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <Smartphone className="w-6 h-6 text-[#800000]" />
+                  <Smartphone className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">4. Cookies</h2>
@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
               {/* Block 5 */}
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                  <FileText className="w-6 h-6 text-[#800000]" />
+                  <FileText className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">5. Controlling Your Personal Information</h2>
@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
                       'We do not sell or distribute your personal data unless required by law'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#800000] mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#101242] mt-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -146,8 +146,8 @@ export default function PrivacyPolicyPage() {
             </div>
 
             {/* Support Box */}
-            <div className="bg-[#800000]/5 border border-[#800000]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#800000]/10">
+            <div className="bg-[#101242]/5 border border-[#101242]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#101242]/10">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-black text-[#1a1c2e]">Contact Us</h2>
                   <p className="text-slate-500 font-medium">
@@ -156,7 +156,7 @@ export default function PrivacyPolicyPage() {
                 </div>
                 <a
                   href="mailto:ftdigitalsolutionspvtltd@gmail.com"
-                  className="inline-block bg-[#800000] text-center text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all transform active:scale-95 shadow-md shadow-red-900/10"
+                  className="inline-block bg-[#101242] text-center text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all transform active:scale-95 shadow-md shadow-red-900/10"
                 >
                   Email Support Team
                 </a>
@@ -176,7 +176,7 @@ export default function PrivacyPolicyPage() {
                     <Globe className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Website</span>
                   </div>
-                  <a href="https://www.itfixer199.com" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
+                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
                 </div>
 
                 <div className="space-y-1">
@@ -184,7 +184,7 @@ export default function PrivacyPolicyPage() {
                     <Phone className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Phone</span>
                   </div>
-                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#800000] transition-colors">8754844270</a>
+                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#101242] transition-colors">8754844270</a>
                 </div>
 
                 <div className="space-y-1">
@@ -192,7 +192,7 @@ export default function PrivacyPolicyPage() {
                     <Mail className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Email</span>
                   </div>
-                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#800000] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
+                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
                 </div>
               </div>
             </div>

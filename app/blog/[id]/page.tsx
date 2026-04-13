@@ -62,7 +62,7 @@ export default function BlogDetailPage() {
           </Link>
 
           <div className="space-y-6">
-            <span className="px-4 py-2 rounded-full bg-[#800000] text-white text-[10px] font-bold uppercase tracking-widest shadow-lg">
+            <span className="px-4 py-2 rounded-full bg-[#101242] text-white text-[10px] font-bold uppercase tracking-widest shadow-lg">
               {post.category}
             </span>
             <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl">
@@ -71,15 +71,15 @@ export default function BlogDetailPage() {
 
             <div className="flex flex-wrap items-center gap-8 text-white/70 font-bold text-xs uppercase tracking-widest">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#800000]" />
+                <Calendar className="w-4 h-4 text-[#101242]" />
                 {post.date}
               </div>
               <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-[#800000]" />
+                <User className="w-4 h-4 text-[#101242]" />
                 By {post.author}
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#800000]" />
+                <Clock className="w-4 h-4 text-[#101242]" />
                 {post.readTime}
               </div>
             </div>
@@ -100,24 +100,24 @@ export default function BlogDetailPage() {
 
             <div className="pt-10 border-t border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 text-[#1a1c2e] font-bold text-sm hover:text-[#800000] transition-colors">
+                <button className="flex items-center gap-2 text-[#1a1c2e] font-bold text-sm hover:text-[#101242] transition-colors">
                   <MessageCircle className="w-5 h-5" />
                   12 Comments
                 </button>
-                <button className="p-2 text-slate-400 hover:text-[#800000] transition-colors">
+                <button className="p-2 text-slate-400 hover:text-[#101242] transition-colors">
                   <Bookmark className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="flex items-center gap-3">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2">Share:</span>
-                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#800000] hover:text-white transition-all shadow-sm">
+                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#101242] hover:text-white transition-all shadow-sm">
                   <Facebook className="w-5 h-5" />
                 </button>
-                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#800000] hover:text-white transition-all shadow-sm">
+                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#101242] hover:text-white transition-all shadow-sm">
                   <Twitter className="w-5 h-5" />
                 </button>
-                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#800000] hover:text-white transition-all shadow-sm">
+                <button className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#101242] hover:text-white transition-all shadow-sm">
                   <Linkedin className="w-5 h-5" />
                 </button>
               </div>
@@ -153,7 +153,7 @@ export default function BlogDetailPage() {
                       <Image src={id === 2 ? "/service-cleaning.jpg" : "/service-plumbing.jpg"} alt="Related" fill className="object-cover" />
                     </div>
                     <div>
-                      <h5 className="font-black text-[#1a1c2e] group-hover:text-[#800000] transition-colors line-clamp-2 leading-tight">
+                      <h5 className="font-black text-[#1a1c2e] group-hover:text-[#101242] transition-colors line-clamp-2 leading-tight">
                         {id === 2 ? 'Professional Cleaning vs. DIY: What to Choose?' : 'How to Identify Plumbing Leaks Early'}
                       </h5>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">March 2026</p>
