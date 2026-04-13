@@ -114,7 +114,7 @@ export default function ServicesPage() {
         </section>
 
         {/* Content Section */}
-        <div className="max-w-7xl mx-auto px-4 py-8 md:py-16 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 py-b md:pb-16 space-y-12">
           {!location?.lat || !location?.lng ? (
             <div className="flex flex-col items-center justify-center py-12 sm:py-20 p-8 space-y-8 bg-white rounded-[40px] border border-dashed border-slate-200 shadow-sm">
               <div className="relative">
@@ -148,7 +148,7 @@ export default function ServicesPage() {
           ) : (
             <>
               {/* Category Tabs */}
-              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+              {/* <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                 {categories.map((cat) => (
                   <button
                     key={cat}
@@ -161,7 +161,7 @@ export default function ServicesPage() {
                     {cat}
                   </button>
                 ))}
-              </div>
+              </div> */}
 
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest ml-1">

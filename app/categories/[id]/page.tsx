@@ -20,6 +20,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
 
     const [categories, setCategories] = useState<any[]>([])
     const [categoryName, setCategoryName] = useState('')
+    const [categoryType, setCategoryType] = useState('')
     const [services, setServices] = useState<Product[]>([])
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
@@ -44,6 +45,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                 setCategories(cats)
                 const currentCat = cats.find((c: any) => c.id.toString() === id)
                 setCategoryName(currentCat ? currentCat.name : 'Category')
+                setCategoryType(currentCat?.type || '')
 
                 // Fetch Services
                 const servicesRes = await axiosInstance.get(Api.services, {
@@ -182,7 +184,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                         </p>
 
                         {/* Category Tabs */}
-                        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 justify-center pt-8">
+                        {/* <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 justify-center pt-8">
                             {categories.map((cat) => (
                                 <button
                                     key={cat.id}
@@ -195,7 +197,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                                     {cat.name}
                                 </button>
                             ))}
-                        </div>
+                        </div> */}
                     </div>
                 </section>
 
@@ -204,6 +206,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                     {/* Grids */}
                     <div className="space-y-24">
                         {/* Services Grid */}
+                        {categoryType !== 'PRODUCT' && (
                         <div className="space-y-10">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
@@ -228,8 +231,10 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                                 </div>
                             )}
                         </div>
+                        )}
 
                         {/* Products Grid */}
+                        {categoryType !== 'SERVICE' && (
                         <div className="space-y-10">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
@@ -254,6 +259,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                                 </div>
                             )}
                         </div>
+                        )}
                     </div>
                 </div>
             </main>

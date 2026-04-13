@@ -294,31 +294,23 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         {/* Hero Section */}
         <div className="grid lg:grid-cols-2 gap-12 items-start mb-16">
           {/* Left: Image */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl group border border-slate-100 bg-slate-50">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl group border border-slate-100 bg-slate-50 h-auto flex items-center justify-center">
             <Image
               src={serviceImage}
               alt={service.name}
               width={800}
               height={600}
-              className="w-full h-full md:h-[500px] object-cantain transition-transform duration-700 group-hover:scale-105"
+              className="max-h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute top-6 right-6 flex gap-3">
-              <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
-                <Heart className="w-5 h-5 text-slate-600" />
-              </button>
-              <button className="p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all active:scale-90">
-                <Share2 className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
           </div>
 
           {/* Right: Details */}
           <div className="space-y-8 py-4">
-            <div className="space-y-4">
+            <div className="space-y-2 mb-2">
               <span className="inline-flex px-4 py-1.5 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest border border-[#101242]/10">
                 {serviceCategory}
               </span>
-              <h1 className="text-5xl font-extrabold text-[#1a1c2e] tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-extrabold text-[#1a1c2e] tracking-tight">
                 {service.name}
               </h1>
               <p className="text-xl text-slate-500 max-w-xl leading-relaxed">
@@ -327,17 +319,17 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Rating & Verified */}
-            <div className="flex items-center gap-6">
+            {/* <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Star className="w-6 h-6 fill-[#ffbb00] text-[#ffbb00]" />
                 <span className="text-xl font-bold text-[#1a1c2e]">{service.rating || 4.5}</span>
                 <span className="text-slate-400 font-medium">({service.reviews_count || 120} reviews)</span>
               </div>
-              {/* <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-sm font-semibold text-green-700">Verified Professionals</span>
-              </div> */}
-            </div>
+              </div>
+            </div> */}
 
             {/* Price Card */}
             <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
@@ -406,10 +398,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               {currentCartItem ? (
                 <button
                   onClick={() => router.push('/cart')}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-green-600/20 uppercase tracking-widest"
+                  className="w-full bg-[#101242] hover:bg-[#101242] text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-xl shadow-red-600/20 uppercase tracking-widest"
                 >
                   <CheckCircle className="w-6 h-6" />
-                  <span>Added — View Cart</span>
+                  <span>View Cart</span>
                 </button>
               ) : (
                 <button
@@ -422,7 +414,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                   ) : (
                     <ShoppingCart className="w-6 h-6" />
                   )}
-                  <span>{error ? "Unavailable in this location" : isAdding ? "Adding..." : `Book Now — ₹${formatPrice(sellingPrice)}`}</span>
+                  <span>{error ? "Unavailable in this location" : isAdding ? "Adding..." : `Book Now`}</span>
                 </button>
               )}
             </div>
@@ -431,16 +423,17 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Related Services Section */}
         {relatedServices.length > 0 && (
-          <div className="space-y-10 py-24 border-t border-slate-100">
-            <div className="py-24 border-t border-slate-100">
+          <div className="space-y-10 py-10 md:py-16 border-t border-slate-100">
+            <div className="py-8 border-t border-slate-100">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
                 {/* Left Side */}
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <h2 className="text-2xl md:text-3xl font-black text-[#1a1c2e]">
+                <div className="flex flex-col items-start md:items-start gap-1 md:gap-2 text-left md:text-left">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#1a1c2e] leading-tight">
                     Related Services
                   </h2>
-                  <p className="text-slate-500 font-medium text-sm md:text-base">
+
+                  <p className="text-slate-500 font-medium text-xs sm:text-sm md:text-base max-w-xs sm:max-w-md md:max-w-none">
                     Popular services frequently booked by our customers in your area
                   </p>
                 </div>
@@ -465,7 +458,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 return (
                   <div
                     key={rs.id}
-                    className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-sm"
+                    className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-[0px_8px_16px_rgba(27,30,36,0.1)]"
                   >
                     <div className="relative h-40 sm:h-64 overflow-hidden flex-shrink-0 bg-white">
                       <Image
