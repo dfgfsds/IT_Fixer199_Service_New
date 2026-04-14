@@ -107,7 +107,7 @@ export default function ServicesPage() {
                 placeholder="Search for services (e.g., Cleaning, Plumbing)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
+                className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#101242] shadow-lg shadow-slate-100/50"
               />
             </div> */}
           </div>
@@ -124,7 +124,7 @@ export default function ServicesPage() {
                 <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
               </div>
               <div className="text-center space-y-3 max-w-sm mx-auto">
-                <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
+                <h3 className="text-2xl font-black text-[#101242] uppercase tracking-tight">Location Required</h3>
                 <p className="text-slate-500 font-medium">To show you available services and accurate pricing, please select your city.</p>
               </div>
               <button
@@ -184,7 +184,7 @@ export default function ServicesPage() {
                     <Search className="w-12 h-12" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-[#1a1c2e]">
+                    <h3 className="text-3xl font-black text-[#101242]">
                       {error || "No services match your search"}
                     </h3>
                     <p className="text-slate-400 font-medium">
@@ -194,7 +194,7 @@ export default function ServicesPage() {
                   {/*
                   <button
                     onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
-                    className="px-10 py-4 bg-[#1a1c2e] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl hover:bg-[#1a1c2e]/90 transition-all active:scale-95"
+                    className="px-10 py-4 bg-[#101242] text-white rounded-2xl font-black tracking-widest uppercase shadow-xl hover:bg-[#101242]/90 transition-all active:scale-95"
                   >
                     Clear all filters
                   </button>

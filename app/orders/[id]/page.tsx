@@ -331,7 +331,7 @@ export default function SingleOrderPage() {
 
             {/* Right Column Skeletons */}
             <div className="space-y-8">
-              <div className="bg-[#1a1c2e] rounded-[40px] p-8 h-48 opacity-20" />
+              <div className="bg-[#101242] rounded-[40px] p-8 h-48 opacity-20" />
               <div className="bg-white rounded-[40px] p-8 border border-slate-100 h-60" />
             </div>
           </div>
@@ -401,13 +401,13 @@ export default function SingleOrderPage() {
                         </button>
                       )}
                       {showSlotChange && (
-                        <button onClick={() => { setActionType('slot'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#1a1c2e] hover:bg-slate-50 transition flex items-center gap-3">
+                        <button onClick={() => { setActionType('slot'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#101242] hover:bg-slate-50 transition flex items-center gap-3">
                           <Calendar className="w-4 h-4" /> Change Slot
                         </button>
                       )}
                       {/* 
                       {showRefund && (
-                        <button onClick={() => { setActionType('refund'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#1a1c2e] hover:bg-slate-50 transition flex items-center gap-3">
+                        <button onClick={() => { setActionType('refund'); setShowMenu(false) }} className="w-full text-left px-5 py-4 text-sm font-bold text-[#101242] hover:bg-slate-50 transition flex items-center gap-3">
                           <IndianRupee className="w-4 h-4" /> Request Refund
                         </button>
                       )} 
@@ -427,23 +427,23 @@ export default function SingleOrderPage() {
 
             {/* Service Schedule */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-              <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+              <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-slate-400" /> Service Schedule
               </h2>
               <div className="flex items-center gap-4 bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#1a1c2e] shadow-sm flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#101242] shadow-sm flex items-center justify-center shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Scheduled For</p>
-                  <p className="font-bold text-[#1a1c2e] text-lg">{order.slot || 'Slot to be confirmed'}</p>
+                  <p className="font-bold text-[#101242] text-lg">{order.slot || 'Slot to be confirmed'}</p>
                 </div>
               </div>
             </div>
 
             {/* Assigned Expert */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-              <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+              <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                 <UserIcon className="w-5 h-5 text-slate-400" /> Service Professional
               </h2>
               {order.agent ? (
@@ -454,13 +454,13 @@ export default function SingleOrderPage() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Expert</p>
-                      <p className="font-bold text-[#1a1c2e] text-lg">{order.agent.name}</p>
+                      <p className="font-bold text-[#101242] text-lg">{order.agent.name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 w-full sm:w-auto">
                     <a
                       href={`tel:${order.agent.phone}`}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-[#1a1c2e] border border-slate-200 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-[#101242] border border-slate-200 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
                     >
                       <Phone className="w-4 h-4" /> Call
                     </a>
@@ -489,7 +489,7 @@ export default function SingleOrderPage() {
 
             {/* Order Items */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-              <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+              <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                 <Package className="w-5 h-5 text-slate-400" /> Booked Services
               </h2>
               <div className="space-y-3">
@@ -509,7 +509,7 @@ export default function SingleOrderPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#1a1c2e] truncate">{item.item_details?.name || 'Service'}</p>
+                      <p className="font-bold text-[#101242] truncate">{item.item_details?.name || 'Service'}</p>
                       {item?.item_details?.full_details?.categories && (
                         <p className="text-xs text-slate-400 font-medium mt-0.5">{item.item_details.full_details.categories}</p>
                       )}
@@ -527,7 +527,7 @@ export default function SingleOrderPage() {
 
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
               <div className="flex items-center justify-between mb-6 px-1">
-                <h2 className="text-lg font-black flex items-center gap-3 text-[#1a1c2e]">
+                <h2 className="text-lg font-black flex items-center gap-3 text-[#101242]">
                   <IndianRupee className="w-5 h-5 text-slate-400" /> Payment
                 </h2>
                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${paymentStatus === 'SUCCESS'
@@ -542,7 +542,7 @@ export default function SingleOrderPage() {
               <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-3">
                 <div className="flex justify-between text-slate-500 font-medium text-sm">
                   <span>Service Total</span>
-                  <span className="font-bold text-[#1a1c2e]">₹{formatPrice(order.amount)}</span>
+                  <span className="font-bold text-[#101242]">₹{formatPrice(order.amount)}</span>
                 </div>
                 <div className="w-full h-px bg-slate-200" />
                 <div className="flex justify-between items-center">
@@ -554,11 +554,11 @@ export default function SingleOrderPage() {
 
             {/* Service Location */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-              <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+              <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-slate-400" /> Service Location
               </h2>
               <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                <p className="font-bold text-[#1a1c2e] mb-2">{order.fullData?.user_address?.name || 'Customer'}</p>
+                <p className="font-bold text-[#101242] mb-2">{order.fullData?.user_address?.name || 'Customer'}</p>
                 <p className="text-slate-600 font-medium text-sm leading-relaxed">
                   {order.fullData?.user_address?.full_address || order.address || 'Address not available'}
                 </p>
@@ -581,7 +581,7 @@ export default function SingleOrderPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl border border-slate-100 space-y-6 animate-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black text-[#1a1c2e] capitalize">
+              <h2 className="text-xl font-black text-[#101242] capitalize">
                 {actionType === 'cancel' && '❌ Cancel Order'}
                 {actionType === 'slot' && '📅 Change Slot'}
                 {actionType === 'refund' && '💰 Request Refund'}
@@ -595,7 +595,7 @@ export default function SingleOrderPage() {
               {actionType === 'cancel' && (
                 <div className="space-y-4">
                   <select
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] outline-none focus:border-[#101242]/30"
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                   >
                     <option value="">Select Cancellation Reason</option>
@@ -604,7 +604,7 @@ export default function SingleOrderPage() {
                   <textarea
                     placeholder="Additional description (optional)"
                     rows={3}
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>
@@ -617,7 +617,7 @@ export default function SingleOrderPage() {
                     <Calendar className="w-5 h-5 text-[#101242]" />
                     <div>
                       <p className="text-[10px] font-black text-[#101242] uppercase tracking-widest">Scheduling For</p>
-                      <p className="font-bold text-[#1a1c2e]">Today, {new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'long' })}</p>
+                      <p className="font-bold text-[#101242]">Today, {new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'long' })}</p>
                     </div>
                   </div>
 
@@ -629,7 +629,7 @@ export default function SingleOrderPage() {
                       </div>
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Appointment</p>
-                        <p className="font-bold text-[#1a1c2e] text-sm">{order.slot || 'Not assigned'}</p>
+                        <p className="font-bold text-[#101242] text-sm">{order.slot || 'Not assigned'}</p>
                       </div>
                     </div>
                     <span className="text-[10px] font-black text-[#101242] uppercase bg-red-50 px-2 py-1 rounded-full">Selected</span>
@@ -655,7 +655,7 @@ export default function SingleOrderPage() {
                               }`}
                           >
                             <div className="text-left">
-                              <p className={`font-bold text-sm ${selectedSlot?.id === slot.id ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>
+                              <p className={`font-bold text-sm ${selectedSlot?.id === slot.id ? 'text-[#101242]' : 'text-[#101242]'}`}>
                                 {slot.name}
                               </p>
                               <p className={`text-[11px] font-medium ${selectedSlot?.id === slot.id ? 'text-[#101242]/70' : 'text-slate-400'}`}>
@@ -677,7 +677,7 @@ export default function SingleOrderPage() {
                   <div className="space-y-3 pt-2">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Reason for Change</p>
                     <select
-                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] outline-none focus:border-[#101242]/30"
                       onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     >
                       <option value="">Select Reason</option>
@@ -686,7 +686,7 @@ export default function SingleOrderPage() {
                     <textarea
                       placeholder="Additional description (optional)"
                       rows={2}
-                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] outline-none focus:border-[#101242]/30 resize-none placeholder:font-medium"
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
@@ -731,7 +731,7 @@ export default function SingleOrderPage() {
                   <Wifi className="w-5 h-5 animate-pulse" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-[#1a1c2e]">Live Tracking</h2>
+                  <h2 className="text-xl font-black text-[#101242]">Live Tracking</h2>
                   {liveStatus && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{liveStatus}</p>}
                 </div>
               </div>

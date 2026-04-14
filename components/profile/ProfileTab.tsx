@@ -46,7 +46,7 @@ export default function ProfileTab() {
   return (
     <div className="bg-white p-10 rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-100 space-y-10">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-black text-[#1a1c2e]">Personal Information</h3>
+        <h3 className="text-2xl font-black text-[#101242]">Personal Information</h3>
         {!isEditing && (
           <button
             onClick={startEditing}
@@ -66,11 +66,11 @@ export default function ProfileTab() {
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e]"
+              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#101242]"
               placeholder="Full Name"
             />
           ) : (
-            <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">
+            <div className="p-4 bg-slate-50 text-[#101242] font-bold rounded-2xl border border-transparent">
               {user?.name}
             </div>
           )}
@@ -83,11 +83,11 @@ export default function ProfileTab() {
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e]"
+              className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#101242]"
               placeholder="Email Address"
             />
           ) : (
-            <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">
+            <div className="p-4 bg-slate-50 text-[#101242] font-bold rounded-2xl border border-transparent">
               {user?.email}
             </div>
           )}
@@ -102,7 +102,7 @@ export default function ProfileTab() {
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 disabled={user?.mobile_number?.toString().length >= 10}
-                className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#1a1c2e] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="block w-full p-4 bg-slate-50 border border-[#101242]/10 rounded-2xl focus:bg-white focus:border-[#101242]/30 outline-none font-bold text-[#101242] disabled:opacity-60 disabled:cursor-not-allowed"
                 placeholder="Phone Number"
               />
               {user?.mobile_number?.toString().length >= 10 && (
@@ -110,7 +110,7 @@ export default function ProfileTab() {
               )}
             </div>
           ) : (
-            <div className="p-4 bg-slate-50 text-[#1a1c2e] font-bold rounded-2xl border border-transparent">
+            <div className="p-4 bg-slate-50 text-[#101242] font-bold rounded-2xl border border-transparent">
               {user?.mobile_number}
             </div>
           )}

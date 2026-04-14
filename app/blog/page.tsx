@@ -89,7 +89,7 @@ export default function BlogListPage() {
       {/* Blog Hero Section */}
       <section className="bg-white py-20 px-4">
         <div className="max-w-7xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight leading-tight">
+          <h1 className="text-5xl sm:text-6xl font-black text-[#101242] tracking-tight leading-tight">
             IT FIX <span className="text-[#101242]">Insights & Blogs</span>
           </h1>
           <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
@@ -103,7 +103,7 @@ export default function BlogListPage() {
               placeholder="Search articles, tips, techniques..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
+              className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#101242] shadow-lg shadow-slate-100/50"
             />
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function BlogListPage() {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-8 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap ${activeCategory === category ? 'bg-[#101242] text-white shadow-lg shadow-[#101242]/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-[#1a1c2e]'}`}
+              className={`px-8 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap ${activeCategory === category ? 'bg-[#101242] text-white shadow-lg shadow-[#101242]/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-[#101242]'}`}
             >
               {category}
             </button>
@@ -162,7 +162,7 @@ export default function BlogListPage() {
                     </div>
                   </div>
 
-                  <h2 className="text-2xl font-black text-[#1a1c2e] leading-tight group-hover:text-[#101242] transition-colors duration-300">
+                  <h2 className="text-2xl font-black text-[#101242] leading-tight group-hover:text-[#101242] transition-colors duration-300">
                     {post.title}
                   </h2>
 
@@ -186,7 +186,7 @@ export default function BlogListPage() {
             <div className="w-24 h-24 bg-slate-100 text-slate-300 rounded-full flex items-center justify-center mx-auto">
               <Search className="w-12 h-12" />
             </div>
-            <h3 className="text-2xl font-black text-[#1a1c2e]">No articles found</h3>
+            <h3 className="text-2xl font-black text-[#101242]">No articles found</h3>
             <p className="text-slate-500 font-medium">Clear search or categories to see all blogs</p>
             <button
               onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
@@ -199,7 +199,7 @@ export default function BlogListPage() {
       </main>
 
       {/* Newsletter Section */}
-      <section className="bg-[#1a1c2e] py-24 px-4 overflow-hidden relative">
+      <section className="bg-[#101242] py-24 px-4 overflow-hidden relative">
         <div className="max-w-4xl mx-auto space-y-10 relative z-10">
           <div className="text-center space-y-4">
             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -211,7 +211,7 @@ export default function BlogListPage() {
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 bg-white/10 border border-transparent rounded-2xl px-8 py-5 text-white placeholder-slate-400 focus:bg-white focus:text-[#1a1c2e] focus:border-[#101242]/20 transition-all outline-none font-bold"
+              className="flex-1 bg-white/10 border border-transparent rounded-2xl px-8 py-5 text-white placeholder-slate-400 focus:bg-white focus:text-[#101242] focus:border-[#101242]/20 transition-all outline-none font-bold"
               required
             />
             <button className="px-10 py-5 bg-[#101242] text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#600000] transition-all shadow-xl shadow-[#101242]/20">

@@ -133,7 +133,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                             <div className="absolute inset-0 blur-xl bg-primary/5 rounded-full"></div>
                         </div>
                         <div className="space-y-3 max-w-sm mx-auto">
-                            <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
+                            <h3 className="text-2xl font-black text-[#101242] uppercase tracking-tight">Location Required</h3>
                             <p className="text-slate-500 font-medium">To show you available services & products and accurate pricing, please select your city.</p>
                         </div>
                         <button
@@ -176,7 +176,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                             <Sparkles className="w-4 h-4" />
                             {categoryName} Experts in {location?.city || 'your city'}
                         </div>
-                        <h1 className="text-5xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight leading-tight capitalize">
+                        <h1 className="text-5xl sm:text-6xl font-black text-[#101242] tracking-tight leading-tight capitalize">
                             {categoryName} <span className="text-[#101242]">Collection</span>
                         </h1>
                         <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
@@ -207,58 +207,58 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                     <div className="space-y-24">
                         {/* Services Grid */}
                         {categoryType !== 'PRODUCT' && (
-                        <div className="space-y-10">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
-                                    Available Services ({services.length})
-                                </h2>
-                            </div>
+                            <div className="space-y-10">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
+                                        Available Services ({services.length})
+                                    </h2>
+                                </div>
 
-                            {services.length > 0 ? (
-                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
-                                    {services.map((service: any) => (
-                                        <div key={service.id} className="animate-fade-in">
-                                            <ServiceCard service={service} />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200 space-y-4">
-                                    <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto">
-                                        <Package className="w-8 h-8" />
+                                {services.length > 0 ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
+                                        {services.map((service: any) => (
+                                            <div key={service.id} className="animate-fade-in">
+                                                <ServiceCard service={service} />
+                                            </div>
+                                        ))}
                                     </div>
-                                    <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No services found in this category</p>
-                                </div>
-                            )}
-                        </div>
+                                ) : (
+                                    <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200 space-y-4">
+                                        <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto">
+                                            <Package className="w-8 h-8" />
+                                        </div>
+                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No services found in this category</p>
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {/* Products Grid */}
                         {categoryType !== 'SERVICE' && (
-                        <div className="space-y-10">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
-                                    Essential Products ({products.length})
-                                </h2>
-                            </div>
+                            <div className="space-y-10">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
+                                        Essential Products ({products.length})
+                                    </h2>
+                                </div>
 
-                            {products.length > 0 ? (
-                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
-                                    {products.map((product) => (
-                                        <div key={product.id} className="animate-fade-in">
-                                            <ProductCard product={product} basePath="products" />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200 space-y-4">
-                                    <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto">
-                                        <Package className="w-8 h-8" />
+                                {products.length > 0 ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
+                                        {products.map((product) => (
+                                            <div key={product.id} className="animate-fade-in">
+                                                <ProductCard product={product} basePath="products" />
+                                            </div>
+                                        ))}
                                     </div>
-                                    <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No products found in this category</p>
-                                </div>
-                            )}
-                        </div>
+                                ) : (
+                                    <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200 space-y-4">
+                                        <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto">
+                                            <Package className="w-8 h-8" />
+                                        </div>
+                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No products found in this category</p>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

@@ -302,7 +302,7 @@ export function LiveMap({
       {!isLoaded && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-sm rounded-3xl space-y-3">
           <Loader2 className="w-8 h-8 text-[#101242] animate-spin" />
-          <p className="text-[#1a1c2e] font-bold text-xs uppercase tracking-widest">Initializing Route...</p>
+          <p className="text-[#101242] font-bold text-xs uppercase tracking-widest">Initializing Route...</p>
         </div>
       )}
 
@@ -316,7 +316,7 @@ export function LiveMap({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
             </div>
-            <p className="text-[#1a1c2e] font-bold text-xs uppercase tracking-widest">Awaiting Expert GPS Signal...</p>
+            <p className="text-[#101242] font-bold text-xs uppercase tracking-widest">Awaiting Expert GPS Signal...</p>
           </div>
         </div>
       )}
