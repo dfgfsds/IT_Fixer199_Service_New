@@ -10,7 +10,7 @@
   --card-foreground: #121245;
   --popover: #ffffff;
   --popover-foreground: #121245;
-  --primary: #7d1719;
+  --primary: #101242;
   --primary-foreground: #ffffff;
   --secondary: #121245;
   --secondary-foreground: #ffffff;
@@ -198,4 +198,46 @@
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+.mobile-location-modal {
+  max-width: 80px !important;
+}
+
+@media(max-width:325px) {
+  .mobile-location-modal {
+    max-width: 40px !important;
+  }
+}
+
+@media(max-width:307px) {
+  .mobile-location-modal {
+    max-width: 30px;
+  }
+
+  .header-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .header-logo {
+    height: 40px !important;
+  }
+}
+
+/* Custom Sonner Animation: Slide from Right to Left */
+.slide-in-from-right-full {
+  animation: toast-slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

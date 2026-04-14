@@ -155,7 +155,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                         <AlertCircle className="w-12 h-12 text-slate-300" />
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-3xl font-black text-[#1a1c2e] tracking-tight">Request Not Found</h2>
+                        <h2 className="text-3xl font-black text-[#101242] tracking-tight">Request Not Found</h2>
                         <p className="text-slate-500 font-medium leading-relaxed">
                             We couldn't find the details for this service request. It might have been moved, deleted, or the ID might be incorrect.
                         </p>
@@ -221,7 +221,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     {/* LEFT COLUMN */}
                     <div className="lg:col-span-2 space-y-8">
                         <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-                            <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+                            <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                                 <Activity className="w-5 h-5 text-slate-400" /> Request Details
                             </h2>
                             {request.request_type === 'SLOT_CHANGE' && (
@@ -232,7 +232,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Requested Slot</p>
-                                            <p className="font-bold text-[#1a1c2e] text-lg">
+                                            <p className="font-bold text-[#101242] text-lg">
                                                 {request.requested_date
                                                     ? new Date(request.requested_date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })
                                                     : 'Not specified'}
@@ -252,7 +252,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Reason for Change</p>
-                                                <p className="font-bold text-[#1a1c2e]">{request.slot_change_reason_type.split('_').join(' ')}</p>
+                                                <p className="font-bold text-[#101242]">{request.slot_change_reason_type.split('_').join(' ')}</p>
                                                 {request.slot_change_reason_description && (
                                                     <p className="text-slate-500 font-medium text-sm mt-0.5 italic">"{request.slot_change_reason_description}"</p>
                                                 )}
@@ -269,7 +269,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Cancellation Reason</p>
-                                        <p className="font-bold text-[#1a1c2e] capitalize">
+                                        <p className="font-bold text-[#101242] capitalize">
                                             {request.cancellation_reason_type?.split('_').join(' ').toLowerCase() || 'Not specified'}
                                         </p>
                                         {request.cancellation_reason_description && (
@@ -286,7 +286,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Expected Refund</p>
-                                        <p className="font-black text-[#1a1c2e] text-2xl">₹{request.refund_amount || '0.00'}</p>
+                                        <p className="font-black text-[#101242] text-2xl">₹{request.refund_amount || '0.00'}</p>
                                     </div>
                                 </div>
                             )}
@@ -298,7 +298,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Hub Service Request</p>
-                                        <p className="font-bold text-[#1a1c2e]">Device submitted for in-hub repair</p>
+                                        <p className="font-bold text-[#101242]">Device submitted for in-hub repair</p>
                                         {request.device_serial_number && (
                                             <p className="text-slate-500 font-medium text-sm mt-0.5">S/N: {request.device_serial_number}</p>
                                         )}
@@ -322,7 +322,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                         {/* Customer & Location Box */}
                         {orderDetails && (
                             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-                                <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+                                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                                     <User className="w-5 h-5 text-slate-400" /> Customer & Address
                                 </h2>
 
@@ -333,7 +333,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Customer</p>
-                                            <p className="font-bold text-[#1a1c2e]">{orderDetails.customer_name}</p>
+                                            <p className="font-bold text-[#101242]">{orderDetails.customer_name}</p>
                                             <p className="text-slate-500 font-medium text-sm mt-0.5">+91 {orderDetails.customer_number}</p>
                                         </div>
                                     </div>
@@ -344,7 +344,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Service Address</p>
-                                            <p className="font-bold text-[#1a1c2e] leading-relaxed">{orderDetails.address}</p>
+                                            <p className="font-bold text-[#101242] leading-relaxed">{orderDetails.address}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -354,7 +354,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                         {/* Impacted Items Box */}
                         {itemDetails && (
                             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-                                <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+                                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                                     <Package className="w-5 h-5 text-slate-400" /> Booked Items
                                 </h2>
                                 <div className="flex items-center gap-4 p-4 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-md transition-all">
@@ -373,7 +373,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Service Item</p>
-                                        <p className="font-bold text-[#1a1c2e] truncate">{itemDetails.name || 'Service'}</p>
+                                        <p className="font-bold text-[#101242] truncate">{itemDetails.name || 'Service'}</p>
                                         <p className="text-xs text-slate-400 font-medium mt-0.5">Quantity: {request.order_item_details?.quantity || 1}</p>
                                     </div>
                                     <p className="font-black text-[#101242] text-lg shrink-0">₹{request.order_item_details?.price || '0.00'}</p>
@@ -386,7 +386,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     <div className="space-y-8">
                         {orderDetails && (
                             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-                                <h2 className="text-lg font-black text-[#1a1c2e] flex items-center gap-3">
+                                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                                     <IndianRupee className="w-5 h-5 text-slate-400" /> Order Summary
                                 </h2>
                                 <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-3">
@@ -410,7 +410,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                                 </div>
                                 <Link
                                     href={`/orders/${orderDetails.id}`}
-                                    className="w-full flex items-center justify-center py-4 bg-slate-100 text-[#1a1c2e] rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all"
+                                    className="w-full flex items-center justify-center py-4 bg-slate-100 text-[#101242] rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all"
                                 >
                                     View Full Order
                                 </Link>

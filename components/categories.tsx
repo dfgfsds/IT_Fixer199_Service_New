@@ -77,7 +77,7 @@ export function Categories() {
                   {/* Content Area */}
                   <div className="p-4 sm:p-8 flex flex-col flex-1 justify-between gap-4 sm:gap-6">
                     <div className="space-y-1">
-                      <h3 className="text-lg sm:text-2xl font-black text-[#1a1c2e] leading-tight group-hover:text-[#101242] transition-colors duration-300 capitalize">
+                      <h3 className="text-lg sm:text-2xl font-black text-[#101242] leading-tight group-hover:text-[#101242] transition-colors duration-300 capitalize">
                         {category.name}
                       </h3>
                     </div>

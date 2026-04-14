@@ -92,7 +92,7 @@ export default function OrdersTab() {
 
   return (
     <div className="space-y-8">
-      <h3 className="text-2xl font-black text-[#1a1c2e]">Recent Orders</h3>
+      <h3 className="text-2xl font-black text-[#101242]">Recent Orders</h3>
 
       {loading ? (
         <div className="space-y-5">
@@ -105,7 +105,7 @@ export default function OrdersTab() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
             <Package className="h-8 w-8 text-slate-400" />
           </div>
-          <h2 className="mb-2 text-lg font-bold text-[#1a1c2e]">No orders yet</h2>
+          <h2 className="mb-2 text-lg font-bold text-[#101242]">No orders yet</h2>
           <p className="text-sm text-slate-500 font-medium">Book a service to see your orders here</p>
         </div>
       ) : (
@@ -123,7 +123,7 @@ export default function OrdersTab() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-400 tracking-widest uppercase mb-1">{order.id}</p>
-                    <h4 className="font-bold text-[#1a1c2e] text-lg leading-tight">{serviceName}</h4>
+                    <h4 className="font-bold text-[#101242] text-lg leading-tight">{serviceName}</h4>
                     <p className="text-slate-500 text-sm font-medium mt-1">Booked on {dateStr} {order?.slot_time && `• ${order.slot_time}`}</p>
                   </div>
                 </div>

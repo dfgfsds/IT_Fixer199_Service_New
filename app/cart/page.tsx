@@ -229,10 +229,19 @@ export default function CartPage() {
   const getItemCategory = (item: any) => item.item_type || item.type || 'Service'
 
   const cartItems: any[] = Array.isArray(cartItem) ? cartItem : []
-  const subtotal = cartItems.reduce((sum, item) => sum + (getItemPrice(item) * (item.quantity || 1)), 0)
-  const serviceCharge = 49
-  const gst = Math.round(subtotal * 0.05)
-  const total = subtotal + serviceCharge + gst
+  const activeItems = cartItems.filter(item => item.is_active !== false)
+
+  const servicesTotal = activeItems
+    .filter(item => item.type === 'SERVICE')
+    .reduce((sum, item) => sum + Number(item.item_total || 0), 0)
+
+  const productsTotal = activeItems
+    .filter(item => item.type === 'PRODUCT')
+    .reduce((sum, item) => sum + Number(item.item_total || 0), 0)
+
+  // Use the API's calculated total as the source of truth
+  const resultData = rawCartData?.data || rawCartData
+  const total = Number(resultData?.cart_total || (servicesTotal + productsTotal))
 
   const handleCheckout = async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
@@ -280,7 +289,7 @@ export default function CartPage() {
 
       const payload: any = {
         address_id: selectedAddressId,
-        payment_method: selectedPayment.toUpperCase(),
+        payment_method: "UPI",
         service_slot: scheduleType.toUpperCase(),
         // Backend required fields from Swagger
         customer_name: user?.name || "",
@@ -506,15 +515,15 @@ export default function CartPage() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-10 md:py-12">
-        <h1 className="text-3xl font-black text-[#1a1c2e] mb-10">Your Cart</h1>
+        <h1 className="text-3xl font-black text-[#101242] mb-10">Your Cart</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6 sm:space-y-10">
+          <div className="lg:col-span-2 space-y-10">
 
             {/* Items Section */}
             <div className="space-y-3 sm:space-y-4">
-              <h2 className="text-base sm:text-lg font-bold text-slate-500 uppercase tracking-wider ml-1">
+              <h2 className="text-base sm:text-lg font-bold text-[#101242] uppercase tracking-wider ml-1">
                 Items ({cartItems.length})
               </h2>
 
@@ -529,20 +538,19 @@ export default function CartPage() {
                   return (
                     <div
                       key={item.id}
-                      className={`relative bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 group
+                      className={`relative bg-white p-3 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-300 flex flex-row items-center gap-3 sm:gap-6 group
           ${isInactive
-                          ? 'border-red-100 bg-slate-50 opacity-80 desaturate-[0.5]'
-                          : 'border-slate-100 shadow-sm hover:shadow-md'}
+                          ? 'border-[#101242]/30 bg-slate-50 opacity-80 desaturate-[0.5]'
+                          : 'border-[#101242]/30'}
           ${isRemoving ? 'opacity-50' : ''}`}
                     >
-
-                      {/* Image */}
-                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-100">
+                      {/* Left: Image */}
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-slate-100">
                         <Image
                           src={getItemImage(item)}
                           alt={getItemName(item)}
                           fill
-                          className={`transition-transform duration-500 group-hover:scale-110
+                          className={`transition-transform duration-500
               ${getItemImage(item) === '/logo.png' ? 'object-contain p-2' : 'object-cover'}`}
                           onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png' }}
                         />
@@ -550,67 +558,62 @@ export default function CartPage() {
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-bold text-[#1a1c2e]">
+                        <h3 className="text-base sm:text-lg font-bold text-[#101242]">
                           {getItemName(item)}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400 font-medium mb-1 capitalize">
+                        <p className="text-xs sm:text-sm text-slate-600 font-medium capitalize">
                           {getItemCategory(item).toLowerCase()}
                         </p>
-                        <p className={`text-lg sm:text-xl font-black mt-1 ${isInactive ? 'text-slate-400' : 'text-[#1a1c2e]'}`}>
+                        <p className={`text-base sm:text-xl font-black mt-[2px] ${isInactive ? 'text-slate-400' : 'text-[#101242]'}`}>
                           ₹{formatPrice(itemPrice)}
                         </p>
                       </div>
 
-                      {/* Right Side */}
-                      <div className="flex items-center justify-between w-full sm:w-auto gap-2">
-
+                      {/* Right: Actions */}
+                      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                         {isInactive ? (
                           <div className="px-3 sm:px-4 py-2 bg-red-50 text-red-600 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-xl sm:rounded-2xl border border-red-100 flex items-center gap-2 whitespace-nowrap">
                             <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             Unavailable
                           </div>
                         ) : item.type === "SERVICE" ? (
-                          <div className="flex items-center gap-2 bg-[#101242]/5 px-3 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#101242]/10">
-                            <CheckCircle className="w-4 h-4 text-[#101242]" />
-                            <span className="text-[10px] sm:text-[11px] font-black text-[#101242] uppercase whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 bg-[#101242]/5 px-2 sm:px-5 py-1.5 sm:py-3 rounded-lg sm:rounded-2xl border border-[#101242]/10">
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-[#101242]" />
+                            <span className="text-[8px] sm:text-[11px] font-black text-[#101242] uppercase whitespace-nowrap">
                               1 SERVICE
                             </span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 sm:gap-4 bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-100">
+                          <div className="flex items-center gap-1.5 sm:gap-4 bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-[#101242]/10">
                             <button
                               onClick={() => updateQuantity(item, itemQty - 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl bg-white text-slate-600"
+                              className="w-6 h-6 sm:w-10 sm:h-10 flex cursor-pointer items-center justify-center rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm"
                             >
-                              {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
+                              {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Minus className="w-3 h-3 sm:w-4 sm:h-4" />}
                             </button>
 
-                            <span className="text-base sm:text-lg font-black text-[#1a1c2e] w-5 sm:w-6 text-center">
+                            <span className="text-[10px] sm:text-lg font-black text-[#101242] w-4 sm:w-8 text-center">
                               {itemQty}
                             </span>
 
                             <button
                               onClick={() => updateQuantity(item, itemQty + 1)}
                               disabled={isUpdating || isRemoving}
-                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl bg-white text-slate-600"
+                              className="w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm"
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         )}
 
-                        {/* Remove */}
                         <button
                           onClick={() => removeItem(item)}
                           disabled={isRemoving}
-                          className="p-2 sm:p-3 text-slate-600 hover:text-red-600"
+                          className="p-1 sm:p-3 text-slate-400 hover:text-red-500 cursor-pointer transition-colors"
                         >
-                          {isRemoving
-                            ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                            : <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+                          {isRemoving ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
-
                       </div>
                     </div>
                   )
@@ -620,7 +623,7 @@ export default function CartPage() {
             {/* Service Address */}
             <div className="space-y-4">
               <div className="flex items-center justify-between ml-1">
-                <h2 className="text-lg font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <h2 className="text-lg font-bold text-[#101242] uppercase tracking-wider flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
                   Service Location
                 </h2>
@@ -633,10 +636,14 @@ export default function CartPage() {
                         router.push('/login');
                       }, 1200);
                     } else {
-                      router.push('/profile?tab=addresses&action=add');
+                      if (addresses.length >= 5) {
+                        toast.error("Maximum limit of 5 addresses reached. Please remove an existing address from your profile to add a new one.");
+                      } else {
+                        router.push('/profile?tab=addresses&action=add');
+                      }
                     }
                   }}
-                  className="px-6 py-2.5 bg-[#101242] text-white text-sm font-black rounded-2xl shadow-lg shadow-red-900/20 hover:bg-[#600000] transition-all active:scale-95 whitespace-nowrap"
+                  className="px-6 py-2.5 cursor-pointer bg-[#101242] text-white text-sm font-black rounded-2xl hover:bg-[#800000] transition-all active:scale-95 whitespace-nowrap"
                 >
                   Add New
                 </button>
@@ -645,14 +652,14 @@ export default function CartPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {addresses.length > 0 ? (
                   <>
-                    {addresses.slice(0, 4).map((addr) => (
-                      <label
-                        key={addr.id}
-                        className={`cursor-pointer bg-white p-5 rounded-3xl border-2 transition-all flex items-start gap-4 ${selectedAddressId === addr.id
-                          ? 'border-[#101242] shadow-md bg-red-50/10'
-                          : 'border-slate-100 hover:border-slate-200 shadow-sm'
-                          }`}
-                      >
+                      {addresses.slice(0, 5).map((addr) => (
+                        <label
+                          key={addr.id}
+                          className={`cursor-pointer bg-white p-5 rounded-3xl border transition-all flex items-start gap-4 ${selectedAddressId === addr.id
+                            ? 'border-[#101242] ring-1 ring-inset ring-[#101242]'
+                            : 'border-[#101242]/30'
+                            }`}
+                        >
                         <input
                           type="radio"
                           name="address"
@@ -661,7 +668,7 @@ export default function CartPage() {
                           onChange={() => handleAddressSelectSync(addr)}
                         />
                         <div className="flex-1">
-                          <p className="font-bold text-[#1a1c2e] flex items-center gap-2">
+                          <p className="font-bold text-[#101242] flex items-center gap-2">
                             {addr.name || (addr.address_type === 'home' ? 'Home' : addr.address_type === 'work' ? 'Work' : 'Saved Address')}
                             {addr.selected_address && <span className="text-[10px] bg-red-100 text-[#101242] px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Active</span>}
                           </p>
@@ -671,7 +678,7 @@ export default function CartPage() {
                         </div>
                       </label>
                     ))}
-                    {addresses.length > 4 && (
+                    {addresses.length > 6 && (
                       <Link
                         href="/profile?tab=addresses"
                         className="sm:col-span-2 w-full flex items-center justify-center rounded-2xl py-3 text-sm font-bold text-[#101242] bg-red-50 hover:bg-red-100 transition-colors"
@@ -688,7 +695,7 @@ export default function CartPage() {
                         <AlertTriangle className="w-5 h-5 text-amber-500" />
                       </div>
                       <div>
-                        <p className="text-[#1a1c2e] font-bold">No saved addresses</p>
+                        <p className="text-[#101242] font-bold">No saved addresses</p>
                         <p className="text-sm text-slate-500">Please add an address to continue checkout</p>
                       </div>
                     </div>
@@ -699,7 +706,7 @@ export default function CartPage() {
 
             {/* Service Slot */}
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 ml-1">
+              <h2 className="text-lg font-bold text-[#101242] uppercase tracking-wider flex items-center gap-2 ml-1">
                 <Calendar className="w-5 h-5" />
                 Schedule
               </h2>
@@ -708,7 +715,7 @@ export default function CartPage() {
               <div className="flex rounded-2xl border border-slate-100 bg-white p-1.5 shadow-sm">
                 <button
                   onClick={() => setScheduleType("instant")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "instant"
+                  className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "instant"
                     ? "bg-[#101242] text-white shadow-lg shadow-red-900/20"
                     : "text-slate-500 hover:bg-slate-50"
                     }`}
@@ -719,7 +726,7 @@ export default function CartPage() {
 
                 <button
                   onClick={() => setScheduleType("later")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "later"
+                  className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${scheduleType === "later"
                     ? "bg-[#101242] text-white shadow-lg shadow-red-900/20"
                     : "text-slate-500 hover:bg-slate-50"
                     }`}
@@ -746,18 +753,18 @@ export default function CartPage() {
                   ) : instant?.available ? (
                     <button
                       onClick={handleInstantSelect}
-                      className={`w-full bg-white p-5 rounded-3xl border-2 transition-all shadow-sm relative overflow-hidden group ${selectedTime === "instant"
-                        ? 'border-[#101242] bg-red-50/30'
-                        : 'border-slate-100 hover:border-slate-200'
+                      className={`w-full bg-white p-5 rounded-3xl border transition-all duration-200 shadow-sm relative overflow-hidden group ${selectedTime === "instant"
+                        ? 'border-[#101242] ring-1 ring-inset ring-[#101242] bg-red-50/30'
+                        : 'border-[#101242]/30'
                         }`}
                     >
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#7d1719] text-white' : 'bg-[#7d1719]/10 text-[#7d1719]'}`}>
+                      <div className="flex cursor-pointer items-center gap-4 relative z-10">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${selectedTime === "instant" ? 'bg-[#101242] text-white' : 'bg-[#101242]/10 text-[#101242]'}`}>
                           <Clock className="w-6 h-6" />
                         </div>
                         <div className="text-left">
-                          <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>Technician Available Now</p>
-                          <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-[#7d1719] font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
+                          <p className={`font-bold transition-colors ${selectedTime === "instant" ? 'text-[#101242]' : 'text-[#101242]'}`}>Technician Available Now</p>
+                          <p className="text-sm text-slate-500">Estimated Arrival: <span className="text-[#101242] font-bold">{instant?.eta_start_time} - {instant?.eta_end_time}</span></p>
                         </div>
                       </div>
 
@@ -768,7 +775,7 @@ export default function CartPage() {
                       )}
                     </button>
                   ) : (
-                    <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <div className="bg-white p-5 rounded-3xl border border-[#101242]/30 shadow-sm">
                       <div className="flex items-center gap-4 text-amber-600 bg-amber-50/50 p-4 rounded-2xl">
                         <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                         <p className="text-sm font-bold leading-tight">Instant service currently unavailable for this location. Please schedule for later.</p>
@@ -793,7 +800,7 @@ export default function CartPage() {
                           safeErrorLog("Failed to clear instant slot", err)
                         }
                       }}
-                      className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all text-xs font-black uppercase tracking-widest"
+                      className="mt-3 cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all text-xs font-black uppercase tracking-widest"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Clear Instant Selection
@@ -820,7 +827,7 @@ export default function CartPage() {
                           <span className={`text-[10px] font-black uppercase tracking-widest ${selectedDate === d.value ? "text-[#101242]" : "text-slate-400"}`}>
                             {d.label}
                           </span>
-                          <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#101242]" : "text-[#1a1c2e]"}`}>
+                          <span className={`text-sm font-black mt-1 ${selectedDate === d.value ? "text-[#101242]" : "text-[#101242]"}`}>
                             {d.day}
                           </span>
                         </button>
@@ -844,7 +851,7 @@ export default function CartPage() {
                             safeErrorLog("Failed to clear slot in cart", err)
                           }
                         }}
-                        className="flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-2xl border-2 border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all group shrink-0"
+                        className="flex cursor-pointer flex-col items-center justify-center min-w-[70px] h-[64px] rounded-2xl border order border-[#101242]/20 bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10 transition-all group shrink-0"
                       >
                         <Trash2 className="w-4 h-4 mb-1" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Clear</span>
@@ -858,14 +865,14 @@ export default function CartPage() {
                       <button
                         key={slot.id}
                         onClick={() => handleSlotSelect(slot)}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden group ${selectedTime === slot.id
-                          ? 'border-[#101242] bg-red-50/30'
-                          : 'border-white bg-white shadow-sm hover:border-slate-100'
+                        className={`p-4 cursor-pointer rounded-2xl border transition-all relative overflow-hidden group ${selectedTime === slot.id
+                          ? 'border-[#101242] ring-1 ring-inset ring-[#101242] bg-red-50/30'
+                          : 'border-[#101242]/30 bg-white'
                           }`}
                       >
                         <div className="relative z-10">
-                          <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">{slot.name}</p>
-                          <p className={`font-bold ${selectedTime === slot.id ? 'text-[#101242]' : 'text-[#1a1c2e]'}`}>
+                          <p className="text-xs font-black text-[#101242]/80 uppercase tracking-wider mb-1">{slot.name}</p>
+                          <p className={`font-bold ${selectedTime === slot.id ? 'text-[#101242]' : 'text-[#101242]'}`}>
                             {slot.start_time} - {slot.end_time}
                           </p>
                         </div>
@@ -876,7 +883,7 @@ export default function CartPage() {
                         )}
                       </button>
                     )) : (
-                      <div className="col-span-2 flex flex-col items-center justify-center p-8 bg-amber-50/50 rounded-3xl border border-amber-100/50 text-center text-amber-600 gap-3">
+                      <div className="col-span-2 flex flex-col items-center justify-center p-8 bg-amber-50/50 rounded-3xl border border-[#101242]/30 text-center text-amber-600 gap-3">
                         <AlertTriangle className="w-8 h-8 opacity-80" />
                         <p className="text-sm font-bold leading-relaxed">
                           No available slots remaining for today.<br />
@@ -890,6 +897,7 @@ export default function CartPage() {
             </div>
 
             {/* Payment Method */}
+            {/* 
             <div className="space-y-4 pb-12">
               <h2 className="text-lg font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 ml-1">
                 <CreditCard className="w-5 h-5" />
@@ -912,87 +920,97 @@ export default function CartPage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> 
+            */}
           </div>
 
           {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             {(() => {
-              const hasInactiveItems = cartItems.some(item => item.is_active === false)
+              const inactiveItems = cartItems.filter(item => item.is_active === false)
+              const hasInactiveItems = inactiveItems.length > 0
+              const allInactive = hasInactiveItems && inactiveItems.length === cartItems.length
 
               return (
-                <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 sticky top-12 space-y-8">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">Order Summary</h2>
+                <div className="bg-white rounded-[40px] p-8 border border-[#101242]/30 shadow-xl shadow-slate-200/20 sticky top-12 space-y-8">
+                  <h2 className="text-2xl font-black text-[#101242]">Order Summary</h2>
 
                   <div className="space-y-4">
-                    <div className="flex justify-between text-slate-500 font-medium">
-                      <span>Subtotal</span>
-                      <span className="font-bold text-[#1a1c2e]">₹{formatPrice(subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-[#7d1719] font-medium">
-                      <span>Service Charge</span>
-                      <span className="font-bold text-[#7d1719]">₹{formatPrice(serviceCharge)}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-500 font-medium">
-                      <span>GST (5%)</span>
-                      <span className="font-bold text-[#1a1c2e]">₹{formatPrice(gst)}</span>
-                    </div>
-
-                    <div className="pt-6 border-t border-slate-100">
-                      <div className="flex justify-between items-end mb-2">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest pb-1">Total Amount</p>
-                        <p className="text-3xl font-black text-[#1a1c2e]">₹{formatPrice(total)}</p>
+                    {!allInactive && servicesTotal > 0 && (
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Services Total</span>
+                        <span className="font-bold text-[#101242]">₹{formatPrice(servicesTotal)}</span>
                       </div>
+                    )}
+                    {!allInactive && productsTotal > 0 && (
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Products Total</span>
+                        <span className="font-bold text-[#101242]">₹{formatPrice(productsTotal)}</span>
+                      </div>
+                    )}
 
-                      {hasInactiveItems && (
-                        <div className="p-4 mt-4 bg-red-50 rounded-2xl border border-red-100 flex gap-3 text-red-600 animate-in fade-in slide-in-from-top-2">
-                          <AlertTriangle className="w-5 h-5 shrink-0" />
-                          <p className="text-[11px] font-bold leading-tight">
-                            Some items are not available at this address. Please remove them or change address to proceed.
-                          </p>
+                    {!allInactive && (
+                      <div className="pt-6 border-t border-[#101242]/20">
+                        <div className="flex justify-between items-end mb-2">
+                          <p className="text-xs font-black text-[#101242]/90 uppercase tracking-widest pb-1">Total Amount</p>
+                          <p className="text-3xl font-black text-[#101242]">₹{formatPrice(total)}</p>
                         </div>
+                      </div>
+                    )}
+
+                    {hasInactiveItems && (
+                      <div className="p-4 mt-4 bg-red-50 rounded-2xl border border-red-100 flex gap-3 text-red-600 animate-in fade-in slide-in-from-top-2">
+                        <AlertTriangle className="w-5 h-5 shrink-0" />
+                        <p className="text-[11.5px] font-bold leading-tight tracking-tight">
+                          {allInactive
+                            ? "We're sorry, none of the items in your cart can be delivered to your current address."
+                            : `${inactiveItems.length === 1 ? 'Notice: An item' : 'Notice: Some items'} in your cart ${inactiveItems.length === 1 ? 'is' : 'are'} unavailable for this address and will not be included in your order.`}
+                          {" "}{!allInactive
+                            ? `The checkout amount has been adjusted for available ${activeItems.length === 1 ? 'item' : 'items'} only.`
+                            : "Please try a different address or remove items to proceed."}
+                        </p>
+                      </div>
+                    )}
+
+                    {!hasInactiveItems && !selectedAddressId && (
+                      <div className="p-4 mt-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3 text-amber-700 animate-in fade-in slide-in-from-top-2">
+                        <MapPin className="w-5 h-5 shrink-0" />
+                        <p className="text-[11px] font-bold leading-tight">
+                          Please select a service location to proceed with your order.
+                        </p>
+                      </div>
+                    )}
+
+                    {!hasInactiveItems && selectedAddressId && !selectedTime && (
+                      <div className="p-4 mt-4 bg-blue-50 rounded-2xl border border-blue-100 flex gap-3 text-blue-700 animate-in fade-in slide-in-from-top-2">
+                        <Clock className="w-5 h-5 shrink-0" />
+                        <p className="text-[11px] font-bold leading-tight">
+                          Please select an Instant Service or Schedule a slot to proceed.
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleCheckout}
+                      disabled={isCheckoutLoading || allInactive || !selectedAddressId || !selectedTime}
+                      className={`w-full cursor-pointer mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${allInactive || !selectedAddressId || !selectedTime
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                        : 'bg-[#101242] text-white hover:bg-[#800000] shadow-none'
+                        }`}
+                    >
+                      {isCheckoutLoading ? (
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      ) : (
+                        <>
+                          {allInactive ? 'Unavailable Items' : 'Place Order'}
+                          <Zap className="w-5 h-5 fill-current" />
+                        </>
                       )}
+                    </button>
 
-                      {!hasInactiveItems && !selectedAddressId && (
-                        <div className="p-4 mt-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3 text-amber-700 animate-in fade-in slide-in-from-top-2">
-                          <MapPin className="w-5 h-5 shrink-0" />
-                          <p className="text-[11px] font-bold leading-tight">
-                            Please select a service location to proceed with your order.
-                          </p>
-                        </div>
-                      )}
-
-                      {!hasInactiveItems && selectedAddressId && !selectedTime && (
-                        <div className="p-4 mt-4 bg-blue-50 rounded-2xl border border-blue-100 flex gap-3 text-blue-700 animate-in fade-in slide-in-from-top-2">
-                          <Clock className="w-5 h-5 shrink-0" />
-                          <p className="text-[11px] font-bold leading-tight">
-                            Please select an Instant Service or Schedule a slot to proceed.
-                          </p>
-                        </div>
-                      )}
-
-                      <button
-                        onClick={handleCheckout}
-                        disabled={isCheckoutLoading || hasInactiveItems}
-                        className={`w-full mt-5 py-4 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-none flex items-center justify-center gap-3 ${hasInactiveItems || !selectedAddressId || !selectedTime
-                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-                          : 'bg-[#101242] text-white hover:bg-[#600000] shadow-none'
-                          }`}
-                      >
-                        {isCheckoutLoading ? (
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                        ) : (
-                          <>
-                            {hasInactiveItems ? 'Unavailable Items' : 'Place Order'}
-                            <Zap className="w-5 h-5 fill-current" />
-                          </>
-                        )}
-                      </button>
-
-                      <p className="text-center mt-4 text-xs text-slate-400 font-medium">
-                        By placing this order, you agree to ITFixer's Terms & Conditions
-                      </p>
-                    </div>
+                    <p className="text-center mt-4 text-xs text-slate-400 font-medium">
+                      By placing this order, you agree to ITFixer's Terms & Conditions
+                    </p>
                   </div>
                 </div>
               )
@@ -1008,7 +1026,7 @@ export default function CartPage() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-bold mb-2 text-[#1a1c2e]">Payment Successful!</h2>
+            <h2 className="text-xl font-bold mb-2 text-[#101242]">Payment Successful!</h2>
             <p className="text-sm text-slate-500">
               Your order has been placed successfully
             </p>

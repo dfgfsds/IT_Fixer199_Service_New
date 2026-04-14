@@ -73,7 +73,7 @@ export default function CategoriesPage() {
               placeholder="Search categories..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#1a1c2e] shadow-lg shadow-slate-100/50"
+              className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-transparent rounded-[32px] focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-bold text-lg text-[#101242] shadow-lg shadow-slate-100/50"
             />
           </div> */}
         </div>
@@ -135,7 +135,7 @@ export default function CategoriesPage() {
                 {/* Content Area */}
                 <div className="p-4 sm:p-8 flex flex-col flex-1 justify-between gap-4 sm:gap-6">
                   <div className="space-y-1">
-                    <h3 className="text-lg sm:text-2xl font-black text-[#1a1c2e] leading-tight group-hover:text-[#101242] transition-colors duration-300 capitalize">
+                    <h3 className="text-lg sm:text-2xl font-black text-[#101242] leading-tight group-hover:text-[#101242] transition-colors duration-300 capitalize">
                       {category.name}
                     </h3>
                   </div>
@@ -155,7 +155,7 @@ export default function CategoriesPage() {
             <div className="w-24 h-24 bg-slate-100 text-slate-300 rounded-full flex items-center justify-center mx-auto">
               <Search className="w-12 h-12" />
             </div>
-            <h3 className="text-2xl font-black text-[#1a1c2e]">No categories found</h3>
+            <h3 className="text-2xl font-black text-[#101242]">No categories found</h3>
             <p className="text-slate-500 font-medium">Clear search to see all categories</p>
             <button
               onClick={() => setSearchQuery('')}

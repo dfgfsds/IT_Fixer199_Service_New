@@ -42,7 +42,7 @@ export function MobileBottomNav() {
                 <Icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
 
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white shadow-sm ring-1 ring-white">
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#800000] text-[9px] font-black text-white shadow-sm ring-1 ring-white">
                     {item.badge}
                   </span>
                 )}

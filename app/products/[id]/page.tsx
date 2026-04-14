@@ -208,7 +208,7 @@ export default function ProductDetailPage({
                             <div className="absolute inset-0 blur-xl bg-[#101242]/5 rounded-full"></div>
                         </div>
                         <div className="space-y-3 max-w-sm mx-auto">
-                            <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Location Required</h3>
+                            <h3 className="text-2xl font-black text-[#101242] uppercase tracking-tight">Location Required</h3>
                             <p className="text-slate-500 font-medium">To show you available products and accurate pricing, please select your city.</p>
                         </div>
                         <button
@@ -256,7 +256,7 @@ export default function ProductDetailPage({
                             <div className="absolute inset-0 blur-xl bg-red-50 rounded-full shadow-inner"></div>
                         </div>
                         <div className="space-y-3 max-w-sm mx-auto">
-                            <h3 className="text-2xl font-black text-[#1a1c2e] uppercase tracking-tight">Product Unavailable</h3>
+                            <h3 className="text-2xl font-black text-[#101242] uppercase tracking-tight">Product Unavailable</h3>
                             <p className="text-slate-500 font-medium">This product is unfortunately not available at your current location</p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-4">
@@ -323,7 +323,7 @@ export default function ProductDetailPage({
                                     {product.category_name || product.category?.name || 'Product'}
                                 </span>
                             </div>
-                            <h1 className="text-5xl font-extrabold text-[#1a1c2e] tracking-tight">
+                            <h1 className="text-5xl font-extrabold text-[#101242] tracking-tight">
                                 {product.name}
                             </h1>
                             <p className="text-xl text-slate-500 max-w-xl leading-relaxed">
@@ -335,7 +335,7 @@ export default function ProductDetailPage({
                         {/* <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2">
                                 <Star className="w-6 h-6 fill-[#ffbb00] text-[#ffbb00]" />
-                                <span className="text-xl font-bold text-[#1a1c2e]">{product.rating || 4.5}</span>
+                                <span className="text-xl font-bold text-[#101242]">{product.rating || 4.5}</span>
                                 <span className="text-slate-400 font-medium">({product.reviews_count || 120} reviews)</span>
                             </div>
                             <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-100">
@@ -348,7 +348,7 @@ export default function ProductDetailPage({
                         <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
                             {/* <p className="text-slate-500 font-medium mb-1">Starting from</p> */}
                             <div className="flex items-baseline gap-3 mb-2">
-                                <span className="text-4xl font-black text-[#1a1c2e]">₹{formatPrice(price)}</span>
+                                <span className="text-4xl font-black text-[#101242]">₹{formatPrice(price)}</span>
                                 {regularPrice && (
                                     <span className="text-xl text-slate-400 line-through font-medium">₹{formatPrice(regularPrice)}</span>
                                 )}
@@ -358,7 +358,7 @@ export default function ProductDetailPage({
 
 
                         <div className="space-y-4">
-                            <h3 className="text-xl font-bold text-[#1a1c2e]">Key Features</h3>
+                            <h3 className="text-xl font-bold text-[#101242]">Key Features</h3>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                                 {attributes.map((item: any, index: number) => (
                                     <div key={index} className="flex items-center gap-3 group">
@@ -376,7 +376,7 @@ export default function ProductDetailPage({
                             <div className="space-y-6 pt-2">
                                 {Object.keys(attributeGroups).map((groupName) => (
                                     <div key={groupName} className="space-y-3">
-                                        <h3 className="text-lg font-bold text-[#1a1c2e] uppercase tracking-wider">{groupName}</h3>
+                                        <h3 className="text-lg font-bold text-[#101242] uppercase tracking-wider">{groupName}</h3>
                                         <div className="flex flex-wrap gap-3">
                                             {attributeGroups[groupName].map((attr) => {
                                                 const isSelected = selectedAttributes[groupName] === attr.value_id
@@ -441,7 +441,7 @@ export default function ProductDetailPage({
                     <div className="space-y-10 py-16 border-t border-slate-100">
                         <div className="flex items-end justify-between">
                             <div className="space-y-2">
-                                <h2 className="text-3xl font-black text-[#1a1c2e]">Similar Products</h2>
+                                <h2 className="text-3xl font-black text-[#101242]">Similar Products</h2>
                                 <p className="text-slate-500">Popular products from the same category</p>
                             </div>
                             <Link

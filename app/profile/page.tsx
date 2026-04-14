@@ -68,7 +68,7 @@ function ProfileContent() {
                   src="/placeholder-user.jpg"
                   alt="Profile"
                   fill
-                  className="rounded-full object-cover border-4 border-slate-50"
+                  className="rounded-full object-cover border-1 border-[#101242]"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=800000&color=fff`;
@@ -76,7 +76,7 @@ function ProfileContent() {
                 />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#1a1c2e]">{user?.name || user?.email || user?.mobile_number}</h2>
+                <h2 className="text-xl font-bold text-[#101242]">{user?.name || user?.email || user?.mobile_number}</h2>
                 <p className="text-slate-700 font-bold text-xs tracking-widest mt-1">{user?.email}</p>
               </div>
             </div>
