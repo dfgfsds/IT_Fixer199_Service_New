@@ -53,7 +53,7 @@ export default function BlogDetailPage() {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c2e] via-[#1a1c2e]/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#101242] via-[#101242]/40 to-transparent"></div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 pb-20 w-full text-left">
           <Link href="/blog" className="inline-flex items-center gap-2 text-white/80 hover:text-white font-bold text-sm tracking-widest uppercase mb-8 transition-all group">
@@ -94,13 +94,13 @@ export default function BlogDetailPage() {
           {/* Article Content */}
           <article className="lg:col-span-8 space-y-12">
             <div
-              className="prose prose-lg max-w-none prose-headings:text-[#1a1c2e] prose-headings:font-black prose-p:text-slate-500 prose-p:leading-relaxed prose-strong:text-[#1a1c2e] prose-strong:font-black text-left"
+              className="prose prose-lg max-w-none prose-headings:text-[#101242] prose-headings:font-black prose-p:text-slate-500 prose-p:leading-relaxed prose-strong:text-[#101242] prose-strong:font-black text-left"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
             <div className="pt-10 border-t border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 text-[#1a1c2e] font-bold text-sm hover:text-[#101242] transition-colors">
+                <button className="flex items-center gap-2 text-[#101242] font-bold text-sm hover:text-[#101242] transition-colors">
                   <MessageCircle className="w-5 h-5" />
                   12 Comments
                 </button>
@@ -128,13 +128,13 @@ export default function BlogDetailPage() {
           <aside className="lg:col-span-4 space-y-12 text-left">
             {/* Author Bio */}
             <div className="bg-slate-50 p-8 rounded-[40px] space-y-4">
-              <h4 className="text-lg font-black text-[#1a1c2e]">About Author</h4>
+              <h4 className="text-lg font-black text-[#101242]">About Author</h4>
               <div className="flex items-center gap-4">
                 <div className="relative w-16 h-16 rounded-full overflow-hidden">
                   <Image src="https://ui-avatars.com/api/?name=Admin&background=800000&color=fff" alt="Author" fill />
                 </div>
                 <div>
-                  <p className="font-bold text-[#1a1c2e] uppercase tracking-tight">IT FIX Editorial</p>
+                  <p className="font-bold text-[#101242] uppercase tracking-tight">IT FIX Editorial</p>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Verified Expert</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function BlogDetailPage() {
 
             {/* Related Posts */}
             <div className="space-y-6">
-              <h4 className="text-lg font-black text-[#1a1c2e]">Related Articles</h4>
+              <h4 className="text-lg font-black text-[#101242]">Related Articles</h4>
               <div className="space-y-6">
                 {[2, 3].map((id) => (
                   <Link key={id} href={`/blog/${id}`} className="group flex items-center gap-4">
@@ -153,7 +153,7 @@ export default function BlogDetailPage() {
                       <Image src={id === 2 ? "/service-cleaning.jpg" : "/service-plumbing.jpg"} alt="Related" fill className="object-cover" />
                     </div>
                     <div>
-                      <h5 className="font-black text-[#1a1c2e] group-hover:text-[#101242] transition-colors line-clamp-2 leading-tight">
+                      <h5 className="font-black text-[#101242] group-hover:text-[#101242] transition-colors line-clamp-2 leading-tight">
                         {id === 2 ? 'Professional Cleaning vs. DIY: What to Choose?' : 'How to Identify Plumbing Leaks Early'}
                       </h5>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">March 2026</p>

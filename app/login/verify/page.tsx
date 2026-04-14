@@ -126,18 +126,18 @@ export default function VerifyOTPPage() {
 
       <main className="flex-1 flex items-center justify-center py-20 px-4">
         <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 text-center">
-          <div className="space-y-4">
+          <div className="space-y-1">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-[#101242]/10 mb-4">
               <KeyRound className="w-8 h-8 text-[#101242]" />
             </div>
-            <h1 className="text-3xl font-black text-[#1a1c2e] tracking-tight">Verify Phone</h1>
+            <h1 className="text-3xl font-black text-[#101242] tracking-tight">Verify Phone</h1>
             <p className="text-slate-500 font-medium tracking-tight">
               Enter the 6-digit code sent to <br />
-              <span className="text-[#1a1c2e] font-bold"> {phone} </span>
+              <span className="text-[#101242] font-bold"> {phone} </span>
             </p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             <form className="space-y-8 flex flex-col items-center" onSubmit={handleVerify}>
               <InputOTP
                 maxLength={6}
@@ -158,7 +158,7 @@ export default function VerifyOTPPage() {
               <button
                 type="submit"
                 disabled={loading || otp.length !== 6}
-                className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-[#101242] hover:bg-[#600000] text-white font-bold transition-all shadow-xl shadow-[#101242]/20 hover:shadow-[#101242]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full flex cursor-pointer items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-[#101242] hover:bg-[#800000] text-white font-bold transition-all shadow-none hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -171,13 +171,13 @@ export default function VerifyOTPPage() {
               </button>
             </form>
 
-            <div className="space-y-4 pt-4 border-t border-slate-50">
+            <div className="space-y-1 pt-[2px] border-t border-slate-50">
               <p className="text-slate-500 font-medium">
                 Didn't receive the code?{' '}
                 <button
                   onClick={handleResend}
                   disabled={resending}
-                  className="text-[#101242] font-bold hover:underline disabled:opacity-50"
+                  className="text-[#101242] font-bold hover:underline disabled:opacity-50 cursor-pointer"
                   type="button"
                 >
                   {resending ? 'Resending...' : 'Resend Code'}
@@ -186,7 +186,7 @@ export default function VerifyOTPPage() {
 
               <Link
                 href="/login"
-                className="inline-block text-xs font-bold text-slate-400 hover:text-[#101242] uppercase tracking-widest transition-colors"
+                className="inline-block text-xs font-bold text-slate-500 hover:text-[#101242] uppercase tracking-widest transition-colors"
               >
                 Change Phone Number
               </Link>

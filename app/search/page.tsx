@@ -34,18 +34,39 @@ function SearchContent() {
         const queryLower = currentQuery.toLowerCase()
 
         // Fetch services
-        const servicesUrl = `${Api.services}/?include_categories=true&include_media=true&include_pricing=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}&size=10000`
-        const servicesPromise = axiosInstance.get(servicesUrl).catch(e => ({ data: [] }))
+        const servicesPromise = axiosInstance.get(Api.services, {
+          params: {
+            include_categories: true,
+            include_media: true,
+            include_pricing: true,
+            status: 'ACTIVE',
+            lat: location.lat,
+            lng: location.lng,
+            size: 10000
+          }
+        }).catch(e => ({ data: [] }))
 
         // Fetch products
-        const productsUrl = `${Api.products}/?include_pricing=true&include_media=true&include_category=true&status=ACTIVE&lat=${location.lat}&lng=${location.lng}&size=10000&include_attribute=true`
-        const productsPromise = axiosInstance.get(productsUrl).catch(e => ({ data: [] }))
+        const productsPromise = axiosInstance.get(Api.products, {
+          params: {
+            include_pricing: true,
+            include_media: true,
+            include_category: true,
+            status: 'ACTIVE',
+            lat: location.lat,
+            lng: location.lng,
+            size: 10000,
+            include_attribute: true
+          }
+        }).catch(e => ({ data: [] }))
 
         const [servicesRes, productsRes] = await Promise.all([servicesPromise, productsPromise])
 
         // Process Services
-        const servicesArray = Array.isArray(servicesRes.data) ? servicesRes.data : (servicesRes.data?.services || [])
-        const mappedServices = Array.isArray(servicesArray) ? servicesArray
+        const rawServices = servicesRes.data?.data || servicesRes.data?.services || servicesRes.data
+        const servicesArray = Array.isArray(rawServices) ? rawServices : []
+
+        const mappedServices = servicesArray
           .filter((s: any) => s.status === "ACTIVE")
           .map((s: any) => {
             const sellingPrice = s.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
@@ -62,21 +83,19 @@ function SearchContent() {
               reviews: s.reviews_count || 100,
               badge: s.badge || 'Service'
             }
-          }) : []
+          })
 
         // Process Products
-        const responseData = productsRes.data
-        const productsData = Array.isArray(responseData)
-          ? responseData
-          : (responseData?.data || responseData?.products || [])
+        const rawProducts = productsRes.data?.data || productsRes.data?.products || productsRes.data
+        const productsArray = Array.isArray(rawProducts) ? rawProducts : []
 
-        const mappedProducts = productsData.map((p: any) => ({
+        const mappedProducts = productsArray.map((p: any) => ({
           id: p.id,
           name: p.name,
           category: p.categories?.[0]?.name || p.category_name || p.category?.name || 'Uncategorized',
           price: Number(p.pricing?.[0]?.price || 0),
           originalPrice: p.pricing?.[0]?.regular_price ? Number(p.pricing?.[0]?.regular_price) : undefined,
-          image: p.media?.[0]?.url || '/placeholder-image.jpg',
+          image: p.media?.[0]?.url || p.media_files?.[0]?.image_url || '/placeholder-image.jpg',
           inStock: p.status === 'ACTIVE',
           rating: p.rating || 4.5,
           reviews: p.reviews_count || 50,
@@ -113,7 +132,7 @@ function SearchContent() {
         {/* Search Header */}
         <section className="bg-white py-12 px-4 border-b border-slate-100">
           <div className="max-w-7xl mx-auto space-y-4">
-            <h1 className="text-3xl sm:text-4xl font-black text-[#1a1c2e] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-black text-[#101242] tracking-tight">
               Search Results for <span className="text-[#101242]">"{currentQuery}"</span>
             </h1>
             <p className="text-slate-500 font-medium">
@@ -142,7 +161,7 @@ function SearchContent() {
               {/* Services Section */}
               {services.length > 0 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-[#1a1c2e]">Services</h2>
+                  <h2 className="text-2xl font-bold text-[#101242]">Services</h2>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
                     {services.map((service) => (
                       <div key={service.id}>
@@ -156,7 +175,7 @@ function SearchContent() {
               {/* Products Section */}
               {products.length > 0 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-[#1a1c2e]">Products</h2>
+                  <h2 className="text-2xl font-bold text-[#101242]">Products</h2>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {products.map((product) => (
                       <div key={product.id}>
@@ -173,7 +192,7 @@ function SearchContent() {
                   <div className="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto">
                     <Search className="w-10 h-10" />
                   </div>
-                  <h3 className="text-2xl font-black text-[#1a1c2e]">
+                  <h3 className="text-2xl font-black text-[#101242]">
                     No matches found
                   </h3>
                   <p className="text-slate-400 font-medium">

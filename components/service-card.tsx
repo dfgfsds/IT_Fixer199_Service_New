@@ -60,7 +60,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
           </div>
         )}
 
-        {/* <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm text-[#1a1c2e] px-1.5 py-1 sm:px-3 sm:py-2 rounded-full flex items-center gap-1 shadow-lg">
+        {/* <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm text-[#101242] px-1.5 py-1 sm:px-3 sm:py-2 rounded-full flex items-center gap-1 shadow-lg">
           <CheckCircle className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-[#101242]" />
           <span className="text-[8px] sm:text-xs font-semibold">Verified</span>
         </div> */}
@@ -82,7 +82,7 @@ export function ServiceCard({ service, basePath = 'services' }: Props) {
           <div className="space-y-0.5 sm:space-y-1">
 
             <div className="flex items-center gap-3">
-              <span className="text-lg sm:text-2xl font-bold text-[#1a1c2e]">₹{formatPrice(service.price)}</span>
+              <span className="text-lg sm:text-2xl font-bold text-[#101242]">₹{formatPrice(service.price)}</span>
               {originalPrice > service.price && (
                 <span className="text-sm font-medium text-slate-400 line-through decoration-[#101242]/30 underline-offset-2">
                   ₹{formatPrice(originalPrice)}

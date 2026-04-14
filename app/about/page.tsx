@@ -15,7 +15,7 @@ export default function AboutPage() {
         <section className="relative pt-20 pb-16 bg-slate-50 border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
 
-            <h1 className="text-4xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-black text-[#101242] tracking-tight leading-tight">
               About Us
             </h1>
             <p className="text-lg sm:text-xl text-slate-500 font-medium max-w-3xl mx-auto leading-relaxed italic">
@@ -35,7 +35,7 @@ export default function AboutPage() {
                 { label: 'Starting Price', value: '₹199' }
               ].map((stat, idx) => (
                 <div key={idx} className="bg-slate-50 p-6 sm:p-8 rounded-3xl text-center space-y-2 border border-slate-100 hover:border-[#101242]/20 transition-all shadow-sm">
-                  <p className="text-3xl sm:text-4xl font-black text-[#1a1c2e]">{stat.value}</p>
+                  <p className="text-3xl sm:text-4xl font-black text-[#101242]">{stat.value}</p>
                   <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
                 </div>
               ))}
@@ -59,7 +59,7 @@ export default function AboutPage() {
                   <p className="text-base sm:text-lg text-slate-500 font-medium leading-relaxed text-left">
                     We specialize in servicing all branded laptops, desktops, gaming systems, and accessories, making professional technical support easily accessible to every customer.
                   </p>
-                  <p className="text-base sm:text-lg font-bold text-[#1a1c2e] leading-relaxed text-left border-l-4 border-[#101242] pl-6 italic">
+                  <p className="text-base sm:text-lg font-bold text-[#101242] leading-relaxed text-left border-l-4 border-[#101242] pl-6 italic">
                     With a network of 3000+ spare parts readily available, our goal is to resolve issues quickly and efficiently - often on the spot, at the customer's location.
                   </p>
                 </div>
@@ -73,7 +73,7 @@ export default function AboutPage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-1000"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c2e]/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#101242]/80 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 text-white space-y-1 sm:space-y-2">
                     <p className="text-[10px] font-black uppercase tracking-widest bg-[#101242] px-3 py-1.5 sm:px-4 sm:py-2 rounded-full inline-block shadow-lg">IT Fixer Team</p>
                     <p className="text-2xl sm:text-3xl font-black">Trusted Service</p>
@@ -142,7 +142,7 @@ export default function AboutPage() {
 
               <div className="relative z-10 space-y-6 sm:space-y-8">
                 <div className="space-y-3">
-                  <h2 className="text-4xl sm:text-6xl font-black text-[#1a1c2e] tracking-tight">Simple Pricing</h2>
+                  <h2 className="text-4xl sm:text-6xl font-black text-[#101242] tracking-tight">Simple Pricing</h2>
                   <p className="text-[#101242] font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs">The IT Fixer Standard</p>
                 </div>
 
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
                 <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto pt-4">
                   {['Device inspection', 'Issue diagnosis', 'Basic repair service', 'Technical consultation'].map((item) => (
-                    <div key={item} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 text-[#1a1c2e] font-black text-sm tracking-wide transition-all hover:border-[#101242]/30 hover:shadow-md">
+                    <div key={item} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 text-[#101242] font-black text-sm tracking-wide transition-all hover:border-[#101242]/30 hover:shadow-md">
                       <div className="w-8 h-8 bg-[#101242]/5 rounded-lg flex items-center justify-center">
                         <CheckCircle className="w-5 h-5 text-[#101242]" />
                       </div>
@@ -171,7 +171,7 @@ export default function AboutPage() {
 
                 <div className="pt-10 border-t border-slate-100">
                   <p className="text-xs sm:text-sm text-slate-400 font-medium italic max-w-xl mx-auto leading-relaxed">
-                    Hardware replacement? The cost of the component is charged separately - ensuring <span className="text-[#1a1c2e] font-black not-italic">complete transparency</span> with no hidden charges.
+                    Hardware replacement? The cost of the component is charged separately - ensuring <span className="text-[#101242] font-black not-italic">complete transparency</span> with no hidden charges.
                   </p>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function AboutPage() {
         <section className="py-10 sm:py-20 bg-slate-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-4 mb-12 sm:mb-20">
-              <h2 className="text-3xl sm:text-5xl font-black text-[#1a1c2e]">Coverage</h2>
+              <h2 className="text-3xl sm:text-5xl font-black text-[#101242]">Coverage</h2>
               <p className="text-lg sm:text-xl text-slate-500 font-medium">Supporting a wide range of devices & services</p>
             </div>
 
@@ -191,7 +191,7 @@ export default function AboutPage() {
               {/* Devices Card */}
               <div className="bg-white p-8 sm:p-12 rounded-[40px] sm:rounded-[50px] shadow-sm space-y-8 sm:space-y-10 border border-slate-100">
                 <div className="space-y-2">
-                  <h3 className="text-2xl sm:text-3xl text-left  font-black text-[#1a1c2e]">Devices We Support</h3>
+                  <h3 className="text-2xl sm:text-3xl text-left  font-black text-[#101242]">Devices We Support</h3>
                   <p className="text-slate-500 text-left  font-medium">All branded laptops and PCs</p>
                 </div>
                 <div className="grid grid-cols-1 gap-4">
@@ -215,7 +215,7 @@ export default function AboutPage() {
               {/* Services Card */}
               <div className="bg-white p-8 sm:p-12 rounded-[10px] sm:rounded-[20px] shadow-sm space-y-8 sm:space-y-10 border border-slate-100">
                 <div className="space-y-2 text-left">
-                  <h3 className="text-2xl sm:text-3xl font-black text-[#1a1c2e]">
+                  <h3 className="text-2xl sm:text-3xl font-black text-[#101242]">
                     Services We Offer
                   </h3>
                   <p className="text-slate-500 font-medium">
@@ -243,7 +243,7 @@ export default function AboutPage() {
         <section className="py-10 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-4 mb-12 sm:mb-20">
-              <h2 className="text-3xl sm:text-5xl font-black text-[#1a1c2e]">Our Promise</h2>
+              <h2 className="text-3xl sm:text-5xl font-black text-[#101242]">Our Promise</h2>
               <p className="text-lg sm:text-xl text-slate-500 font-medium">What you can always count on</p>
             </div>
 
@@ -260,7 +260,7 @@ export default function AboutPage() {
                   <div className="w-10 h-10 sm:w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-slate-100">
                     <Star className="w-5 h-5 sm:w-6 h-6 text-[#101242]" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-[#1a1c2e]">{item.title}</h3>
+                  <h3 className="text-lg sm:text-xl font-black text-[#101242]">{item.title}</h3>
                   <p className="text-slate-400 font-medium text-xs sm:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}

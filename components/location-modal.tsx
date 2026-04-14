@@ -213,7 +213,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
             onClick={handleClose}
             className="flex h-8 w-8 items-center justify-center rounded-full transition-all hover:bg-muted active:scale-90"
           >
-            <X className="h-5 w-5 text-muted-foreground" />
+            <X className="h-5 w-5 text-primary" />
           </button>
         </div>
 
@@ -225,7 +225,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                   <MapPin className="h-3.5 w-3.5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#1a1c2e]">Location Required</p>
+                  <p className="text-sm font-bold text-[#101242]">Location Required</p>
                   <p className="mt-1 text-[12px] leading-relaxed text-slate-600">
                     To show you the right pricing and available service experts in your area, please select your city manually or allow browser access.
                   </p>
@@ -251,7 +251,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-primary">Use Current Location</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-slate-600">
                     {geo.loading ? "Detecting your location..." : "Using device GPS"}
                   </p>
                 </div>
@@ -288,13 +288,16 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
             <div className="px-5 pt-4">
               <button
                 onClick={() => {
-                  handleClose();
                   if (!isLoggedIn) {
+                    handleClose();
                     toast.error("Please login to add a new address", { duration: 3000 });
                     setTimeout(() => {
                       window.location.href = '/login';
                     }, 1200);
+                  } else if (savedAddresses.length >= 5) {
+                    toast.error("Maximum limit of 5 addresses reached. Please remove an existing address to add a new one.");
                   } else {
+                    handleClose();
                     window.location.href = '/profile?tab=addresses&action=add';
                   }
                 }}
@@ -304,7 +307,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                   <Plus className="h-5 w-5 text-slate-400 group-hover:text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#1a1c2e] group-hover:text-primary tracking-tight">Add New Address</p>
+                  <p className="text-sm font-bold text-[#101242] group-hover:text-primary tracking-tight">Add New Address</p>
                   <p className="text-[11px] text-slate-500 font-medium tracking-tight">Save a new location for faster bookings</p>
                 </div>
               </button>
@@ -339,25 +342,25 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
 
                       return (
                         <>
-                          {finale.slice(0, 4).map((addr: any) => {
+                          {finale.slice(0, 5).map((addr: any) => {
                             const isSelected = addr.selected_address === true;
 
                             return (
                               <button
                                 key={addr.id}
                                 onClick={() => handleAddressSelect(addr)}
-                                className={`group flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-all hover:bg-muted/80 active:scale-[0.99] border-2 ${isSelected ? 'bg-primary/5 border-primary/20 shadow-sm' : 'border-transparent bg-slate-50/50'
+                                className={`group flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-all hover:bg-muted/80 active:scale-[0.99] border-2 ${isSelected ? 'bg-[#101242]/5 border-[#101242]/40 shadow-none' : 'border-transparent bg-[slate-50]/50'
                                   }`}
                               >
-                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm transition-all ${isSelected ? 'bg-primary text-white shadow-primary/20' : 'bg-white text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'
+                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm transition-all ${isSelected ? 'bg-[#101242] text-white shadow-[#101242]/20' : 'bg-white text-slate-400 group-hover:bg-[#101242]/85 group-hover:text-white'
                                   }`}>
                                   <MapPin className="h-4 w-4" />
                                 </div>
                                 <div className="min-w-0 flex-1 py-0.5">
                                   <div className="flex items-center gap-2">
-                                    <p className="truncate text-sm font-bold text-[#1a1c2e] tracking-tight">{addr.name || 'Saved Address'}</p>
+                                    <p className="truncate text-sm font-bold text-[#101242] tracking-tight">{addr.name || 'Saved Address'}</p>
                                     {isSelected && (
-                                      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 scale-105">
+                                      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#101242] text-white scale-105">
                                         <Check className="h-2.5 w-2.5 stroke-[4]" />
                                       </div>
                                     )}
@@ -369,7 +372,7 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
                               </button>
                             );
                           })}
-                          {finale.length > 4 && (
+                          {finale.length > 6 && (
                             <button
                               onClick={() => {
                                 handleClose();

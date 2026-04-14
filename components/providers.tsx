@@ -14,7 +14,17 @@ export function Providers({ children }: { children: ReactNode }) {
         <CartItemProvider>
           {children}
           <MobileBottomNav />
-          <Toaster position="top-center" richColors />
+          <Toaster
+            position="top-right"
+            richColors
+            style={{
+              top: '80px',
+              right: '30px',
+            }}
+            toastOptions={{
+              className: 'animate-in fade-in slide-in-from-right-full duration-500'
+            }}
+          />
         </CartItemProvider>
       </LocationProvider>
     </AuthProvider>
