@@ -26,7 +26,7 @@ export default function CartPage() {
   const [selectedTime, setSelectedTime] = useState<string | number>("")
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [selectedPayment, setSelectedPayment] = useState('upi')
-  const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [optimisticQuantities, setOptimisticQuantities] = useState<Record<string, number>>({})
   const [removingId, setRemovingId] = useState<string | null>(null)
 
   // Generate next 7 days
@@ -165,21 +165,21 @@ export default function CartPage() {
     });
   };
 
-  const updateQuantity = async (item: any, newQty: number) => {
-    const currentQty = item.quantity || 1
+  const updateQuantity = async (item: any, newQty: number, direction: "inc" | "dec") => {
+    const currentQty = optimisticQuantities[item.id] ?? item.quantity ?? 1
+
     if (newQty < 1) {
       await removeItem(item)
       return
     }
-    setUpdatingId(item.id)
+
+    // Optimistically update immediately
+    setOptimisticQuantities(prev => ({ ...prev, [item.id]: newQty }))
+
     try {
-      if (newQty > currentQty) {
-        // INCREASE
+      if (direction === "inc") {
         const itemType = item.type || item.item_type || (item.product ? 'PRODUCT' : 'SERVICE')
-        const payload: any = {
-          type: itemType,
-          quantity: 1,
-        }
+        const payload: any = { type: itemType, quantity: 1 }
         if (itemType === 'SERVICE' || itemType === 'service') {
           payload.service_id = item.service?.id || item.service_id
         } else {
@@ -187,12 +187,8 @@ export default function CartPage() {
         }
         await axiosInstance.post(`${Api.cartApi}/add/`, payload)
       } else {
-        // DECREASE
         const itemType = item.type || item.item_type || (item.product ? 'PRODUCT' : 'SERVICE')
-        const payload: any = {
-          type: itemType,
-          quantity: currentQty - 1,
-        }
+        const payload: any = { type: itemType, quantity: newQty }
         if (itemType === 'SERVICE' || itemType === 'service') {
           payload.service_id = item.service?.id || item.service_id
         } else {
@@ -200,12 +196,22 @@ export default function CartPage() {
         }
         await axiosInstance.post(`${Api.cartApi}/item/${item.id}/decrease/`, payload)
       }
+      // Sync with server and clear optimistic state
       await fetchCart()
+      setOptimisticQuantities(prev => {
+        const next = { ...prev }
+        delete next[item.id]
+        return next
+      })
     } catch (error: any) {
       safeErrorLog('Update quantity error', error)
       toast.error('Failed to update quantity')
-    } finally {
-      setUpdatingId(null)
+      // Revert to original quantity on failure
+      setOptimisticQuantities(prev => {
+        const next = { ...prev }
+        delete next[item.id]
+        return next
+      })
     }
   }
 
@@ -529,10 +535,9 @@ export default function CartPage() {
 
               <div className="space-y-3 sm:space-y-4">
                 {cartItems.map((item: any) => {
-                  const isUpdating = updatingId === item.id
                   const isRemoving = removingId === item.id
                   const itemPrice = getItemPrice(item)
-                  const itemQty = item.quantity || 1
+                  const itemQty = optimisticQuantities[item.id] ?? item.quantity ?? 1
                   const isInactive = item.is_active === false
 
                   return (
@@ -586,11 +591,11 @@ export default function CartPage() {
                         ) : (
                           <div className="flex items-center gap-1.5 sm:gap-4 bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-[#101242]/10">
                             <button
-                              onClick={() => updateQuantity(item, itemQty - 1)}
-                              disabled={isUpdating || isRemoving}
-                              className="w-6 h-6 sm:w-10 sm:h-10 flex cursor-pointer items-center justify-center rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm"
+                              onClick={() => updateQuantity(item, itemQty - 1, "dec")}
+                              disabled={isRemoving}
+                              className="w-6 h-6 sm:w-10 sm:h-10 flex cursor-pointer items-center justify-center rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm active:scale-90 transition-transform"
                             >
-                              {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Minus className="w-3 h-3 sm:w-4 sm:h-4" />}
+                              <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                             </button>
 
                             <span className="text-[10px] sm:text-lg font-black text-[#101242] w-4 sm:w-8 text-center">
@@ -598,9 +603,9 @@ export default function CartPage() {
                             </span>
 
                             <button
-                              onClick={() => updateQuantity(item, itemQty + 1)}
-                              disabled={isUpdating || isRemoving}
-                              className="w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm"
+                              onClick={() => updateQuantity(item, itemQty + 1, "inc")}
+                              disabled={isRemoving}
+                              className="w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer rounded-md sm:rounded-xl bg-white text-slate-600 border border-[#101242]/10 shadow-sm active:scale-90 transition-transform"
                             >
                               <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                             </button>
@@ -652,14 +657,14 @@ export default function CartPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {addresses.length > 0 ? (
                   <>
-                      {addresses.slice(0, 5).map((addr) => (
-                        <label
-                          key={addr.id}
-                          className={`cursor-pointer bg-white p-5 rounded-3xl border transition-all flex items-start gap-4 ${selectedAddressId === addr.id
-                            ? 'border-[#101242] ring-1 ring-inset ring-[#101242]'
-                            : 'border-[#101242]/30'
-                            }`}
-                        >
+                    {addresses.slice(0, 5).map((addr) => (
+                      <label
+                        key={addr.id}
+                        className={`cursor-pointer bg-white p-5 rounded-3xl border transition-all flex items-start gap-4 ${selectedAddressId === addr.id
+                          ? 'border-[#101242] ring-1 ring-inset ring-[#101242]'
+                          : 'border-[#101242]/30'
+                          }`}
+                      >
                         <input
                           type="radio"
                           name="address"

@@ -34,6 +34,7 @@ export default function ProductDetailPage({
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [addingToCart, setAddingToCart] = useState(false)
+    const [optimisticQuantity, setOptimisticQuantity] = useState<number | null>(null)
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
 
     const attributeGroups = useMemo(() => {
@@ -163,7 +164,9 @@ export default function ProductDetailPage({
 
     const increaseQty = async () => {
         if (!currentCartItem) return
-        setAddingToCart(true)
+        const currentQty = optimisticQuantity !== null ? optimisticQuantity : currentCartItem.quantity
+        setOptimisticQuantity(currentQty + 1)
+
         try {
             await axiosInstance.post(`${Api.cartApi}/add/`, {
                 type: 'PRODUCT',
@@ -174,24 +177,34 @@ export default function ProductDetailPage({
         } catch (error) {
             toast.error('Failed to increase quantity')
         } finally {
-            setAddingToCart(false)
+            setOptimisticQuantity(null)
         }
     }
 
     const decreaseQty = async () => {
         if (!currentCartItem) return
-        setAddingToCart(true)
+        const currentQty = optimisticQuantity !== null ? optimisticQuantity : currentCartItem.quantity
+        const newQty = currentQty - 1
+
+        // Optimistically update
+        setOptimisticQuantity(Math.max(0, newQty))
+
         try {
-            await axiosInstance.post(`${Api.cartApi}/item/${currentCartItem.id}/decrease/`, {
-                type: 'PRODUCT',
-                product_id: id,
-                quantity: currentCartItem.quantity - 1,
-            })
+            if (newQty < 1) {
+                await axiosInstance.delete(`${Api.cartApi}/item/${currentCartItem.id}/delete/`)
+                toast.success('Item removed from cart')
+            } else {
+                await axiosInstance.post(`${Api.cartApi}/item/${currentCartItem.id}/decrease/`, {
+                    type: 'PRODUCT',
+                    product_id: id,
+                    quantity: newQty,
+                })
+            }
             await fetchCart()
         } catch (error) {
-            toast.error('Failed to decrease quantity')
+            toast.error('Failed to update quantity')
         } finally {
-            setAddingToCart(false)
+            setOptimisticQuantity(null)
         }
     }
 
@@ -289,6 +302,14 @@ export default function ProductDetailPage({
         ? product.attributes.map((attr: any) => attr.value)
         : ['High Quality Guaranteed', 'Professional Service', '90-Day Warranty', 'Verified Product']
 
+    const isAllSelected = attributeGroups
+        ? Object.keys(attributeGroups).every(groupName => !!selectedAttributes[groupName])
+        : true;
+
+    const displayQty = currentCartItem
+        ? (optimisticQuantity !== null ? optimisticQuantity : currentCartItem.quantity)
+        : 0
+
     return (
         <div className="min-h-screen bg-white">
             <Header />
@@ -376,7 +397,10 @@ export default function ProductDetailPage({
                             <div className="space-y-6 pt-2">
                                 {Object.keys(attributeGroups).map((groupName) => (
                                     <div key={groupName} className="space-y-3">
-                                        <h3 className="text-lg font-bold text-[#101242] uppercase tracking-wider">{groupName}</h3>
+                                        <h3 className="text-lg font-bold text-[#101242] uppercase tracking-wider flex items-center gap-2">
+                                            {groupName}
+                                            <span className="text-[10px] text-red-500 font-black tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded-md">* Required</span>
+                                        </h3>
                                         <div className="flex flex-wrap gap-3">
                                             {attributeGroups[groupName].map((attr) => {
                                                 const isSelected = selectedAttributes[groupName] === attr.value_id
@@ -401,25 +425,23 @@ export default function ProductDetailPage({
 
 
                         <div className="pt-4 flex flex-col sm:flex-row gap-4">
-                            {currentCartItem ? (
+                            {(currentCartItem && displayQty > 0) ? (
                                 <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-3xl border border-border/50 shadow-inner w-full sm:w-auto">
                                     <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-border shadow-sm grow min-w-[200px]">
                                         <button
                                             onClick={decreaseQty}
-                                            disabled={addingToCart}
-                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-[#101242] bg-opacity-20 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-opacity-90 active:scale-95 transition-all outline-none"
                                         >
-                                            {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Minus className="w-6 h-6 text-white stroke-[3px]" />}
+                                            <Minus className="w-6 h-6 text-white stroke-[3px]" />
                                         </button>
-                                        <span className="flex-1 text-center text-2xl font-black text-foreground tabular-nums">
-                                            {currentCartItem.quantity}
+                                        <span className="flex-1 text-center text-2xl font-black text-[#101242] tabular-nums">
+                                            {displayQty}
                                         </span>
                                         <button
                                             onClick={increaseQty}
-                                            disabled={addingToCart}
-                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-[#101242] bg-opacity-20 transition-all hover:scale-105 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:scale-100"
+                                            className="w-14 h-14 flex items-center justify-center bg-[#101242] rounded-xl shadow-lg shadow-primary/20 hover:bg-opacity-90 active:scale-95 transition-all outline-none"
                                         >
-                                            {addingToCart ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6 text-white stroke-[3px]" />}
+                                            <Plus className="w-6 h-6 text-white stroke-[3px]" />
                                         </button>
                                     </div>
                                 </div>
@@ -427,9 +449,12 @@ export default function ProductDetailPage({
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={addingToCart}
-                                    className="flex-1 bg-[#101242] hover:from-primary/90 hover:to-primary text-white py-4 px-8 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg disabled:opacity-70"
+                                    className={`flex-1 hover:from-primary/90 hover:to-primary py-4 px-8 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all disabled:opacity-70 ${!isAllSelected
+                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none hover:shadow-none'
+                                        : 'bg-[#101242] text-white hover:shadow-lg'
+                                        }`}
                                 >
-                                    {addingToCart ? 'Adding...' : 'Add to Cart'}
+                                    {addingToCart ? 'Adding...' : (!isAllSelected ? 'Select Options to Add' : 'Add to Cart')}
                                 </button>
                             )}
                         </div>
