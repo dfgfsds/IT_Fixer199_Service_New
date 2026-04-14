@@ -226,7 +226,7 @@ export function Header() {
             {/* Location Picker */}
             <button
               onClick={() => setShowLocationModal(true)}
-              className="hidden md:flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/50 hover:shadow-nsm transition-all text-slate-600 shadow-sm max-w-[200px] lg:max-w-[280px] group"
+              className="hidden md:flex cursor-pointer items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/50 hover:shadow-nsm transition-all text-slate-600 shadow-sm max-w-[200px] lg:max-w-[280px] group"
             >
               <MapPin className="w-4 h-4 text-[#101242] flex-shrink-0 group-hover:scale-110 transition-transform" />
               <span className="text-[13px] font-bold truncate text-[#101242]">
@@ -291,7 +291,7 @@ export function Header() {
                                     type="button"
                                     data-selected={isSelected}
                                     onClick={() => { router.push(`/services/${s.id}`); setShowDropdown(false); }}
-                                    className={`flex items-center gap-4 p-2.5 rounded-2xl transition-all text-left group scroll-my-10 ${isSelected ? 'bg-[#101242]/5 ring-1 ring-[#101242]/10 shadow-sm' : 'hover:bg-slate-50'
+                                    className={`flex cursor-pointer items-center gap-4 p-2.5 rounded-2xl transition-all text-left group scroll-my-10 ${isSelected ? 'bg-[#101242]/5 ring-1 ring-[#101242]/10 shadow-sm' : 'hover:bg-slate-50'
                                       }`}
                                   >
                                     <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
@@ -330,7 +330,7 @@ export function Header() {
                                     type="button"
                                     data-selected={isSelected}
                                     onClick={() => { router.push(`/products/${p.id}`); setShowDropdown(false); }}
-                                    className={`flex items-center gap-4 p-2.5 rounded-2xl transition-all text-left group scroll-mt-10 scroll-mb-24 ${isSelected ? 'bg-[#101242]/5 ring-1 ring-[#101242]/10 shadow-sm' : 'hover:bg-slate-50'
+                                    className={`flex cursor-pointer items-center gap-4 p-2.5 rounded-2xl transition-all text-left group scroll-mt-10 scroll-mb-24 ${isSelected ? 'bg-[#101242]/5 ring-1 ring-[#101242]/10 shadow-sm' : 'hover:bg-slate-50'
                                       }`}
                                   >
                                     <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100">
@@ -387,7 +387,7 @@ export function Header() {
                               type="button"
                               onClick={() => handleSearchSubmit(undefined as any, true)}
                               data-selected={selectedIndex === flatResults.length}
-                              className={`w-full py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedIndex === flatResults.length
+                              className={`w-full cursor-pointer py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedIndex === flatResults.length
                                 ? 'bg-[#101242] text-white shadow-lg'
                                 : 'bg-[#101242]/5 text-[#101242] hover:bg-[#101242]/10'
                                 }`}

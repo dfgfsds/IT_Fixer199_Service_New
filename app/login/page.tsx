@@ -177,7 +177,7 @@ function LoginContent() {
                 <button
                   type="button"
                   onClick={() => setLoginMethod('mobile')}
-                  className={`flex items-center justify-center gap-3 px-4 py-4 rounded-2xl border transition-all font-bold text-sm ${loginMethod === 'mobile' ? 'bg-[#101242] border-[#101242] text-white shadow-none' : 'bg-slate-50 border-slate-200 text-[#101242] hover:bg-slate-100'}`}
+                  className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-4 rounded-2xl border transition-all font-bold text-sm ${loginMethod === 'mobile' ? 'bg-[#101242] border-[#101242] text-white shadow-none' : 'bg-slate-50 border-slate-200 text-[#101242] hover:bg-slate-100'}`}
                 >
                   <Smartphone className="w-5 h-5" />
                   Mobile
@@ -185,7 +185,7 @@ function LoginContent() {
                 <button
                   type="button"
                   onClick={() => setLoginMethod('email')}
-                  className={`flex items-center justify-center gap-3 px-4 py-4 rounded-2xl border transition-all font-bold text-sm ${loginMethod === 'email' ? 'bg-[#101242] border-[#101242] text-white shadow-none' : 'bg-slate-50 border-slate-200 text-[#101242] hover:bg-slate-100'}`}
+                  className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-4 rounded-2xl border transition-all font-bold text-sm ${loginMethod === 'email' ? 'bg-[#101242] border-[#101242] text-white shadow-none' : 'bg-slate-50 border-slate-200 text-[#101242] hover:bg-slate-100'}`}
                 >
                   <Mail className="w-5 h-5" />
                   Email
