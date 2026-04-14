@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
               <ShieldAlert className="w-4 h-4" />
               Privacy Policy
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-[#1a1c2e] tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-black text-[#101242] tracking-tight leading-tight">
               Privacy & <span className="text-[#101242]">Data Protection</span>
             </h1>
             <p className="text-lg text-slate-500 font-medium leading-relaxed italic">
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
 
             <div className="prose prose-slate max-w-none space-y-4">
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                This privacy policy sets out how <span className="font-bold text-[#1a1c2e]">FTDS INDIA PRIVATE LIMITED</span> uses and protects any information that you give when you visit our website and/or purchase from us.
+                This privacy policy sets out how <span className="font-bold text-[#101242]">FTDS INDIA PRIVATE LIMITED</span> uses and protects any information that you give when you visit our website and/or purchase from us.
               </p>
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
                 We are committed to ensuring that your privacy is protected. Any information you provide will only be used in accordance with this privacy statement.
@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
                   <Info className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">1. Information We Collect</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">1. Information We Collect</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'Name',
@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
                   <Settings className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">2. How We Use Your Information</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">2. How We Use Your Information</h2>
                   <div className="grid sm:grid-cols-2 gap-4 mt-4">
                     {[
                       'Internal record keeping',
@@ -98,7 +98,7 @@ export default function PrivacyPolicyPage() {
                   <Lock className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">3. Data Security</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">3. Data Security</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     We are committed to ensuring that your information is secure. Suitable measures have been implemented to prevent unauthorized access or disclosure.
                   </p>
@@ -111,7 +111,7 @@ export default function PrivacyPolicyPage() {
                   <Smartphone className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">4. Cookies</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">4. Cookies</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     Cookies are small files placed on your device to help analyze web traffic and improve user experience.
                   </p>
@@ -127,7 +127,7 @@ export default function PrivacyPolicyPage() {
                   <FileText className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">5. Controlling Your Personal Information</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">5. Controlling Your Personal Information</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'You may opt-out of direct marketing anytime',
@@ -149,7 +149,7 @@ export default function PrivacyPolicyPage() {
             <div className="bg-[#101242]/5 border border-[#101242]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#101242]/10">
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">Contact Us</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">Contact Us</h2>
                   <p className="text-slate-500 font-medium">
                     If you have any concerns about your data, please reach out to us:
                   </p>
@@ -168,7 +168,7 @@ export default function PrivacyPolicyPage() {
                     <Building className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Brand</span>
                   </div>
-                  <p className="font-bold text-[#1a1c2e]">IT Fixer @199</p>
+                  <p className="font-bold text-[#101242]">IT Fixer @199</p>
                 </div>
 
                 <div className="space-y-1">
@@ -176,7 +176,7 @@ export default function PrivacyPolicyPage() {
                     <Globe className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Website</span>
                   </div>
-                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
+                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#101242] transition-colors">itfixer199.com</a>
                 </div>
 
                 <div className="space-y-1">
@@ -184,7 +184,7 @@ export default function PrivacyPolicyPage() {
                     <Phone className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Phone</span>
                   </div>
-                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#101242] transition-colors">8754844270</a>
+                  <a href="tel:8754844270" className="font-bold text-[#101242] hover:text-[#101242] transition-colors">8754844270</a>
                 </div>
 
                 <div className="space-y-1">
@@ -192,7 +192,7 @@ export default function PrivacyPolicyPage() {
                     <Mail className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Email</span>
                   </div>
-                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
+                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#101242] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
                 </div>
               </div>
             </div>

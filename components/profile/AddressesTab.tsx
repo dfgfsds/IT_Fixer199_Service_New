@@ -231,13 +231,23 @@ export default function AddressesTab() {
       const latNum = parseFloat(result.lat);
       const lngNum = parseFloat(result.lng);
 
-      setNewAddress(prev => ({ ...prev, lat: result.lat, lng: result.lng }));
+      // Extract full details from the new coordinates
+      const details: any = await reverseGeocode(latNum, lngNum);
+
+      setNewAddress(prev => ({
+        ...prev,
+        ...details,
+        lat: result.lat,
+        lng: result.lng
+      }));
 
       if (!showMap) setShowMap(true);
       setTimeout(() => {
         if (googleMapRef.current) {
           googleMapRef.current.setCenter({ lat: latNum, lng: lngNum });
-          markerRef.current.setPosition({ lat: latNum, lng: lngNum });
+          if (markerRef.current) {
+            markerRef.current.setPosition({ lat: latNum, lng: lngNum });
+          }
         }
       }, 500);
     } catch (error) {
@@ -310,6 +320,12 @@ export default function AddressesTab() {
 
 
   const openAddModal = () => {
+    if (userAddresses.length >= 5) {
+      toast.error("Maximum limit of 5 addresses reached. Please remove an existing address to add a new one.", {
+        duration: 4000,
+      });
+      return;
+    }
     setEditingAddressId(null)
     setNewAddress({
       name: user?.name || '',
@@ -484,6 +500,20 @@ export default function AddressesTab() {
           const result: any = await geocodeAddress(searchString);
           finalLat = result.lat.toString();
           finalLng = result.lng.toString();
+
+          // AUTO-FILL: If district/state/pincode are missing, fetch them now
+          if (!newAddress.district || !newAddress.state || !newAddress.pincode) {
+            try {
+              const details: any = await reverseGeocode(parseFloat(finalLat), parseFloat(finalLng));
+              setNewAddress(prev => ({ ...prev, ...details }));
+              // Update local variables for immediate payload use
+              newAddress.district = details.district || newAddress.district;
+              newAddress.state = details.state || newAddress.state;
+              newAddress.pincode = details.pincode || newAddress.pincode;
+            } catch (revErr) {
+              console.warn("Auto-fill during save failed", revErr);
+            }
+          }
         } catch (err) {
           if (!finalLat || !finalLng || (finalLat === "13.0827" && finalLng === "80.2707")) {
             toast.error("Could not find precise address on map. Please verify or pin manually.");
@@ -524,6 +554,7 @@ export default function AddressesTab() {
 
       setShowAddModal(false)
       setEditingAddressId(null)
+      fetchAddresses() // Refresh list
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to save address')
     } finally {
@@ -539,10 +570,10 @@ export default function AddressesTab() {
     <>
       <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h3 className="text-2xl font-black text-[#1a1c2e]">Addresses</h3>
+          <h3 className="text-2xl font-black text-[#101242]">Addresses</h3>
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-6 py-3 bg-[#101242] text-white rounded-2xl font-bold shadow-lg shadow-[#101242]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
+            className="flex items-center gap-2 px-6 py-3 bg-[#101242] text-white rounded-2xl font-bold shadow-none hover:-translate-y-0.5 transition-all text-sm"
           >
             <Plus className="w-5 h-5" />
             Add New
@@ -571,7 +602,7 @@ export default function AddressesTab() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <MapPin className={`w-5 h-5 ${addr.selected_address ? 'text-[#101242]' : 'text-slate-400'}`} />
-                    <span className="font-bold text-[#1a1c2e]">{addr.name || 'Saved Address'}</span>
+                    <span className="font-bold text-[#101242]">{addr.name || 'Saved Address'}</span>
                   </div>
                   {addr.selected_address && (
                     <span className="text-[10px] font-black uppercase tracking-widest text-[#101242] bg-white border border-red-100 shadow-sm px-3 py-1.5 rounded-full">Active</span>
@@ -600,7 +631,7 @@ export default function AddressesTab() {
                     <button
                       onClick={() => handleSetPrimary(addr)}
                       disabled={loading}
-                      className="text-xs font-black text-white bg-slate-900 hover:bg-[#101242] px-4 py-2 rounded-xl tracking-widest uppercase transition-all ml-auto disabled:opacity-50 shadow-md"
+                      className="text-xs font-black text-white bg-[#101242] hover:bg-[#800000] px-4 py-2 rounded-xl tracking-widest uppercase transition-all ml-auto disabled:opacity-50 shadow-md"
                     >
                       Set Active
                     </button>
@@ -620,7 +651,7 @@ export default function AddressesTab() {
               <LogOut className="w-8 h-8 text-red-500 rotate-180" />
             </div>
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-black text-[#1a1c2e]">Remove Address?</h3>
+              <h3 className="text-xl font-black text-[#101242]">Remove Address?</h3>
               <p className="text-slate-500 font-medium text-sm">Are you sure you want to remove this saved address from your profile?</p>
             </div>
             <div className="flex flex-col gap-3">
@@ -649,9 +680,9 @@ export default function AddressesTab() {
       {/* Add Address Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 animate-in fade-in duration-300">
-          <div className="bg-white max-w-2xl w-full rounded-[20px] p-6 lg:p-8 shadow-2xl shadow-slate-900/20 border border-slate-100 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="bg-white max-w-2xl w-full rounded-[20px] p-6 lg:p-8 shadow-2xl shadow-slate-900/20 border border-slate-100 max-h-[75vh] md:max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-black text-[#1a1c2e]">
+              <h3 className="text-2xl font-black text-[#101242]">
                 {editingAddressId ? 'Edit Service Address' : 'New Service Address'}
               </h3>
               <button
@@ -662,7 +693,7 @@ export default function AddressesTab() {
                 className="p-2 hover:bg-slate-50 rounded-full transition-colors"
                 disabled={loading}
               >
-                <Plus className="w-6 h-6 text-slate-400 rotate-45" />
+                <Plus className="w-6 h-6 text-[#101242] rotate-45" />
               </button>
             </div>
 
@@ -675,7 +706,7 @@ export default function AddressesTab() {
                     value={newAddress.name}
                     onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
                     placeholder="Your Name or Recipient Name"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
                   />
                 </div>
                 <div className="space-y-2">
@@ -687,7 +718,7 @@ export default function AddressesTab() {
                     value={newAddress.contact}
                     onChange={(e) => setNewAddress({ ...newAddress, contact: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     placeholder="10-digit number"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] focus:bg-white focus:border-[#101242]/30 outline-none placeholder:font-medium"
                   />
                 </div>
               </div>
@@ -700,7 +731,7 @@ export default function AddressesTab() {
                   value={newAddress.full_address}
                   onChange={(e) => setNewAddress({ ...newAddress, full_address: e.target.value })}
                   placeholder="Flat No, Wing, Building Name, Area"
-                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none resize-none placeholder:font-medium"
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#101242] focus:bg-white focus:border-[#101242]/30 outline-none resize-none placeholder:font-medium"
                 />
               </div>
 
@@ -709,7 +740,7 @@ export default function AddressesTab() {
                   type="button"
                   onClick={handleLocateOnMap}
                   disabled={mapLoading}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-slate-100 text-[#1a1c2e] rounded-xl font-bold hover:bg-slate-200 transition-all text-sm"
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-slate-100 text-[#101242] rounded-xl font-bold hover:bg-slate-200 transition-all text-sm"
                 >
                   {mapLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
                   Locate on Map
@@ -721,7 +752,7 @@ export default function AddressesTab() {
                   className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-200 text-slate-500 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
                 >
                   <Map className="w-4 h-4" />
-                  {showMap ? 'Hide Map' : 'Pick Location from Map'}
+                  {showMap ? 'Hide Map' : 'Pick Your Current Location'}
                 </button>
 
                 {showMap && (
@@ -740,32 +771,28 @@ export default function AddressesTab() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">District</label>
                   <input
-                    required
+                    readOnly
                     value={newAddress.district}
-                    onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })}
-                    placeholder="City/District"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
+                    placeholder="Auto-filled"
+                    className="w-full p-4 bg-slate-100 border border-slate-100 rounded-2xl font-bold text-slate-500 cursor-not-allowed outline-none"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">State</label>
                   <input
-                    required
+                    readOnly
                     value={newAddress.state}
-                    onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-                    placeholder="State"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
+                    placeholder="Auto-filled"
+                    className="w-full p-4 bg-slate-100 border border-slate-100 rounded-2xl font-bold text-slate-500 cursor-not-allowed outline-none"
                   />
                 </div>
                 <div className="col-span-2 md:col-span-1 space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Pincode</label>
                   <input
-                    required
-                    maxLength={6}
+                    readOnly
                     value={newAddress.pincode}
-                    onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-                    placeholder="6 digits"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-[#1a1c2e] focus:bg-white focus:border-[#101242]/30 outline-none"
+                    placeholder="Auto-filled"
+                    className="w-full p-4 bg-slate-100 border border-slate-100 rounded-2xl font-bold text-slate-500 cursor-not-allowed outline-none"
                   />
                 </div>
               </div>

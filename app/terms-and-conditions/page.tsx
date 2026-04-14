@@ -17,7 +17,7 @@ export default function TermsConditionsPage() {
               <Scale className="w-4 h-4" />
               Legal Document
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-[#1a1c2e] tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-black text-[#101242] tracking-tight leading-tight">
               Terms & <span className="text-[#101242]">Conditions</span>
             </h1>
             <p className="text-lg text-slate-500 font-medium leading-relaxed italic">
@@ -35,8 +35,8 @@ export default function TermsConditionsPage() {
 
             <div className="prose prose-slate max-w-none space-y-4">
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                Welcome to <span className="font-bold text-[#1a1c2e]">FTDS INDIA PRIVATE LIMITED</span> ("Company", "we", "our", or "us").
-                By accessing our website <span className="font-bold text-[#1a1c2e]">itfixer.in</span> or using our services, you agree to be bound by the following Terms and Conditions.
+                Welcome to <span className="font-bold text-[#101242]">FTDS INDIA PRIVATE LIMITED</span> ("Company", "we", "our", or "us").
+                By accessing our website <span className="font-bold text-[#101242]">itfixer.in</span> or using our services, you agree to be bound by the following Terms and Conditions.
               </p>
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
                 If you do not agree with these terms, please do not use our website or services.
@@ -52,7 +52,7 @@ export default function TermsConditionsPage() {
                   <Globe className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">1. Use of Website</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">1. Use of Website</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'Content is for general information and may change without notice',
@@ -74,7 +74,7 @@ export default function TermsConditionsPage() {
                   <Package className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">2. Products and Services</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">2. Products and Services</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'All services are subject to availability',
@@ -97,7 +97,7 @@ export default function TermsConditionsPage() {
                   <User className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">3. User Information</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">3. User Information</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'You must provide accurate and complete information',
@@ -120,7 +120,7 @@ export default function TermsConditionsPage() {
                   <CreditCard className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">4. Payments and Billing</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">4. Payments and Billing</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'Payments must be made via approved methods',
@@ -142,7 +142,7 @@ export default function TermsConditionsPage() {
                   <RefreshCw className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">5. Cancellation and Refund Policy</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">5. Cancellation and Refund Policy</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'Refund eligibility depends on service terms',
@@ -164,7 +164,7 @@ export default function TermsConditionsPage() {
                   <Award className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">6. Intellectual Property</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">6. Intellectual Property</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     All content including text, images, logos, and software belongs to FTDS INDIA PRIVATE LIMITED. Unauthorized use is prohibited.
                   </p>
@@ -177,7 +177,7 @@ export default function TermsConditionsPage() {
                   <AlertCircle className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2 w-full">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">7. Limitation of Liability</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">7. Limitation of Liability</h2>
                   <ul className="space-y-3 mt-4">
                     {[
                       'We do not guarantee uninterrupted or error-free service',
@@ -199,7 +199,7 @@ export default function TermsConditionsPage() {
                   <LinkIcon className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">8. Third-Party Links</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">8. Third-Party Links</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     Our website may contain links to third-party websites. We are not responsible for their content or policies.
                   </p>
@@ -212,7 +212,7 @@ export default function TermsConditionsPage() {
                   <Shield className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">9. Security</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">9. Security</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     We use reasonable security measures but cannot guarantee complete data security over the internet.
                   </p>
@@ -225,7 +225,7 @@ export default function TermsConditionsPage() {
                   <Scale className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">10. Governing Law</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">10. Governing Law</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     These terms are governed by the laws of India. Any disputes will fall under Indian jurisdiction.
                   </p>
@@ -238,7 +238,7 @@ export default function TermsConditionsPage() {
                   <FileText className="w-6 h-6 text-[#101242]" />
                 </div>
                 <div className="space-y-4 pt-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">11. Changes to Terms</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">11. Changes to Terms</h2>
                   <p className="text-slate-500 leading-relaxed font-medium">
                     We may update these Terms at any time. Continued use of the website means you accept those changes.
                   </p>
@@ -251,7 +251,7 @@ export default function TermsConditionsPage() {
             <div className="bg-[#101242]/5 border border-[#101242]/10 rounded-[32px] p-8 sm:p-12 space-y-6 mt-16 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#101242]/10">
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-[#1a1c2e]">Contact Information</h2>
+                  <h2 className="text-2xl font-black text-[#101242]">Contact Information</h2>
                   <p className="text-slate-500 font-medium">
                     For any questions regarding these Terms, please reach out to us:
                   </p>
@@ -270,7 +270,7 @@ export default function TermsConditionsPage() {
                     <Globe className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Website</span>
                   </div>
-                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors">itfixer199.com</a>
+                  <a href="https://www.itfixer199.com" className="font-bold text-[#101242] hover:text-[#101242] transition-colors">itfixer199.com</a>
                 </div>
 
                 <div className="space-y-1">
@@ -278,7 +278,7 @@ export default function TermsConditionsPage() {
                     <Phone className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Phone</span>
                   </div>
-                  <a href="tel:8754844270" className="font-bold text-[#1a1c2e] hover:text-[#101242] transition-colors">8754844270</a>
+                  <a href="tel:8754844270" className="font-bold text-[#101242] hover:text-[#101242] transition-colors">8754844270</a>
                 </div>
 
                 <div className="space-y-1">
@@ -286,7 +286,7 @@ export default function TermsConditionsPage() {
                     <Mail className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Email</span>
                   </div>
-                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#1a1c2e] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
+                  <a href="mailto:ftdigitalsolutionspvtltd@gmail.com" className="font-bold text-[#101242] hover:text-[#101242] transition-colors break-words">ftdigitalsolutionspvtltd@gmail.com</a>
                 </div>
               </div>
             </div>

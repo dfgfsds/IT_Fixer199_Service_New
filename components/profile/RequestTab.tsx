@@ -169,7 +169,7 @@ export default function RequestTab() {
         <div className="space-y-8">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-black text-[#1a1c2e]">My Requests</h3>
+                <h3 className="text-2xl font-black text-[#101242]">My Requests</h3>
                 {!loading && requests.length > 0 && (
                     <span className="text-xs font-bold text-white bg-[#101242] px-3 py-1.5 rounded-full">
                         {requests.length} {requests.length === 1 ? 'Request' : 'Requests'}
@@ -190,7 +190,7 @@ export default function RequestTab() {
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
                         <ClipboardList className="h-8 w-8 text-slate-400" />
                     </div>
-                    <h2 className="text-lg font-bold text-[#1a1c2e]">No requests yet</h2>
+                    <h2 className="text-lg font-bold text-[#101242]">No requests yet</h2>
                     <p className="text-sm text-slate-500 font-medium">
                         Submit a service request to see it listed here
                     </p>
@@ -241,7 +241,7 @@ export default function RequestTab() {
                                                 Order ID: {req.order_id}
                                             </p>
                                         </div>
-                                        <h4 className="font-bold text-[#1a1c2e] text-lg leading-tight truncate">
+                                        <h4 className="font-bold text-[#101242] text-lg leading-tight truncate">
                                             {typeInfo.label}
                                         </h4>
 
