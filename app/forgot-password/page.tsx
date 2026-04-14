@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
       <main className="flex-1 flex items-center justify-center py-20 px-4">
         <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black text-[#101242] tracking-tight">Recover Password</h1>
+            <h1 className="text-4xl font-black text-[#1a1c2e] tracking-tight">Recover Password</h1>
             <p className="text-slate-500 font-medium tracking-tight">Enter your email to receive reset instructions</p>
           </div>
 
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-2xl focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-medium text-[#101242]"
+                      className="block w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-2xl focus:bg-white focus:border-[#101242]/20 focus:ring-4 focus:ring-[#101242]/5 transition-all outline-none font-medium text-[#1a1c2e]"
                       placeholder="name@example.com"
                       required
                     />
@@ -55,8 +55,8 @@ export default function ForgotPasswordPage() {
                   <Mail className="w-10 h-10" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-[#101242]">Check your email</h3>
-                  <p className="text-slate-500 font-medium">We've sent a password reset link to <span className="text-[#101242] font-bold">{email}</span></p>
+                  <h3 className="text-xl font-bold text-[#1a1c2e]">Check your email</h3>
+                  <p className="text-slate-500 font-medium">We've sent a password reset link to <span className="text-[#1a1c2e] font-bold">{email}</span></p>
                 </div>
                 <button
                   onClick={() => setSubmitted(false)}
