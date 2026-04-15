@@ -14,12 +14,30 @@ export default function AllProductsPage() {
     const { location, setShowLocationModal } = useLocation()
     const [products, setProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedCategory, setSelectedCategory] = useState('All')
+    const [categoriesList, setCategoriesList] = useState<any[]>([])
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1)
     const [paginationData, setPaginationData] = useState<any>(null)
     const PAGE_SIZE = 12
+
+    // Fetch Global Product Categories
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get(Api.categories)
+                let data = Array.isArray(response.data?.data) ? response.data.data : []
+                if (!data.length && Array.isArray(response.data)) data = response.data
+
+                const productCategories = data.filter((cat: any) => cat.status === 'ACTIVE' && cat.type === 'PRODUCT')
+                setCategoriesList(productCategories)
+            } catch (error) {
+                console.error("Failed to fetch categories", error)
+            }
+        }
+        fetchCategories()
+    }, [])
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -40,6 +58,7 @@ export default function AllProductsPage() {
                         page: currentPage,
                         size: PAGE_SIZE,
                         include_attribute: true,
+                        ...(selectedCategoryId ? { category_id: selectedCategoryId } : {})
                     }
                 })
 
@@ -84,14 +103,7 @@ export default function AllProductsPage() {
         }
 
         fetchProducts()
-    }, [location?.lat, location?.lng, currentPage])
-
-    const CATEGORIES = useMemo(() => {
-        const categories = Array.from(new Set(products.map(p => p.category)))
-        return ['All', ...categories]
-    }, [products])
-
-    const filtered = products.filter(p => selectedCategory === 'All' || p.category === selectedCategory)
+    }, [location?.lat, location?.lng, currentPage, selectedCategoryId])
 
     // Calculate pagination showing range
     const totalItems = paginationData?.total_elements || 0
@@ -120,17 +132,27 @@ export default function AllProductsPage() {
 
                     {/* Category Tabs */}
                     <div className="flex gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide">
-                        {CATEGORIES.map((cat) => (
+                        <button
+                            type="button"
+                            onClick={() => { setSelectedCategoryId(null); setCurrentPage(1); }}
+                            className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wide whitespace-nowrap transition-all duration-200 ${!selectedCategoryId
+                                ? 'bg-[#101242] text-white shadow-lg shadow-[0_10px_30px_rgba(16,18,66,0.2)] scale-105'
+                                : 'bg-white text-muted-foreground border-2 border-border hover:border-[rgba(16,18,66,0.4)] hover:text-[#101242]'
+                                }`}
+                        >
+                            All
+                        </button>
+                        {categoriesList.map((cat) => (
                             <button
                                 type="button"
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wide whitespace-nowrap transition-all duration-200 ${selectedCategory === cat
+                                key={cat.id}
+                                onClick={() => { setSelectedCategoryId(cat.id); setCurrentPage(1); }}
+                                className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wide whitespace-nowrap transition-all duration-200 ${selectedCategoryId === cat.id
                                     ? 'bg-[#101242] text-white shadow-lg shadow-[0_10px_30px_rgba(16,18,66,0.2)] scale-105'
                                     : 'bg-white text-muted-foreground border-2 border-border hover:border-[rgba(16,18,66,0.4)] hover:text-[#101242]'
                                     }`}
                             >
-                                {cat}
+                                {cat.name}
                             </button>
                         ))}
                     </div>
@@ -189,10 +211,10 @@ export default function AllProductsPage() {
                             )} */}
 
                             {/* Product Grid */}
-                            {filtered.length > 0 ? (
+                            {products.length > 0 ? (
                                 <>
                                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                                        {filtered.map((product) => (
+                                        {products.map((product) => (
                                             <div key={product.id} className="animate-fade-in">
                                                 <ProductCard product={product} basePath="products" />
                                             </div>
