@@ -957,7 +957,7 @@ export default function CartPage() {
                     {!allInactive && (
                       <div className="pt-6 border-t border-[#101242]/20">
                         <div className="flex justify-between items-end mb-2">
-                          <p className="text-xs font-black text-[#101242]/90 uppercase tracking-widest pb-1">Total Amount</p>
+                          <p className="text-xs font-black text-slate-500 uppercase tracking-widest pb-1">Total Amount</p>
                           <p className="text-3xl font-black text-[#101242]">₹{formatPrice(total)}</p>
                         </div>
                       </div>

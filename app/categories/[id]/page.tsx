@@ -170,7 +170,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
             <Header />
             <main className="flex-1 pb-24">
                 {/* Hero Section */}
-                <section className="bg-white py-20 px-4 border-b border-slate-100">
+                <section className="bg-white py-20 px-4 border-b border-slate-200">
                     <div className="max-w-7xl mx-auto text-center space-y-8">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#101242]/5 text-[#101242] text-xs font-black uppercase tracking-widest shadow-sm">
                             <Sparkles className="w-4 h-4" />
@@ -237,7 +237,7 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                         {categoryType !== 'SERVICE' && (
                             <div className="space-y-10">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-slate-400 uppercase tracking-widest">
+                                    <h2 className="text-lg font-bold text-[#101242] uppercase tracking-widest">
                                         Essential Products ({products.length})
                                     </h2>
                                 </div>
