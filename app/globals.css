@@ -241,3 +241,7 @@
     opacity: 1;
   }
 }
+
+button {
+  cursor: pointer;
+}

@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle, FileText, User as UserIcon, Calendar, IndianRupee, Loader2, Phone, MoreVertical, X, Package, Wifi, Check } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, AlertCircle, FileText, User as UserIcon, Calendar, IndianRupee, Loader2, Phone, MoreVertical, X, Package, Wifi, Check, RotateCcw } from 'lucide-react'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
@@ -28,21 +28,41 @@ const LiveMap = dynamic(
   { ssr: false }
 )
 
-const transformOrder = (order: any) => ({
-  id: order.id,
-  status: order.order_status?.toLowerCase(),
-  slot: order.slot_time,
-  address: order.address,
-  amount: Math.abs(Number(order.total_price || 0)),
-  fullData: order,
-  items: order.items || [],
-  agent: order.agent_details
-    ? {
-      name: order.agent_details.user_details?.name,
-      phone: order.agent_details.user_details?.mobile_number,
+const transformOrder = (order: any) => {
+  const items = order.items || []
+  let sTotal = 0
+  let pTotal = 0
+
+  items.forEach((item: any) => {
+    const lineTotal = (item.quantity || 1) * Number(item.selling_price || item.price || 0)
+    if (item.type === 'SERVICE') {
+      sTotal += lineTotal
+    } else {
+      pTotal += lineTotal
     }
-    : null,
-})
+  })
+
+  return {
+    id: order.id,
+    status: order.order_status?.toLowerCase(),
+    slot: order.slot_time,
+    isInstant: order.is_instant_slot,
+    customer_name: order.customer_name,
+    google_address: order.google_address,
+    address: order.address,
+    amount: Math.abs(Number(order.total_price || 0)),
+    serviceTotal: sTotal,
+    productTotal: pTotal,
+    fullData: order,
+    items: items,
+    agent: order.agent_details
+      ? {
+        name: order.agent_details.user_details?.name,
+        phone: order.agent_details.user_details?.mobile_number,
+      }
+      : null,
+  }
+}
 
 const statusLabel = (status: string) => {
   switch (status?.toLowerCase()) {
@@ -55,6 +75,7 @@ const statusLabel = (status: string) => {
     case "completed": return "Completed"
     case "cancelled": return "Cancelled"
     case "refunded": return "Refund Processed"
+    case "returned": return "Returned"
     default: return status || 'Unknown'
   }
 }
@@ -63,7 +84,8 @@ const getStatusCtx = (status: string) => {
   const s = status?.toLowerCase()
   if (s === 'completed') return { icon: <CheckCircle className="w-7 h-7" />, bg: 'bg-emerald-50', text: 'text-emerald-600', bar: 'bg-emerald-500', border: 'border-emerald-100' }
   if (s === 'cancelled' || s === 'refunded') return { icon: <XCircle className="w-7 h-7" />, bg: 'bg-red-50', text: 'text-red-600', bar: 'bg-red-500', border: 'border-red-100' }
-  if (s === 'pending' || s === 'confirmed') return { icon: <Clock className="w-7 h-7" />, bg: 'bg-blue-50', text: 'text-blue-600', bar: 'bg-blue-500', border: 'border-blue-100' }
+  if (s === 'pending') return { icon: <Clock className="w-7 h-7" />, bg: 'bg-amber-50', text: 'text-amber-600', bar: 'bg-amber-500', border: 'border-amber-100' }
+  if (s === 'confirmed' || s === 'assigned') return { icon: <CheckCircle className="w-7 h-7" />, bg: 'bg-blue-50', text: 'text-blue-600', bar: 'bg-blue-500', border: 'border-blue-100' }
   return { icon: <AlertCircle className="w-7 h-7" />, bg: 'bg-indigo-50', text: 'text-indigo-600', bar: 'bg-indigo-500', border: 'border-indigo-100' }
 }
 
@@ -163,7 +185,7 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
@@ -428,25 +450,30 @@ export default function SingleOrderPage() {
             {/* Service Schedule */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
               <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-slate-400" /> Service Schedule
+                <Calendar className="w-5 h-5 text-[#101242]" /> Service Schedule
               </h2>
               <div className="flex items-center gap-4 bg-slate-50 rounded-3xl p-5 border border-slate-100">
                 <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-[#101242] shadow-sm flex items-center justify-center shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Scheduled For</p>
-                  <p className="font-bold text-[#101242] text-lg">{order.slot || 'Slot to be confirmed'}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
+                    {/* {order.isInstant ? 'Service Type' : 'Scheduled For'} */}
+                    Scheduled For
+                  </p>
+                  <p className="font-bold text-[#101242] text-lg">
+                    {order.isInstant ? (order.slot || 'Instant Service') : (order.slot || 'Slot to be confirmed')}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Assigned Expert */}
-            <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
-              <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
-                <UserIcon className="w-5 h-5 text-slate-400" /> Service Professional
-              </h2>
-              {order.agent ? (
+            {order.agent && (
+              <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
+                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
+                  <UserIcon className="w-5 h-5 text-[#101242]" /> Service Professional
+                </h2>
                 <div className="flex items-center justify-between bg-slate-50 rounded-3xl p-5 border border-slate-100 gap-4 flex-wrap">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-[#101242]/10 text-[#101242] flex items-center justify-center shrink-0">
@@ -474,47 +501,47 @@ export default function SingleOrderPage() {
                     )}
                   </div>
                 </div>
-              ) : (
-                <div className="flex items-center gap-4 bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
-                    <UserIcon className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-500">Not Assigned Yet</p>
-                    <p className="text-xs text-slate-400 font-medium mt-1">An expert will be assigned shortly</p>
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Order Items */}
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
               <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
-                <Package className="w-5 h-5 text-slate-400" /> Booked Services
+                <Package className="w-5 h-5 text-[#101242]" /> Booked Services
               </h2>
               <div className="space-y-3">
                 {order.items.map((item: any) => (
                   <div key={item.id} className="flex items-center gap-5 p-4 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-md transition-all">
                     <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-slate-100 shrink-0">
-                      {item?.item_details?.full_details?.media_files?.[0]?.image_url ? (
-                        <Image
-                          src={item.item_details.full_details.media_files[0].image_url}
-                          alt={item.item_details?.name || 'Service'}
-                          fill
-                          className="object-cover"
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png' }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl">🛠️</div>
-                      )}
+                      <Image
+                        src={item?.item_details?.full_details?.media_files?.[0]?.image_url || '/placeholder-image.jpg'}
+                        alt={item.item_details?.name || 'Service'}
+                        fill
+                        className="object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#101242] truncate">{item.item_details?.name || 'Service'}</p>
-                      {item?.item_details?.full_details?.categories && (
-                        <p className="text-xs text-slate-400 font-medium mt-0.5">{item.item_details.full_details.categories}</p>
-                      )}
+                      <p className="font-bold text-[#101242] text-[16px] capitalize truncate">
+                        {item.item_details?.name || item.item_details?.full_details?.name}
+                      </p>
+                      <div className="mt-0.5 space-y-0.5">
+                        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                          {item?.type?.toLowerCase() || ""}
+                        </p>
+                        <p className="font-black text-[#101242]/80 text-[15px]">₹{formatPrice(item.price)}</p>
+                      </div>
                     </div>
-                    <p className="font-black text-[#101242] text-lg shrink-0">₹{formatPrice(item.price)}</p>
+
+                    <span className={`text-[9px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest shrink-0 shadow-sm whitespace-nowrap ${item.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                      item.status === 'CANCELLED' || item.status === 'RETURNED' ? 'bg-red-50 text-red-600 border-red-100' :
+                        item.status === 'SERVICE_IN_PROGRESS' || item.status === 'IN_PROGRESS' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                          item.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                            item.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                              'bg-slate-50 text-slate-500 border-slate-100'
+                      }`}>
+                      {item.status || ''}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -528,45 +555,54 @@ export default function SingleOrderPage() {
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
               <div className="flex items-center justify-between mb-6 px-1">
                 <h2 className="text-lg font-black flex items-center gap-3 text-[#101242]">
-                  <IndianRupee className="w-5 h-5 text-slate-400" /> Payment
+                  <IndianRupee className="w-5 h-5 text-[#101242]" /> Payment
                 </h2>
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${paymentStatus === 'SUCCESS'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${paymentStatus === 'SUCCESS' || paymentStatus === 'CREDIT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                  paymentStatus === 'FAILED' || paymentStatus === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-200' :
+                    paymentStatus === 'REFUNDED' || paymentStatus === 'PARTIALLY_REFUNDED' ? 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200' :
+                      'bg-amber-50 text-amber-700 border-amber-200'
                   }`}>
-                  {paymentStatus === 'SUCCESS' ? <CheckCircle className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+                  {paymentStatus === 'SUCCESS' || paymentStatus === 'CREDIT' ? <CheckCircle className="w-3.5 h-3.5" /> :
+                    paymentStatus === 'FAILED' || paymentStatus === 'CANCELLED' ? <XCircle className="w-3.5 h-3.5" /> :
+                      paymentStatus === 'REFUNDED' || paymentStatus === 'PARTIALLY_REFUNDED' ? <RotateCcw className="w-3.5 h-3.5" /> :
+                        <Clock className="w-3.5 h-3.5" />}
                   {paymentStatus || 'PENDING'}
                 </div>
               </div>
 
               <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-3">
-                <div className="flex justify-between text-slate-500 font-medium text-sm">
-                  <span>Service Total</span>
-                  <span className="font-bold text-[#101242]">₹{formatPrice(order.amount)}</span>
-                </div>
+                {order.serviceTotal > 0 && (
+                  <div className="flex justify-between text-slate-500 font-medium text-sm px-1">
+                    <span>Service Total</span>
+                    <span className="font-bold text-[#101242]">₹{formatPrice(order.serviceTotal)}</span>
+                  </div>
+                )}
+                {order.productTotal > 0 && (
+                  <div className="flex justify-between text-slate-500 font-medium text-sm px-1">
+                    <span>Product Total</span>
+                    <span className="font-bold text-[#101242]">₹{formatPrice(order.productTotal)}</span>
+                  </div>
+                )}
+
                 <div className="w-full h-px bg-slate-200" />
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-slate-500 text-md">Total Paid</span>
-                  <span className="font-black text-[#101242] text-md tracking-tight">₹{formatPrice(order.amount)}</span>
+
+                <div className="flex justify-between items-center px-1">
+                  <span className="font-bold text-slate-500 text-md">Total Amount</span>
+                  <span className="font-black text-[#101242] text-lg tracking-tight">₹{formatPrice(order.amount)}</span>
                 </div>
               </div>
             </div>
 
             {/* Service Location */}
-            <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5">
+            <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-4">
               <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-slate-400" /> Service Location
+                <MapPin className="w-5 h-5 text-[#101242]" /> Service Location
               </h2>
               <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                <p className="font-bold text-[#101242] mb-2">{order.fullData?.user_address?.name || 'Customer'}</p>
+                <p className="font-bold text-[#101242] mb-1">{order.customer_name || 'Customer'}</p>
                 <p className="text-slate-600 font-medium text-sm leading-relaxed">
-                  {order.fullData?.user_address?.full_address || order.address || 'Address not available'}
+                  {order.address || order.google_address || 'Address not available'}
                 </p>
-                {order.fullData?.user_address?.district && (
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">
-                    {order.fullData.user_address.district}, {order.fullData.user_address.state} - {order.fullData.user_address.pincode}
-                  </p>
-                )}
               </div>
             </div>
 
