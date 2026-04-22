@@ -24,7 +24,7 @@ export function Categories() {
         const mappedCategories = categoriesData.map((cat: any) => ({
           id: cat.id,
           name: cat.name,
-          image: cat.media?.[0]?.url || '/placeholder-category.jpg',
+          image: cat.media?.[0]?.url || '/placeholder-image.jpg',
           count: cat.services_count || 'Multiple'
         }))
 

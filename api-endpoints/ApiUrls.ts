@@ -1,12 +1,12 @@
 //Live
-const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://api.itfixer199.com"
-
-//Test
 // const baseUrl =
 //     process.env.NEXT_PUBLIC_API_BASE_URL ||
-//     "https://api-test.itfixer199.com"
+//     "https://api.itfixer199.com"
+
+//Test
+const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://api-test.itfixer199.com"
 
 
 // Categories
@@ -61,6 +61,9 @@ const requestCancellation = `${baseUrl}/api/request/cancellation/`;
 // requestRefund
 const requestRefund = `${baseUrl}/api/request/refund/`;
 
+// Item Tracking
+const itemTracking = `${baseUrl}/api/request/tracking/order/`;
+
 // Third Party
 const getIp = `${baseUrl}/api/third-party/get-ip/`;
 
@@ -97,4 +100,5 @@ export default {
     slotChange,
     requestCancellation,
     requestRefund,
+    itemTracking,
 }
