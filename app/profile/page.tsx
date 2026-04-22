@@ -77,7 +77,7 @@ function ProfileContent() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-[#101242]">{user?.name || user?.email || user?.mobile_number}</h2>
-                <p className="text-slate-700 font-bold text-xs tracking-widest mt-1">{user?.email}</p>
+                <p className="text-slate-700 font-bold text-xs tracking-widest mt-1 break-all">{user?.email}</p>
               </div>
             </div>
 
