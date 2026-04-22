@@ -245,3 +245,14 @@
 button {
   cursor: pointer;
 }
+
+.service-professional {
+  display: flex;
+  flex-direction: row;
+}
+
+@media(max-width:421px) {
+  .service-professional {
+    flex-direction: column-reverse;
+  }
+}

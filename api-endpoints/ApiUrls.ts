@@ -61,6 +61,9 @@ const requestCancellation = `${baseUrl}/api/request/cancellation/`;
 // requestRefund
 const requestRefund = `${baseUrl}/api/request/refund/`;
 
+// Item Tracking
+const itemTracking = `${baseUrl}/api/request/tracking/order/`;
+
 // Third Party
 const getIp = `${baseUrl}/api/third-party/get-ip/`;
 
@@ -97,4 +100,5 @@ export default {
     slotChange,
     requestCancellation,
     requestRefund,
+    itemTracking,
 }
