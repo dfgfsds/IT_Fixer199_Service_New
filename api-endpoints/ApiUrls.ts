@@ -74,6 +74,12 @@ const logout = `${baseUrl}/api/logout/`;
 const getUser = `${baseUrl}/api/user/`;
 const updateUser = `${baseUrl}/api/user/`;
 
+// Notifications
+const registerFCM = `${baseUrl}/api/notifications/register-fcm/`;
+
+// Modifications
+const modificationApproval = `${baseUrl}/api/order/order-item-modification/`;
+
 
 export default {
     categories,
@@ -101,4 +107,6 @@ export default {
     requestCancellation,
     requestRefund,
     itemTracking,
+    registerFCM,
+    modificationApproval,
 }
