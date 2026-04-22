@@ -50,6 +50,7 @@ import { useRouter } from 'next/navigation'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
+import { requestForToken } from '@/configs/firebase-config'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -101,6 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("user", JSON.stringify(user))
     }
 
+    // ✅ AUTOMATICALLY REGISTER FCM TOKEN AFTER LOGIN
+    requestForToken()
   }, [])
 
   // RESTORE LOGIN

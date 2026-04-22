@@ -299,7 +299,89 @@ export default function SingleOrderPage() {
       safeErrorLog('Failed to fetch tracking details', err)
       toast.error('Tracking details unavailable right now.')
     } finally {
+      setLoading(false)
       setLoadingItemTracking(false)
+    }
+  }
+
+  const [appData, setAppData] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchAppSetting = async () => {
+      try {
+        const res = await axiosInstance.get(Api.appSettings)
+        if (res.data?.success) setAppData(res.data.data)
+      } catch (error) { }
+    }
+    fetchAppSetting()
+  }, [])
+
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleModificationAction = async (modificationId: string, action: 'APPROVED' | 'REJECTED') => {
+    try {
+      setSubmitting(true)
+      const res = await axiosInstance.post(`${Api.modificationApproval}${modificationId}/customer-approval/`, {
+        customer_confirmation: action
+      })
+
+      const responseData = res.data?.data || res.data
+
+      if (action === 'APPROVED' && responseData?.payment_required) {
+        const razorpayLoaded = await loadRazorpay()
+        if (!razorpayLoaded) {
+          toast.error("Payment gateway failed to load. Please disable adblock.")
+          return
+        }
+
+        const options = {
+          key: appData?.pg_api_key,
+          amount: Math.round(responseData.amount * 100),
+          currency: "INR",
+          name: "ITFixer@199",
+          description: "Order Modification Payment",
+          order_id: responseData.razorpay_order_id,
+          prefill: {
+            name: order?.customer_name || "",
+            email: order?.fullData?.user_details?.email || "",
+            contact: order?.fullData?.user_details?.mobile_number || ""
+          },
+          handler: function (response: any) {
+            toast.success("Payment successful!")
+            fetchOrder()
+          },
+          modal: {
+            ondismiss: function () {
+              setSubmitting(false)
+              toast.error("Payment cancelled.")
+            },
+          },
+          theme: { color: "#101242" },
+        }
+
+        const razorpay = new (window as any).Razorpay(options)
+        razorpay.open()
+      } else {
+        toast.success(`Request ${action.toLowerCase()} successfully`)
+        fetchOrder()
+      }
+    } catch (err: any) {
+      safeErrorLog('Failed to update modification status', err)
+      toast.error(err.response?.data?.message || `Failed to ${action.toLowerCase()} the request`)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -532,7 +614,7 @@ export default function SingleOrderPage() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Expert</p>
-                      <p className="font-bold text-[#101242] text-lg">{order.agent.name}</p>
+                      <p className="font-bold text-[#101242] text-lg capitalize">{order.agent.name}</p>
                     </div>
                   </div>
                   <div className="service-professional items-start md:items-center gap-3 w-full sm:w-auto">
@@ -551,6 +633,70 @@ export default function SingleOrderPage() {
                       </button>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Order Item Modifications */}
+            {order.fullData?.order_item_modifications?.length > 0 && (
+              <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5 mb-8">
+                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#101242]" /> Order Modification Requests
+                </h2>
+                <div className="space-y-3">
+                  {order.fullData.order_item_modifications.map((mod: any) => (
+                    <div key={mod.id} className="space-y-4">
+                      {mod.modification_items?.map((mItem: any) => (
+                        <div key={mItem.id} className="flex flex-wrap min-[501px]:flex-nowrap items-center gap-x-4 gap-y-3 p-4 rounded-3xl bg-slate-50 border border-slate-100">
+                          <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-[#101242]/20 shrink-0">
+                            <Image
+                              src={mItem.new_entity_details?.media_files?.[0]?.image_url || mItem.new_entity_details?.image_url || mItem.original_entity_details?.media_files?.[0]?.image_url || mItem.original_entity_details?.image_url || '/placeholder-image.jpg'}
+                              alt={mItem.new_entity_details?.name || mItem.original_entity_details?.name || "Item"}
+                              fill
+                              className="object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[100px]">
+                            <p className="font-bold text-[#101242] text-[16px] w-[90%] capitalize truncate">
+                              {mItem.new_entity_details?.name || mItem.original_entity_details?.name}
+                            </p>
+                            <div className="mt-0.5 space-y-0.5">
+                              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                                Request: {mItem.modification_type}
+                              </p>
+                              <p className="font-black text-[#101242]/80 text-[15px]">₹{formatPrice(mItem.new_price)}</p>
+                            </div>
+                          </div>
+
+                          {mod.customer_confirmation === 'PENDING' ? (
+                            <div className="flex flex-col-reverse sm:flex-row mt-2 sm:mt-0 gap-2 w-full sm:w-auto">
+                              <button
+                                disabled={submitting}
+                                onClick={() => handleModificationAction(mod.id, 'REJECTED')}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-red-600 border border-red-100 font-bold text-xs uppercase tracking-widest hover:bg-[#101242] hover:text-white transition-all disabled:opacity-50"
+                              >
+                                <X className="w-3 h-3" /> Reject
+                              </button>
+                              <button
+                                disabled={submitting}
+                                onClick={() => handleModificationAction(mod.id, 'APPROVED')}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-[#101242] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#800000] transition-all disabled:opacity-50 shadow-md shadow-[#101242]/10"
+                              >
+                                {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Accept
+                              </button>
+                            </div>
+                          ) : (
+                            <span className={`text-[10px] font-black px-4 py-2 rounded-full border uppercase tracking-widest whitespace-nowrap 
+                              ${mod.customer_confirmation === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}
+                            `}>
+                              {mod.customer_confirmation}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
