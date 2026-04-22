@@ -1,12 +1,12 @@
 //Live
-const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://api.itfixer199.com"
-
-//Test
 // const baseUrl =
 //     process.env.NEXT_PUBLIC_API_BASE_URL ||
-//     "https://api-test.itfixer199.com"
+//     "https://api.itfixer199.com"
+
+//Test
+const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://api-test.itfixer199.com"
 
 
 // Categories
@@ -61,6 +61,9 @@ const requestCancellation = `${baseUrl}/api/request/cancellation/`;
 // requestRefund
 const requestRefund = `${baseUrl}/api/request/refund/`;
 
+// Item Tracking
+const itemTracking = `${baseUrl}/api/request/tracking/order/`;
+
 // Third Party
 const getIp = `${baseUrl}/api/third-party/get-ip/`;
 
@@ -70,6 +73,12 @@ const logout = `${baseUrl}/api/logout/`;
 // Get User Detail
 const getUser = `${baseUrl}/api/user/`;
 const updateUser = `${baseUrl}/api/user/`;
+
+// Notifications
+const registerFCM = `${baseUrl}/api/notifications/register-fcm/`;
+
+// Modifications
+const modificationApproval = `${baseUrl}/api/order/order-item-modification/`;
 
 
 export default {
@@ -97,4 +106,7 @@ export default {
     slotChange,
     requestCancellation,
     requestRefund,
+    itemTracking,
+    registerFCM,
+    modificationApproval,
 }

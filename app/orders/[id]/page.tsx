@@ -14,6 +14,7 @@ import Image from 'next/image'
 import { formatPrice } from '@/lib/format-price'
 import { useLocation } from '@/context/location-context'
 import { safeErrorLog } from '@/lib/error-handler'
+import { ItemTrackingModal } from '@/components/item-tracking-modal'
 
 // SSR-safe dynamic import for LiveMap
 const LiveMap = dynamic(
@@ -77,6 +78,20 @@ const statusLabel = (status: string) => {
     case "refunded": return "Refund Processed"
     case "returned": return "Returned"
     default: return status || 'Unknown'
+  }
+}
+
+const OrderItemStatusLabel = (status: string) => {
+  const s = status?.toUpperCase()
+  switch (s) {
+    case "PENDING": return "Pending"
+    case "CONFIRMED": return "Confirmed"
+    case "IN_PROGRESS": return "In Progress"
+    case "SERVICE_IN_PROGRESS": return "Service In Progress"
+    case "COMPLETED": return "Completed"
+    case "CANCELLED": return "Cancelled"
+    case "RETURNED": return "Returned"
+    default: return status || ""
   }
 }
 
@@ -167,6 +182,12 @@ export default function SingleOrderPage() {
   const [debugData, setDebugData] = useState<any>({ api: null, ws: null })
   const wsRef = useRef<WebSocket | null>(null)
 
+  // Tracking Modal States
+  const [itemTrackingOpen, setItemTrackingOpen] = useState(false)
+  const [selectedTrackItem, setSelectedTrackItem] = useState<any>(null)
+  const [itemTrackingLogs, setItemTrackingLogs] = useState<any[]>([])
+  const [loadingItemTracking, setLoadingItemTracking] = useState(false)
+
   useEffect(() => { if (id) fetchOrder() }, [id])
 
   // Close menu on outside click
@@ -185,7 +206,7 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
@@ -249,6 +270,118 @@ export default function SingleOrderPage() {
       router.push('/profile?tab=orders')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchItemTracking = async (item: any) => {
+    try {
+      setSelectedTrackItem(item)
+      setLoadingItemTracking(true)
+      const res = await axiosInstance.get(Api.itemTracking, {
+        params: { order_id: id, order_item_id: item.id }
+      })
+
+      let itemLogs = []
+      if (res.data?.success && res.data?.data) {
+        itemLogs = res.data.data[item.id]
+
+        if (!itemLogs || itemLogs.length === 0) {
+          const firstKey = Object.keys(res.data.data)[0]
+          if (firstKey) {
+            itemLogs = res.data.data[firstKey]
+          }
+        }
+      }
+
+      setItemTrackingLogs(itemLogs || [])
+      setItemTrackingOpen(true)
+    } catch (err) {
+      safeErrorLog('Failed to fetch tracking details', err)
+      toast.error('Tracking details unavailable right now.')
+    } finally {
+      setLoading(false)
+      setLoadingItemTracking(false)
+    }
+  }
+
+  const [appData, setAppData] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchAppSetting = async () => {
+      try {
+        const res = await axiosInstance.get(Api.appSettings)
+        if (res.data?.success) setAppData(res.data.data)
+      } catch (error) { }
+    }
+    fetchAppSetting()
+  }, [])
+
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleModificationAction = async (modificationId: string, action: 'APPROVED' | 'REJECTED') => {
+    try {
+      setSubmitting(true)
+      const res = await axiosInstance.post(`${Api.modificationApproval}${modificationId}/customer-approval/`, {
+        customer_confirmation: action
+      })
+
+      const responseData = res.data?.data || res.data
+
+      if (action === 'APPROVED' && responseData?.payment_required) {
+        const razorpayLoaded = await loadRazorpay()
+        if (!razorpayLoaded) {
+          toast.error("Payment gateway failed to load. Please disable adblock.")
+          return
+        }
+
+        const options = {
+          key: appData?.pg_api_key,
+          amount: Math.round(responseData.amount * 100),
+          currency: "INR",
+          name: "ITFixer@199",
+          description: "Order Modification Payment",
+          order_id: responseData.razorpay_order_id,
+          prefill: {
+            name: order?.customer_name || "",
+            email: order?.fullData?.user_details?.email || "",
+            contact: order?.fullData?.user_details?.mobile_number || ""
+          },
+          handler: function (response: any) {
+            toast.success("Payment successful!")
+            fetchOrder()
+          },
+          modal: {
+            ondismiss: function () {
+              setSubmitting(false)
+              toast.error("Payment cancelled.")
+            },
+          },
+          theme: { color: "#101242" },
+        }
+
+        const razorpay = new (window as any).Razorpay(options)
+        razorpay.open()
+      } else {
+        toast.success(`Request ${action.toLowerCase()} successfully`)
+        fetchOrder()
+      }
+    } catch (err: any) {
+      safeErrorLog('Failed to update modification status', err)
+      toast.error(err.response?.data?.message || `Failed to ${action.toLowerCase()} the request`)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -481,25 +614,89 @@ export default function SingleOrderPage() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Expert</p>
-                      <p className="font-bold text-[#101242] text-lg">{order.agent.name}</p>
+                      <p className="font-bold text-[#101242] text-lg capitalize">{order.agent.name}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="service-professional items-start md:items-center gap-3 w-full sm:w-auto">
                     <a
                       href={`tel:${order.agent.phone}`}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-[#101242] border border-slate-200 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-[#101242] border border-slate-100 font-bold text-sm hover:bg-slate-50 hover:border-[#101242] transition-all"
                     >
                       <Phone className="w-4 h-4" /> Call
                     </a>
                     {showTrackBtn && (
                       <button
                         onClick={() => setShowTracking(true)}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#101242] text-white font-bold text-sm hover:bg-[#600000] transition-all shadow-lg shadow-[#101242]/20"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#101242] text-white font-bold text-sm hover:bg-[#800000] transition-all"
                       >
                         <Wifi className="w-4 h-4" /> Track Live
                       </button>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Order Item Modifications */}
+            {order.fullData?.order_item_modifications?.length > 0 && (
+              <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 space-y-5 mb-8">
+                <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#101242]" /> Order Modification Requests
+                </h2>
+                <div className="space-y-3">
+                  {order.fullData.order_item_modifications.map((mod: any) => (
+                    <div key={mod.id} className="space-y-4">
+                      {mod.modification_items?.map((mItem: any) => (
+                        <div key={mItem.id} className="flex flex-wrap min-[501px]:flex-nowrap items-center gap-x-4 gap-y-3 p-4 rounded-3xl bg-slate-50 border border-slate-100">
+                          <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-[#101242]/20 shrink-0">
+                            <Image
+                              src={mItem.new_entity_details?.media_files?.[0]?.image_url || mItem.new_entity_details?.image_url || mItem.original_entity_details?.media_files?.[0]?.image_url || mItem.original_entity_details?.image_url || '/placeholder-image.jpg'}
+                              alt={mItem.new_entity_details?.name || mItem.original_entity_details?.name || "Item"}
+                              fill
+                              className="object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[100px]">
+                            <p className="font-bold text-[#101242] text-[16px] w-[90%] capitalize truncate">
+                              {mItem.new_entity_details?.name || mItem.original_entity_details?.name}
+                            </p>
+                            <div className="mt-0.5 space-y-0.5">
+                              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                                Request: {mItem.modification_type}
+                              </p>
+                              <p className="font-black text-[#101242]/80 text-[15px]">₹{formatPrice(mItem.new_price)}</p>
+                            </div>
+                          </div>
+
+                          {mod.customer_confirmation === 'PENDING' ? (
+                            <div className="flex flex-col-reverse sm:flex-row mt-2 sm:mt-0 gap-2 w-full sm:w-auto">
+                              <button
+                                disabled={submitting}
+                                onClick={() => handleModificationAction(mod.id, 'REJECTED')}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-red-600 border border-red-100 font-bold text-xs uppercase tracking-widest hover:bg-[#101242] hover:text-white transition-all disabled:opacity-50"
+                              >
+                                <X className="w-3 h-3" /> Reject
+                              </button>
+                              <button
+                                disabled={submitting}
+                                onClick={() => handleModificationAction(mod.id, 'APPROVED')}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-[#101242] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#800000] transition-all disabled:opacity-50 shadow-md shadow-[#101242]/10"
+                              >
+                                {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Accept
+                              </button>
+                            </div>
+                          ) : (
+                            <span className={`text-[10px] font-black px-4 py-2 rounded-full border uppercase tracking-widest whitespace-nowrap 
+                              ${mod.customer_confirmation === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}
+                            `}>
+                              {mod.customer_confirmation}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -511,8 +708,8 @@ export default function SingleOrderPage() {
               </h2>
               <div className="space-y-3">
                 {order.items.map((item: any) => (
-                  <div key={item.id} className="flex items-center gap-5 p-4 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-md transition-all">
-                    <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-slate-100 shrink-0">
+                  <div key={item.id} className="flex flex-wrap min-[501px]:flex-nowrap items-center gap-x-4 gap-y-3 p-4 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-md transition-all">
+                    <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-[#101242]/20 shrink-0">
                       <Image
                         src={item?.item_details?.full_details?.media_files?.[0]?.image_url || '/placeholder-image.jpg'}
                         alt={item.item_details?.name || 'Service'}
@@ -521,8 +718,8 @@ export default function SingleOrderPage() {
                         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#101242] text-[16px] capitalize truncate">
+                    <div className="flex-1 min-w-[100px]">
+                      <p className="font-bold text-[#101242] text-[16px] w-[90%] capitalize truncate">
                         {item.item_details?.name || item.item_details?.full_details?.name}
                       </p>
                       <div className="mt-0.5 space-y-0.5">
@@ -533,15 +730,30 @@ export default function SingleOrderPage() {
                       </div>
                     </div>
 
-                    <span className={`text-[9px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest shrink-0 shadow-sm whitespace-nowrap ${item.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                      item.status === 'CANCELLED' || item.status === 'RETURNED' ? 'bg-red-50 text-red-600 border-red-100' :
-                        item.status === 'SERVICE_IN_PROGRESS' || item.status === 'IN_PROGRESS' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                          item.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                            item.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                              'bg-slate-50 text-slate-500 border-slate-100'
+                    <div className={`flex ${item.status === 'SERVICE_IN_PROGRESS'
+                      ? 'w-full max-[501px]:flex-row max-[501px]:flex-wrap max-[501px]:justify-evenly max-[501px]:pt-3 min-[501px]:flex-col min-[501px]:w-auto items-center gap-2'
+                      : 'flex-col items-center gap-2.5 w-auto'
                       }`}>
-                      {item.status || ''}
-                    </span>
+                      <span className={`text-[10px] font-black px-4 py-2 rounded-full border uppercase tracking-widest whitespace-nowrap 
+                      ${item.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                          item.status === 'CANCELLED' || item.status === 'RETURNED' ? 'bg-red-50 text-red-600 border-red-100' :
+                            item.status === 'SERVICE_IN_PROGRESS' || item.status === 'IN_PROGRESS' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                              item.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                item.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                  'bg-slate-50 text-slate-500 border-slate-100'
+                        }`}>
+                        {OrderItemStatusLabel(item.status)}
+                      </span>
+
+                      {item.status === 'SERVICE_IN_PROGRESS' && (
+                        <button
+                          onClick={() => fetchItemTracking(item)}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#101242] text-white rounded-xl hover:bg-[#800000] transition-all font-bold text-[10px] uppercase tracking-widest"
+                        >
+                          Track
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -551,7 +763,6 @@ export default function SingleOrderPage() {
 
           {/* RIGHT COLUMN */}
           <div className="space-y-8">
-
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
               <div className="flex items-center justify-between mb-6 px-1">
                 <h2 className="text-lg font-black flex items-center gap-3 text-[#101242]">
@@ -573,13 +784,13 @@ export default function SingleOrderPage() {
               <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-3">
                 {order.serviceTotal > 0 && (
                   <div className="flex justify-between text-slate-500 font-medium text-sm px-1">
-                    <span>Service Total</span>
+                    <span>Services Total</span>
                     <span className="font-bold text-[#101242]">₹{formatPrice(order.serviceTotal)}</span>
                   </div>
                 )}
                 {order.productTotal > 0 && (
                   <div className="flex justify-between text-slate-500 font-medium text-sm px-1">
-                    <span>Product Total</span>
+                    <span>Products Total</span>
                     <span className="font-bold text-[#101242]">₹{formatPrice(order.productTotal)}</span>
                   </div>
                 )}
@@ -605,7 +816,6 @@ export default function SingleOrderPage() {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </main>
@@ -793,6 +1003,13 @@ export default function SingleOrderPage() {
           </div>
         </div>
       )}
+      {/* MODALS */}
+      <ItemTrackingModal
+        isOpen={itemTrackingOpen}
+        onClose={() => setItemTrackingOpen(false)}
+        item={selectedTrackItem}
+        logs={itemTrackingLogs}
+      />
     </div>
   )
 }
