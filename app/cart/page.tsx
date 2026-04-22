@@ -305,6 +305,7 @@ export default function CartPage() {
         google_address: addr?.google_address || addr?.full_address || "",
         latitude: addr?.lat ? Number(addr.lat) : 0,
         longitude: addr?.lng ? Number(addr.lng) : 0,
+        order_platform: "WEB",
       }
 
       // Scheduling data
@@ -463,7 +464,7 @@ export default function CartPage() {
               <ShoppingCart className="w-10 h-10 text-slate-300" />
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">Your cart is empty</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-[#101242] mb-4 tracking-tight">Your cart is empty</h2>
             <p className="text-slate-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">
               Looks like your cart is feeling a bit light! Let's get began by exploring our catalogue.
             </p>

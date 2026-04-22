@@ -206,7 +206,7 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
@@ -643,58 +643,67 @@ export default function SingleOrderPage() {
                 <h2 className="text-lg font-black text-[#101242] flex items-center gap-3">
                   <AlertCircle className="w-5 h-5 text-[#101242]" /> Order Modification Requests
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-6">
                   {order.fullData.order_item_modifications.map((mod: any) => (
-                    <div key={mod.id} className="space-y-4">
-                      {mod.modification_items?.map((mItem: any) => (
-                        <div key={mItem.id} className="flex flex-wrap min-[501px]:flex-nowrap items-center gap-x-4 gap-y-3 p-4 rounded-3xl bg-slate-50 border border-slate-100">
-                          <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-[#101242]/20 shrink-0">
-                            <Image
-                              src={mItem.new_entity_details?.media_files?.[0]?.image_url || mItem.new_entity_details?.image_url || mItem.original_entity_details?.media_files?.[0]?.image_url || mItem.original_entity_details?.image_url || '/placeholder-image.jpg'}
-                              alt={mItem.new_entity_details?.name || mItem.original_entity_details?.name || "Item"}
-                              fill
-                              className="object-cover"
-                              onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-[100px]">
-                            <p className="font-bold text-[#101242] text-[16px] w-[90%] capitalize truncate">
-                              {mItem.new_entity_details?.name || mItem.original_entity_details?.name}
-                            </p>
-                            <div className="mt-0.5 space-y-0.5">
-                              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
-                                Request: {mItem.modification_type}
-                              </p>
-                              <p className="font-black text-[#101242]/80 text-[15px]">₹{formatPrice(mItem.new_price)}</p>
-                            </div>
-                          </div>
+                    <div key={mod.id} className="p-6 rounded-[32px] bg-slate-50/50 border border-slate-100 space-y-5">
+                      <div className="flex items-center justify-between gap-4 border-b border-slate-200/60 pb-4">
+                        <p className="text-[10px] font-black text-[#101242]/80 uppercase tracking-[0.2em]">
+                          Request ID: {mod.id}
+                        </p>
+                        <span className={`text-[11px] font-bold px-4 py-1.5 rounded-full border uppercase tracking-wider whitespace-nowrap 
+                          ${mod.customer_confirmation === 'APPROVED' ? 'bg-[#f1f8f1] text-[#007600] border-[#d8ecd8]' :
+                            mod.customer_confirmation === 'REJECTED' ? 'bg-[#fff1f1] text-[#ba0000] border-[#fcdede]' :
+                              'bg-[#fff9ed] text-[#a15d00] border-[#f2e6cc]'}
+                        `}>
+                          {mod.customer_confirmation}
+                        </span>
+                      </div>
 
-                          {mod.customer_confirmation === 'PENDING' ? (
-                            <div className="flex flex-col-reverse sm:flex-row mt-2 sm:mt-0 gap-2 w-full sm:w-auto">
-                              <button
-                                disabled={submitting}
-                                onClick={() => handleModificationAction(mod.id, 'REJECTED')}
-                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-red-600 border border-red-100 font-bold text-xs uppercase tracking-widest hover:bg-[#101242] hover:text-white transition-all disabled:opacity-50"
-                              >
-                                <X className="w-3 h-3" /> Reject
-                              </button>
-                              <button
-                                disabled={submitting}
-                                onClick={() => handleModificationAction(mod.id, 'APPROVED')}
-                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-[#101242] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#800000] transition-all disabled:opacity-50 shadow-md shadow-[#101242]/10"
-                              >
-                                {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Accept
-                              </button>
+                      <div className="space-y-3">
+                        {mod.modification_items?.map((mItem: any) => (
+                          <div key={mItem.id} className="flex flex-wrap min-[501px]:flex-nowrap items-center gap-x-4 gap-y-3 p-4 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                            <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white border border-[#101242]/20 shrink-0">
+                              <Image
+                                src={mItem.new_entity_details?.media_files?.[0]?.image_url || mItem.new_entity_details?.image_url || mItem.original_entity_details?.media_files?.[0]?.image_url || mItem.original_entity_details?.image_url || '/placeholder-image.jpg'}
+                                alt={mItem.new_entity_details?.name || mItem.original_entity_details?.name || "Item"}
+                                fill
+                                className="object-cover"
+                                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg' }}
+                              />
                             </div>
-                          ) : (
-                            <span className={`text-[10px] font-black px-4 py-2 rounded-full border uppercase tracking-widest whitespace-nowrap 
-                              ${mod.customer_confirmation === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}
-                            `}>
-                              {mod.customer_confirmation}
-                            </span>
-                          )}
+                            <div className="flex-1 min-w-[100px]">
+                              <p className="font-bold text-[#101242] text-[16px] w-[90%] capitalize truncate">
+                                {mItem.new_entity_details?.name || mItem.original_entity_details?.name}
+                              </p>
+                              <div className="mt-0.5 space-y-0.5">
+                                <p className="text-[11px] text-[#101242] font-bold uppercase tracking-wider">
+                                  Request: {mItem.modification_type}
+                                </p>
+                                <p className="font-black text-[#101242] text-[15px]">₹{formatPrice(mItem.new_price)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {mod.customer_confirmation === 'PENDING' && (
+                        <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                          <button
+                            disabled={submitting}
+                            onClick={() => handleModificationAction(mod.id, 'REJECTED')}
+                            className="flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white text-red-600 border-2 border-red-50 font-bold text-xs uppercase tracking-widest hover:bg-[#101242] hover:text-white hover:border-[#101242] transition-all disabled:opacity-50"
+                          >
+                            <X className="w-4 h-4" /> Reject Request
+                          </button>
+                          <button
+                            disabled={submitting}
+                            onClick={() => handleModificationAction(mod.id, 'APPROVED')}
+                            className="flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-[#101242] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#800000] transition-all disabled:opacity-50"
+                          >
+                            {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Accept Request
+                          </button>
                         </div>
-                      ))}
+                      )}
                     </div>
                   ))}
                 </div>
@@ -978,7 +987,7 @@ export default function SingleOrderPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-black text-[#101242]">Live Tracking</h2>
-                  {liveStatus && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{liveStatus}</p>}
+                  {/* {liveStatus && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{liveStatus}</p>} */}
                 </div>
               </div>
               <button onClick={() => setShowTracking(false)} className="p-2 rounded-full hover:bg-slate-50 transition">

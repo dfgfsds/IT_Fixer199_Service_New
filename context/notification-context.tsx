@@ -19,8 +19,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [modalData, setModalData] = useState<any>(null)
 
   useEffect(() => {
-    // Request Permission and get token
-    requestForToken()
+    const setupNotifications = async () => {
+      // Get token
+      const token = await requestForToken()
+      
+      if (token) {
+        try {
+          // Register token with backend
+          await axiosInstance.post(Api.registerFCM, { 
+            fcm_token: token,
+            device_type: 'WEB' 
+          })
+          console.log('✅ FCM TOKEN REGISTERED WITH BACKEND')
+        } catch (error) {
+          console.error('❌ FAILED TO REGISTER FCM TOKEN:', error)
+        }
+      }
+    }
+
+    setupNotifications()
 
     // Listen for foreground notifications
     if (messaging) {
