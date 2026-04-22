@@ -66,6 +66,7 @@ export function LiveMap({
   const agentMarkerRef = useRef<google.maps.Marker | null>(null)
   const customerMarkerRef = useRef<google.maps.Marker | null>(null)
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null)
+  const lastRoutePosRef = useRef<{ lat: number, lng: number } | null>(null)
 
   // Animation refs for smooth movement
   const prevPosRef = useRef<{ lat: number, lng: number } | null>(null)
@@ -142,35 +143,48 @@ export function LiveMap({
     }
   }, [initMap])
 
-  // 2. FETCH ROUTE FIRST TIME
+  // 2. FETCH ROUTE & UPDATE DYNAMICALLY
   useEffect(() => {
-    if (!isLoaded || !agentLat || !agentLng || !customerLat || !customerLng || !googleMapRef.current || initialRouteFetched) return
+    if (!isLoaded || !agentLat || !agentLng || !customerLat || !customerLng || !googleMapRef.current) return
+
+    // Movement threshold: Only recalculate if moved > ~10-15 meters 
+    // to avoid flickering and save API quota
+    if (lastRoutePosRef.current) {
+      const distLat = Math.abs(lastRoutePosRef.current.lat - agentLat)
+      const distLng = Math.abs(lastRoutePosRef.current.lng - agentLng)
+      if (distLat < 0.0001 && distLng < 0.0001) return 
+    }
 
     const google: any = (window as any).google
     const startPos = { lat: agentLat, lng: agentLng }
+    const destPos = { lat: customerLat, lng: customerLng }
 
     const directionsService = new google.maps.DirectionsService()
+
+    // Fetch route
     directionsService.route(
       {
         origin: startPos,
-        destination: { lat: customerLat, lng: customerLng },
+        destination: destPos,
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (result: any, status: any) => {
         if (status === google.maps.DirectionsStatus.OK && directionsRendererRef.current) {
           directionsRendererRef.current.setDirections(result)
+          lastRoutePosRef.current = startPos
 
-          // Auto-zoom bounds to show both start and end points nicely
-          const bounds = new google.maps.LatLngBounds()
-          bounds.extend(startPos)
-          bounds.extend({ lat: customerLat, lng: customerLng })
-          googleMapRef.current?.fitBounds(bounds, { top: 60, bottom: 60, left: 60, right: 60 })
-
-          setInitialRouteFetched(true)
+          // Only auto-zoom/fit bounds the very first time so we don't annoy the user
+          if (!initialRouteFetched) {
+            const bounds = new google.maps.LatLngBounds()
+            bounds.extend(startPos)
+            bounds.extend(destPos)
+            googleMapRef.current?.fitBounds(bounds, { top: 60, bottom: 60, left: 60, right: 60 })
+            setInitialRouteFetched(true)
+          }
         }
       }
     )
-  }, [isLoaded, agentLat, agentLng, customerLat, customerLng, initialRouteFetched])
+  }, [isLoaded, agentLat, agentLng, customerLat, customerLng]) // Re-run when agent moves
 
 
   // 3. SMOOTH DRIVER MOVEMENT, ROTATION & AUTO-FOLLOW

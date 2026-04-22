@@ -20,7 +20,7 @@ export const messaging = typeof window !== 'undefined' ? getMessaging(app) : nul
 
 export const requestForToken = async () => {
   if (!messaging) return;
-  
+
   try {
     // 1. Check/Request Notification Permission
     const permission = await Notification.requestPermission();
@@ -33,22 +33,17 @@ export const requestForToken = async () => {
     const currentToken = await getToken(messaging, {
       vapidKey: 'BOtkHeLbJsy5wUDM8JYupKCRpoy4gdNAPXDs-oiXUyP4MfpJJAEUhe_eigvlNCYlc73xia3iLeN-m1QfaNi7TXA'
     });
-    
+
     if (currentToken) {
       console.log('🎫 CURRENT FCM TOKEN:', currentToken);
-      
-      // Send this token to your backend
-      try {
-        await axiosInstance.post(Api.registerFCM, { fcm_token: currentToken });
-        console.log('✅ FCM TOKEN REGISTERED WITH BACKEND');
-      } catch (error) {
-        console.error('❌ FAILED TO REGISTER FCM TOKEN WITH BACKEND:', error);
-      }
-      
+      console.log('🔥 FCM TOKEN OBTAINED:', currentToken);
+      return currentToken;
     } else {
-      console.log('❌ No registration token available. Request permission to generate one.');
+      console.log('No registration token available. Request permission to generate one.');
+      return null;
     }
   } catch (err) {
-    console.error('❌ An error occurred while retrieving token:', err);
+    console.log('An error occurred while retrieving token. ', err);
+    return null;
   }
 };

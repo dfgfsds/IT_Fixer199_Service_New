@@ -12,13 +12,12 @@ export function ShopButton() {
       className="group fixed right-0 top-1/2 -translate-y-1/2 z-50
         flex flex-col items-center gap-2
         bg-[#101242] hover:bg-[#800000] text-white
-        px-3 py-4 rounded-tl-[10px] rounded-bl-[10px]
-        shadow-xl shadow-[#101242]/30
+        pl-[13px] pr-[12px] py-4 rounded-tl-[10px] rounded-bl-[10px]
         hover:shadow-[#800000]/30
         transition-all duration-300 ease-in-out"
     >
       <span
-        className="text-[12px] font-black uppercase tracking-widest whitespace-nowrap select-none"
+        className="text-[12.5px] font-black uppercase tracking-widest whitespace-nowrap select-none"
         style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}
       >
         Shop Products
