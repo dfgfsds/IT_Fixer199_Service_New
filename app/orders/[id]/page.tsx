@@ -206,7 +206,7 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
