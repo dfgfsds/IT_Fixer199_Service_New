@@ -40,6 +40,8 @@ import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { useAuth } from '@/context/auth-context'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export default function OrdersTab() {
   const { user } = useAuth()
@@ -57,6 +59,7 @@ export default function OrdersTab() {
       setOrders(res?.data?.orders || [])
     } catch (error: any) {
       safeErrorLog("Failed to fetch orders", error)
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }

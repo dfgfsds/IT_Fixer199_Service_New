@@ -33,17 +33,20 @@ function RequestSkeleton() {
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ClipboardList, Clock, CheckCircle, XCircle, AlertCircle, Wrench, ChevronRight, Search, Activity, RotateCcw, CalendarClock } from 'lucide-react'
+import { ClipboardList, Clock, CheckCircle, XCircle, AlertCircle, Wrench, ChevronRight, Search, Activity, RotateCcw, CalendarClock, Check, X } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 interface ServiceRequest {
     id: string
     request_type: 'HUB_SERVICE' | 'CANCELLATION' | 'SLOT_CHANGE' | 'REFUND'
     status: string
     approval_status: 'PENDING' | 'APPROVED' | 'REJECTED'
+    customer_confirmation_status: string
     created_at: string
     order_id: string
     refund_amount?: string
@@ -52,33 +55,11 @@ interface ServiceRequest {
     order_details?: any
 }
 
-
-// Status config
-function getStatusConfig(status: string, approvalStatus: string) {
-    if (status === 'CANCELLED') {
-        return {
-            label: 'Cancelled',
-            icon: <XCircle className="w-5 h-5" />,
-            iconBg: 'bg-slate-100 text-slate-400',
-            badge: 'bg-slate-100 text-slate-500 border-slate-200',
-            dot: 'bg-slate-400',
-        }
-    }
-
-    if (status === 'COMPLETED') {
-        return {
-            label: 'Completed',
-            icon: <CheckCircle className="w-5 h-5" />,
-            iconBg: 'bg-emerald-50 text-emerald-500',
-            badge: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-            dot: 'bg-emerald-400',
-        }
-    }
-
-    switch (approvalStatus) {
-        case 'PENDING':
+function getStatusConfig(status: string) {
+    switch (status) {
+        case 'REQUESTED':
             return {
-                label: 'Pending Approval',
+                label: 'Requested',
                 icon: <Clock className="w-5 h-5" />,
                 iconBg: 'bg-amber-50 text-amber-500',
                 badge: 'bg-amber-50 text-amber-600 border-amber-100',
@@ -88,9 +69,9 @@ function getStatusConfig(status: string, approvalStatus: string) {
             return {
                 label: 'Approved',
                 icon: <CheckCircle className="w-5 h-5" />,
-                iconBg: 'bg-violet-50 text-violet-500',
-                badge: 'bg-violet-50 text-violet-600 border-violet-100',
-                dot: 'bg-violet-400',
+                iconBg: 'bg-indigo-50 text-indigo-500',
+                badge: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+                dot: 'bg-indigo-400',
             }
         case 'REJECTED':
             return {
@@ -100,10 +81,26 @@ function getStatusConfig(status: string, approvalStatus: string) {
                 badge: 'bg-red-50 text-red-600 border-red-100',
                 dot: 'bg-red-400',
             }
+        case 'CANCELLED':
+            return {
+                label: 'Cancelled',
+                icon: <XCircle className="w-5 h-5" />,
+                iconBg: 'bg-slate-100 text-slate-400',
+                badge: 'bg-slate-100 text-slate-500 border-slate-200',
+                dot: 'bg-slate-400',
+            }
+        case 'COMPLETED':
+            return {
+                label: 'Completed',
+                icon: <CheckCircle className="w-5 h-5" />,
+                iconBg: 'bg-emerald-50 text-emerald-500',
+                badge: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                dot: 'bg-emerald-400',
+            }
         default:
             return {
                 label: status,
-                icon: <AlertCircle className="w-5 h-5" />,
+                icon: <Clock className="w-5 h-5" />,
                 iconBg: 'bg-slate-100 text-slate-400',
                 badge: 'bg-slate-100 text-slate-500 border-slate-200',
                 dot: 'bg-slate-400',
@@ -135,7 +132,6 @@ function getRequestTypeInfo(type: string) {
     }
 }
 
-// Main Component
 export default function RequestTab() {
     const { user } = useAuth()
     const [requests, setRequests] = useState<ServiceRequest[]>([])
@@ -152,11 +148,27 @@ export default function RequestTab() {
             setRequests(Array.isArray(res.data) ? res.data : (res.data?.data || []))
         } catch (error: any) {
             safeErrorLog("Failed to fetch requests", error)
+            toast.error(extractErrorMessage(error))
         } finally {
             setLoading(false)
         }
     }
 
+    const handleAction = async (e: React.MouseEvent, requestId: string, isAccepted: boolean) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        try {
+            await axiosInstance.post(`${Api.requests}customer/confirm/${requestId}/`, {
+                is_accepted: isAccepted
+            })
+            toast.success(isAccepted ? 'Request accepted successfully' : 'Request declined successfully')
+            fetchRequests()
+        } catch (error: any) {
+            safeErrorLog("Failed to confirm request", error)
+            toast.error(extractErrorMessage(error))
+        }
+    }
 
     const formatDate = (iso: string) =>
         new Date(iso).toLocaleDateString('en-IN', {
@@ -186,19 +198,19 @@ export default function RequestTab() {
                 </div>
             ) : requests.length === 0 ? (
                 /* Empty state */
-                <div className="py-20 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] space-y-4">
+                <div className="py-20 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px]">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
                         <ClipboardList className="h-8 w-8 text-slate-400" />
                     </div>
-                    <h2 className="text-lg font-bold text-[#101242]">No requests yet</h2>
-                    <p className="text-sm text-slate-500 font-medium">
+                    <h2 className="mt-3 text-lg font-bold text-[#101242]">No requests yet</h2>
+                    <p className="mt-0.5 text-sm text-slate-500 font-medium">
                         Submit a service request to see it listed here
                     </p>
                 </div>
             ) : (
                 <div className="space-y-5 text-left">
                     {requests.map((req) => {
-                        const statusConfig = getStatusConfig(req.status, req.approval_status)
+                        const statusConfig = getStatusConfig(req.status)
                         const typeInfo = getRequestTypeInfo(req.request_type)
 
                         // Extract service name from order_item_details if possible
@@ -226,9 +238,9 @@ export default function RequestTab() {
                             <Link
                                 href={`/requests/${req.id}`}
                                 key={req.id}
-                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:shadow-xl hover:border-[#101242]/20 group cursor-pointer"
+                                className="bg-white p-6 rounded-[32px] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:border-[#101242]/80 group cursor-pointer"
                             >
-                                {/* Left: icon + info */}
+                                {/* Left side*/}
                                 <div className="flex items-start gap-5 min-w-0 flex-1">
                                     <div
                                         className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${typeInfo.bg} ${typeInfo.color}`}
@@ -237,7 +249,7 @@ export default function RequestTab() {
                                     </div>
                                     <div className="min-w-0 flex-1 text-left">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+                                            <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
                                                 Order ID: {req.order_id}
                                             </p>
                                         </div>
@@ -245,37 +257,57 @@ export default function RequestTab() {
                                             {typeInfo.label}
                                         </h4>
 
-                                        <div className="flex flex-wrap gap-2 mt-2">
+                                        <div className="flex flex-wrap gap-2 mt-0">
+                                            {/*
                                             {req.device_serial_number && (
                                                 <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">
                                                     SN: {req.device_serial_number}
                                                 </span>
                                             )}
+                                            */}
+
                                             {req.request_type === 'REFUND' && req.refund_amount && (
-                                                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#101242] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
+                                                <span className="mt-2 mb-0.5 inline-block text-[10px] font-bold uppercase tracking-widest text-[#101242] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
                                                     Refund: ₹{req.refund_amount}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <p className="text-slate-400 text-xs font-medium mt-1">
+                                        <p className="text-slate-500 text-xs font-medium mt-1.5">
                                             Submitted on {formatDate(req.created_at)}
                                         </p>
                                     </div>
                                 </div>
 
-                                {/* Right: status badge + chevron */}
-                                <div className="flex items-center justify-between md:justify-end gap-8 shrink-0">
-                                    <div className="text-right flex flex-col items-end gap-2">
-                                        <span
-                                            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest ${statusConfig.badge}`}
-                                        >
-                                            <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
-                                            {statusConfig.label}
-                                        </span>
-                                    </div>
+                                {/* Right side */}
+                                <div className="flex items-center justify-between md:justify-end gap-6 shrink-0">
+                                    {/* Action Buttons*/}
+                                    {req.approval_status !== 'REJECTED' && req.customer_confirmation_status === 'PENDING' ? (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={(e) => handleAction(e, req.id, false)}
+                                                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white text-red-600 border border-red-100 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-[#101242] hover:text-white hover:border-[#101242] transition-all active:scale-95 whitespace-nowrap"
+                                            >
+                                                <X className="w-3.5 h-3.5" /> Reject
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleAction(e, req.id, true)}
+                                                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[#101242] text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-[#800000] transition-all active:scale-95 whitespace-nowrap"
+                                            >
+                                                <Check className="w-3.5 h-3.5" /> Accept
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="text-right flex flex-col items-end gap-2 min-w-[100px]">
+                                            <span
+                                                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest ${statusConfig.badge}`}
+                                            >
+                                                <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                                                {statusConfig.label}
+                                            </span>
+                                        </div>
+                                    )}
 
-                                    {/* Chevron */}
                                     <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-[#101242] group-hover:text-white transition-all flex items-center justify-center shrink-0">
                                         <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
                                     </div>

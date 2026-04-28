@@ -15,6 +15,7 @@ import { formatPrice } from '@/lib/format-price'
 import { useLocation } from '@/context/location-context'
 import { safeErrorLog } from '@/lib/error-handler'
 import { ItemTrackingModal } from '@/components/item-tracking-modal'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 // SSR-safe dynamic import for LiveMap
 const LiveMap = dynamic(
@@ -189,6 +190,15 @@ export default function SingleOrderPage() {
   const [loadingItemTracking, setLoadingItemTracking] = useState(false)
 
   useEffect(() => { if (id) fetchOrder() }, [id])
+
+  // Listen for global order update signals
+  useEffect(() => {
+    const handleOrderUpdate = () => {
+      if (id) fetchOrder()
+    }
+    window.addEventListener('order_updated', handleOrderUpdate)
+    return () => window.removeEventListener('order_updated', handleOrderUpdate)
+  }, [id])
 
   // Close menu on outside click
   useEffect(() => {
@@ -379,7 +389,7 @@ export default function SingleOrderPage() {
       }
     } catch (err: any) {
       safeErrorLog('Failed to update modification status', err)
-      toast.error(err.response?.data?.message || `Failed to ${action.toLowerCase()} the request`)
+      toast.error(extractErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -429,16 +439,7 @@ export default function SingleOrderPage() {
       fetchOrder()
     } catch (err: any) {
       safeErrorLog('Action failed', err)
-      const data = err?.response?.data
-      const errMsg =
-        (typeof data === 'string' ? data : null) ||
-        data?.message ||
-        data?.detail ||
-        data?.error ||
-        (Array.isArray(data?.non_field_errors) ? data.non_field_errors[0] : null) ||
-        err?.message ||
-        'Action failed. Please try again.'
-      toast.error(errMsg)
+      toast.error(extractErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -676,8 +677,11 @@ export default function SingleOrderPage() {
                                 {mItem.new_entity_details?.name || mItem.original_entity_details?.name}
                               </p>
                               <div className="mt-0.5 space-y-0.5">
-                                <p className="text-[11px] text-[#101242] font-bold uppercase tracking-wider">
-                                  Request: {mItem.modification_type}
+                                <p className="text-[11px] text-[#101242]/90 font-bold uppercase tracking-[0.10em]">
+                                  {mItem.modification_type === 'ADD' ? 'Item Added' :
+                                    mItem.modification_type === 'REMOVE' ? 'Item Removed' :
+                                      mItem.modification_type === 'REPLACE' ? 'Item Replaced' :
+                                        mItem.modification_type}
                                 </p>
                                 <p className="font-black text-[#101242] text-[15px]">₹{formatPrice(mItem.new_price)}</p>
                               </div>

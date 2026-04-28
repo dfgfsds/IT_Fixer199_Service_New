@@ -24,6 +24,7 @@ import { useAuth } from "@/context/auth-context"
 import axiosInstance from "@/configs/axios-middleware"
 import Api from "@/api-endpoints/ApiUrls"
 import { safeErrorLog } from "@/lib/error-handler"
+import { extractErrorMessage } from "@/lib/error-utils"
 
 export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   const {
@@ -72,7 +73,10 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
           const rawData = res.data?.data || res.data
           setSavedAddresses(Array.isArray(rawData) ? rawData : [])
         })
-        .catch(err => safeErrorLog("Failed to fetch addresses", err))
+        .catch(err => {
+          safeErrorLog("Failed to fetch addresses", err)
+          toast.error(extractErrorMessage(err))
+        })
         .finally(() => setFetchingAddresses(false))
     }
   }, [visible, isLoggedIn])
@@ -130,9 +134,9 @@ export function LocationModal({ isOpen, onClose }: { isOpen?: boolean; onClose?:
         pincode: addr.pincode || "",
       })
       handleClose()
-    } catch (err) {
+    } catch (err: any) {
       safeErrorLog("Failed to set primary address", err)
-      toast.error("Could not sync selected address")
+      toast.error(extractErrorMessage(err))
     }
   }
 

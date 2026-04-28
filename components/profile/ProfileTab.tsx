@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { useAuth } from '@/context/auth-context'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function ProfileTab() {
   const { user, refreshUserData } = useAuth()
@@ -37,7 +38,7 @@ export default function ProfileTab() {
       await refreshUserData()
       setIsEditing(false)
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update profile')
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }
