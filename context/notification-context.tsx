@@ -7,6 +7,8 @@ import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
 import { messaging, requestForToken } from '@/configs/firebase-config'
 import { onMessage } from 'firebase/messaging'
+import { useAuth } from '@/context/auth-context'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 interface NotificationContextType {
   showModification: (data: any) => void
@@ -17,50 +19,61 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
   const [modalData, setModalData] = useState<any>(null)
+  const { isLoggedIn } = useAuth()
 
   useEffect(() => {
     const setupNotifications = async () => {
-      // Get token
-      const token = await requestForToken()
-      
-      if (token) {
-        try {
-          // Register token with backend
-          await axiosInstance.post(Api.registerFCM, { 
-            fcm_token: token,
-            device_type: 'WEB' 
-          })
-          console.log('✅ FCM TOKEN REGISTERED WITH BACKEND')
-        } catch (error) {
-          console.error('❌ FAILED TO REGISTER FCM TOKEN:', error)
+      try {
+        // Get token for everyone
+        const token = await requestForToken()
+
+        if (token) {
+          // register with backend
+          try {
+            await axiosInstance.post(Api.registerFCM, {
+              fcm_token: token,
+              device_type: 'WEB'
+            })
+            console.log('FCM TOKEN REGISTERED WITH BACKEND')
+          } catch (apiError: any) {
+            if (apiError.response?.status !== 401) {
+              console.error('FCM API ERROR:', extractErrorMessage(apiError))
+            }
+          }
         }
+      } catch (err) {
+        console.error('FCM SETUP ERROR:', extractErrorMessage(err))
       }
     }
 
     setupNotifications()
 
-    // Listen for foreground notifications
+    // Listen for foreground notifications for EVERYONE
+    let unsubscribe: (() => void) | undefined
     if (messaging) {
-      const unsubscribe = onMessage(messaging, (payload) => {
-        console.log('📬 NEW FOREGROUND NOTIFICATION RECEIVED:', payload)
+      unsubscribe = onMessage(messaging, (payload) => {
+        console.log('NOTIFICATION RESPONSE:', payload)
 
-        // Extract data for our modal
         const data = {
           title: payload.notification?.title || payload.data?.title,
           body: payload.notification?.body || payload.data?.body,
           orderId: payload.data?.order_id || payload.data?.orderId,
-          modificationId: payload.data?.modification_id || payload.data?.id
+          modificationId: payload.data?.modification_id || payload.data?.id,
+          requestId: payload.data?.request_id,
+          type: payload.data?.type
         }
 
         showModification(data)
       })
-
-      return () => unsubscribe()
     }
-  }, [])
+
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [isLoggedIn])
 
   const showModification = (data: any) => {
-    console.log('NOTIFICATION RECEIVED FROM BACKEND:', data)
+    console.log('DATA RECEIVED FROM NOTIFICATION:', data)
     setModalData(data)
     setIsOpen(true)
   }
@@ -94,72 +107,93 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const handleConfirm = async () => {
     console.log('USER CLICKED CONFIRM for order:', modalData?.orderId)
     try {
-      if (modalData?.modificationId) {
-        const res = await axiosInstance.post(`${Api.modificationApproval}${modalData.modificationId}/customer-approval/`, {
-          customer_confirmation: 'APPROVED'
-        })
+      if (modalData?.type === 'order_item_modification') {
+        if (modalData?.modificationId) {
+          const res = await axiosInstance.post(`${Api.modificationApproval}${modalData.modificationId}/customer-approval/`, {
+            customer_confirmation: 'APPROVED'
+          })
 
-        const responseData = res.data?.data || res.data
+          const responseData = res.data?.data || res.data
 
-        if (responseData?.payment_required) {
-          const razorpayLoaded = await loadRazorpay()
-          if (!razorpayLoaded) {
-            toast.error("Payment gateway failed to load.")
-            return
-          }
+          if (responseData?.payment_required) {
+            const razorpayLoaded = await loadRazorpay()
+            if (!razorpayLoaded) {
+              toast.error("Payment gateway failed to load.")
+              return
+            }
 
-          const options = {
-            key: appData?.pg_api_key,
-            amount: Math.round(responseData.amount * 100),
-            currency: "INR",
-            name: "ITFixer@199",
-            description: "Order Modification Payment",
-            order_id: responseData.razorpay_order_id,
-            handler: function (response: any) {
-              toast.success('Modification approved successfully')
-              setIsOpen(false)
-              window.location.reload()
-            },
-            modal: {
-              ondismiss: function () {
-                toast.error("Payment cancelled.")
+            const options = {
+              key: appData?.pg_api_key,
+              amount: Math.round(responseData.amount * 100),
+              currency: "INR",
+              name: "ITFixer@199",
+              description: "Order Modification Payment",
+              order_id: responseData.razorpay_order_id,
+              handler: function (response: any) {
+                toast.success('Modification approved successfully')
+                setIsOpen(false)
+                window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
               },
-            },
-            theme: { color: "#101242" },
-          }
+              modal: {
+                ondismiss: function () {
+                  toast.error("Payment cancelled.")
+                },
+              },
+              theme: { color: "#101242" },
+            }
 
-          const razorpay = new (window as any).Razorpay(options)
-          razorpay.open()
+            const razorpay = new (window as any).Razorpay(options)
+            razorpay.open()
+          } else {
+            toast.success('Modification approved successfully')
+            setIsOpen(false)
+            // Dispatch custom event for reactive update
+            window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
+          }
         } else {
-          toast.success('Modification approved successfully')
+          toast.info('No modification ID found in notification')
           setIsOpen(false)
-          window.location.reload()
         }
-      } else {
-        toast.info('No modification ID found in notification')
+      } else if (modalData?.requestId) {
+        await axiosInstance.post(`${Api.requests}customer/confirm/${modalData.requestId}/`, {
+          is_accepted: true
+        })
+        toast.success('Request approved successfully')
         setIsOpen(false)
+        window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
       }
     } catch (error) {
-      console.error('ERROR CONFIRMING MODIFICATION:', error)
-      toast.error('Failed to approve modification')
+      console.error('ERROR CONFIRMING REQUEST:', extractErrorMessage(error))
+      toast.error(extractErrorMessage(error))
     }
   }
 
   const handleReject = async () => {
     console.log('USER CLICKED REJECT for order:', modalData?.orderId)
     try {
-      if (modalData?.modificationId) {
-        await axiosInstance.post(`${Api.modificationApproval}${modalData.modificationId}/customer-approval/`, {
-          customer_confirmation: 'REJECTED'
+      if (modalData?.type === 'order_item_modification') {
+        if (modalData?.modificationId) {
+          await axiosInstance.post(`${Api.modificationApproval}${modalData.modificationId}/customer-approval/`, {
+            customer_confirmation: 'REJECTED'
+          })
+          toast.error('Modification request rejected')
+          setIsOpen(false)
+          window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
+        } else {
+          toast.info('No modification ID found in notification')
+        }
+      } else if (modalData?.requestId) {
+        await axiosInstance.post(`${Api.requests}customer/confirm/${modalData.requestId}/`, {
+          is_accepted: false
         })
-        toast.error('Modification rejected')
-      } else {
-        toast.info('No modification ID found in notification')
+        toast.success('Request declined successfully')
+        setIsOpen(false)
+        window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
       }
       setIsOpen(false)
     } catch (error) {
-      console.error('❌ ERROR REJECTING MODIFICATION:', error)
-      toast.error('Failed to reject modification')
+      console.error('ERROR REJECTING REQUEST:', extractErrorMessage(error))
+      toast.error(extractErrorMessage(error))
     }
   }
 
@@ -171,6 +205,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         data={modalData}
         onConfirm={handleConfirm}
         onReject={handleReject}
+        onClose={() => {
+          setIsOpen(false)
+          window.dispatchEvent(new CustomEvent('order_updated', { detail: { orderId: modalData?.orderId } }))
+        }}
       />
     </NotificationContext.Provider>
   )

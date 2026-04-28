@@ -256,3 +256,23 @@ button {
     flex-direction: column-reverse;
   }
 }
+
+/* Fix browser autofill background colors */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+  -webkit-text-fill-color: #101242 !important;
+  border: none !important;
+  outline: none !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Hide the browser's internal autofill icons/buttons */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}

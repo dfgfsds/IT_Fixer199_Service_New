@@ -39,6 +39,7 @@ import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { useAuth } from '@/context/auth-context'
 import { useLocation } from '@/context/location-context'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function AddressesTab() {
   const { user } = useAuth()
@@ -396,12 +397,14 @@ export default function AddressesTab() {
             pincode: topAddr.pincode,
             state: topAddr.state
           });
-        } catch (err) {
+        } catch (err: any) {
           safeErrorLog("Auto-selection failed", err)
+          toast.error(extractErrorMessage(err))
         }
       }
     } catch (error: any) {
       safeErrorLog('Error fetching addresses', error)
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoadingAddresses(false)
     }
@@ -429,7 +432,7 @@ export default function AddressesTab() {
       setShowDeleteModal(false)
       setAddressToDelete(null)
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to remove address')
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -457,7 +460,7 @@ export default function AddressesTab() {
       await fetchAddresses();
       toast.success('Active address updated successfully');
     } catch (error: any) {
-      toast.error('Failed to set active address');
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false);
     }
@@ -556,7 +559,7 @@ export default function AddressesTab() {
       setEditingAddressId(null)
       fetchAddresses() // Refresh list
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save address')
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }

@@ -14,6 +14,7 @@ import { useAuth } from '@/context/auth-context'
 import { formatPrice } from '@/lib/format-price'
 import { useCartItem } from '@/context/CartItemContext'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export function Header() {
   const { location, setShowLocationModal } = useLocation()
@@ -98,7 +99,7 @@ export function Header() {
 
       setSearchResults({ services: matchedServices, products: matchedProducts })
     } catch (error) {
-      safeErrorLog("Header search error", error)
+      safeErrorLog("Header search error", extractErrorMessage(error))
     } finally {
       setIsSearching(false)
     }

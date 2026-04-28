@@ -12,6 +12,7 @@ import Api from '@/api-endpoints/ApiUrls'
 import Image from 'next/image'
 import { toast } from 'sonner'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 interface RequestDetail {
     id: string
@@ -93,13 +94,13 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                 try {
                     const detailRes = await axiosInstance.get(`${Api.requests}${id}/`)
                     setRequest(detailRes.data?.data || detailRes.data)
-                } catch {
-                    toast.error('Request not found')
+                } catch (err: any) {
+                    toast.error(extractErrorMessage(err))
                 }
             }
         } catch (error: any) {
             safeErrorLog('Failed to fetch request details', error)
-            toast.error('Failed to load request details')
+            toast.error(extractErrorMessage(error))
         } finally {
             setLoading(false)
         }

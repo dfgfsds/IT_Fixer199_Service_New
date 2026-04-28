@@ -11,6 +11,8 @@ import { useSearchParams } from 'next/navigation'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 function SearchContent() {
   const searchParams = useSearchParams()
@@ -115,7 +117,9 @@ function SearchContent() {
 
       } catch (err: any) {
         safeErrorLog("Search error", err)
-        setError('An error occurred during search.')
+        const msg = extractErrorMessage(err)
+        setError(msg)
+        toast.error(msg)
       } finally {
         setLoading(false)
       }

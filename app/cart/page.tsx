@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/auth-context'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
@@ -88,6 +89,7 @@ export default function CartPage() {
       })
     } catch (err) {
       safeErrorLog("Failed to sync slot to cart", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 
@@ -105,6 +107,7 @@ export default function CartPage() {
       })
     } catch (err) {
       safeErrorLog("Failed to sync instant slot to cart", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 
@@ -131,6 +134,7 @@ export default function CartPage() {
         }
       } catch (err) {
         safeErrorLog("Error fetching addresses", err)
+        toast.error(extractErrorMessage(err))
       }
     }
 
@@ -205,7 +209,7 @@ export default function CartPage() {
       })
     } catch (error: any) {
       safeErrorLog('Update quantity error', error)
-      toast.error('Failed to update quantity')
+      toast.error(extractErrorMessage(error))
       // Revert to original quantity on failure
       setOptimisticQuantities(prev => {
         const next = { ...prev }
@@ -223,7 +227,7 @@ export default function CartPage() {
       toast.success('Item removed from cart')
     } catch (err: any) {
       safeErrorLog('Failed to delete cart item', err)
-      toast.error('Could not remove item. Please try again.')
+      toast.error(extractErrorMessage(err))
     } finally {
       setRemovingId(null)
     }
@@ -393,7 +397,7 @@ export default function CartPage() {
 
     } catch (err: any) {
       console.warn("Checkout validation failed:", err?.response?.data, err instanceof Error ? err.message : String(err))
-      toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Checkout failed. Please try again.')
+      toast.error(extractErrorMessage(err))
       setIsCheckoutLoading(false)
     }
   }
@@ -429,8 +433,9 @@ export default function CartPage() {
       })
       setAddresses(sorted)
 
-    } catch (err) {
+    } catch (err: any) {
       safeErrorLog("Failed to sync selection to backend", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 

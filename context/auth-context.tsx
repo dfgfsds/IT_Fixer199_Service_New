@@ -51,6 +51,7 @@ import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
 import { requestForToken } from '@/configs/firebase-config'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await axiosInstance.post(`${Api.logout}${user.id}`)
       }
     } catch (e) {
-      console.warn("Logout error:", e)
+      console.warn("Logout error:", extractErrorMessage(e))
     } finally {
       setUser(null)
       setIsLoggedIn(false)
@@ -152,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("user", JSON.stringify(updatedUser))
       }
     } catch (e) {
-      console.warn("Refresh user error:", e)
+      console.warn("Refresh user error:", extractErrorMessage(e))
     }
   }, [user?.id])
 
