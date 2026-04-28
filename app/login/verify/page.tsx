@@ -11,6 +11,8 @@ import axiosInstance from '@/configs/axios-middleware'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function VerifyOTPPage() {
   const router = useRouter()
@@ -83,9 +85,7 @@ export default function VerifyOTPPage() {
       }
     } catch (error: any) {
       console.warn('Verify error:', error.response?.data || error.message)
-      const res = error.response?.data
-      const errorMessage = res?.errors?.[0] || res?.message || res?.error || 'Verification failed. Please check your code.'
-      toast.error(errorMessage)
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -114,7 +114,7 @@ export default function VerifyOTPPage() {
       })
       toast.success('OTP resent successfully!')
     } catch (error: any) {
-      toast.error('Failed to resend OTP')
+      toast.error(extractErrorMessage(error))
     } finally {
       setResending(false)
     }
@@ -144,6 +144,7 @@ export default function VerifyOTPPage() {
                 value={otp}
                 onChange={setOtp}
                 disabled={loading}
+                pattern={REGEXP_ONLY_DIGITS}
               >
                 <InputOTPGroup className="gap-2">
                   <InputOTPSlot index={0} className="w-12 h-14 text-xl font-bold bg-slate-50 rounded-xl border-l border-y border-r" />

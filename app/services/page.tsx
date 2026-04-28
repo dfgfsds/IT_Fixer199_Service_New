@@ -11,6 +11,8 @@ import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -60,11 +62,9 @@ export default function ServicesPage() {
         }
       } catch (err: any) {
         safeErrorLog("Error fetching services", err)
-        if (err.response?.status === 400 && err.response?.data?.message) {
-          setError(err.response.data.message)
-        } else {
-          setError('An error occurred while fetching services.')
-        }
+        const msg = extractErrorMessage(err)
+        setError(msg)
+        toast.error(msg)
       } finally {
         setLoading(false)
       }

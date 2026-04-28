@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import axiosInstance from "@/configs/axios-middleware"
 import Api from "@/api-endpoints/ApiUrls"
 import { useAuth } from "./auth-context"
+import { extractErrorMessage } from "@/lib/error-utils"
 
 export interface LocationData {
   city: string
@@ -71,7 +72,7 @@ export function LocationProvider({ children }: any) {
       }
     } catch (err: any) {
       if (err.response?.status !== 500) {
-        console.warn("Zone fetch error", err)
+        console.warn("Zone fetch error", extractErrorMessage(err))
       }
     }
   }, [])
@@ -164,7 +165,7 @@ export function LocationProvider({ children }: any) {
           }
         } catch (e: any) {
           if (e.response?.status !== 401 && e.response?.status !== 404) {
-            console.warn("Init location fetch error", e)
+            console.warn("Init location fetch error", extractErrorMessage(e))
           }
         }
       }
@@ -176,7 +177,7 @@ export function LocationProvider({ children }: any) {
 
       setIsInitialized(true)
     } catch (error: any) {
-      console.error("Critical error in location init", error)
+      console.error("Critical error in location init", extractErrorMessage(error))
     } finally {
       isInitializingRef.current = false
     }

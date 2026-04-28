@@ -12,6 +12,7 @@ import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 function LoginContent() {
   const router = useRouter()
@@ -148,9 +149,7 @@ function LoginContent() {
       }
     } catch (error: any) {
       console.warn('Login error:', error.response?.data || error.message)
-      const res = error.response?.data
-      const errorMessage = res?.errors?.[0] || res?.message || res?.error || 'Login failed. Please try again.'
-      toast.error(errorMessage)
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }

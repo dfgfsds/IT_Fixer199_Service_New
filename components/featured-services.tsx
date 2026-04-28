@@ -7,6 +7,8 @@ import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { ServiceCard } from '@/components/service-card'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export function FeaturedServices() {
   const [services, setServices] = useState<any[]>([])
@@ -61,6 +63,7 @@ export function FeaturedServices() {
         setServices(activeServices)
       } catch (err: any) {
         safeErrorLog("Error fetching featured services", err)
+        toast.error(extractErrorMessage(err))
       } finally {
         setLoading(false)
       }
