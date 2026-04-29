@@ -775,7 +775,7 @@ export default function SingleOrderPage() {
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="space-y-8">
+          <div className="space-y-8 lg:sticky lg:top-44 h-fit self-start">
             <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
               <div className="flex items-center justify-between mb-6 px-1">
                 <h2 className="text-lg font-black flex items-center gap-3 text-[#101242]">
