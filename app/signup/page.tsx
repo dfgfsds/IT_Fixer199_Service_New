@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -43,9 +44,7 @@ export default function SignupPage() {
       router.push(`/login?phone=${phone}&email=${email}`)
     } catch (error: any) {
       console.warn('Signup error:', error.response?.data || error.message)
-      const res = error.response?.data
-      const errorMessage = res?.errors?.[0] || res?.message || res?.error || 'Registration failed. Please try again.'
-      toast.error(errorMessage)
+      toast.error(extractErrorMessage(error))
     } finally {
       setLoading(false)
     }

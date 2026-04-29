@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export function Categories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -31,6 +33,7 @@ export function Categories() {
         setCategories(mappedCategories)
       } catch (error: any) {
         safeErrorLog("Error fetching categories", error)
+        toast.error(extractErrorMessage(error))
       } finally {
         setLoading(false)
       }

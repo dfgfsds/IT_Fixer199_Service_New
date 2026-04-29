@@ -8,7 +8,8 @@ import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
-import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export default function CategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -24,7 +25,6 @@ export default function CategoriesPage() {
         const response = await axiosInstance.get(Api.categories)
 
         const categoriesData = response.data?.data || []
-        console.log(categoriesData);
         const mappedCategories = categoriesData.map((cat: any) => ({
           id: cat.id,
           name: cat.name,
@@ -34,8 +34,8 @@ export default function CategoriesPage() {
         }))
 
         setCategories(mappedCategories)
-      } catch (error: any) {
-        safeErrorLog("Error fetching categories", error)
+      } catch (err: any) {
+        toast.error(extractErrorMessage(err))
       } finally {
         setLoading(false)
       }

@@ -14,6 +14,7 @@ import axiosInstance from '@/configs/axios-middleware'
 import Api from '@/api-endpoints/ApiUrls'
 import { toast } from 'sonner'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -77,7 +78,9 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         }
       } catch (err: any) {
         safeErrorLog("Error fetching service details", err)
-        setError(err.response?.data?.message || err.message || 'Service not available at this location.')
+        const msg = extractErrorMessage(err)
+        setError(msg)
+        toast.error(msg)
       } finally {
         setLoading(false)
       }
@@ -134,7 +137,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       toast.success("Service added to cart!")
     } catch (error: any) {
       safeErrorLog("Add to cart error", error)
-      toast.error(error.response?.data?.message || 'Failed to add to cart')
+      toast.error(extractErrorMessage(error))
     } finally {
       setIsAdding(false)
     }
@@ -152,7 +155,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await fetchCart()
     } catch (error: any) {
       safeErrorLog("Increase qty error", error)
-      toast.error('Failed to update quantity')
+      toast.error(extractErrorMessage(error))
     }
   }
 
@@ -168,6 +171,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       await fetchCart()
     } catch (error) {
       safeErrorLog("Decrease qty error", error)
+      toast.error(extractErrorMessage(error))
     }
   }
 

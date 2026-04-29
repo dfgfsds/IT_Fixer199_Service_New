@@ -5,6 +5,7 @@ import Api from "../api-endpoints/ApiUrls";
 import { useLocation } from "./location-context";
 import { toast } from "sonner";
 import { useAuth } from "./auth-context";
+import { extractErrorMessage } from "@/lib/error-utils";
 
 
 const CartItemContext = createContext<any | undefined>(undefined);
@@ -57,10 +58,10 @@ export function CartItemProvider({ children }: { children: ReactNode }) {
       setData(items)
 
     } catch (err: any) {
-      console.warn("Cart fetch note:", err?.response?.data?.message || "Out of zone or server error");
+      console.warn("Cart fetch note:", extractErrorMessage(err));
 
       if (err?.response?.status !== 404 && err?.response?.status !== 401) {
-        toast.error("Services are currently not available in this location.");
+        toast.error(extractErrorMessage(err));
       }
 
       setData([])

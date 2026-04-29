@@ -15,6 +15,7 @@ import { ProductCard } from '@/components/product-card'
 import { toast } from 'sonner'
 import { formatPrice } from '@/lib/format-price'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function ProductDetailPage({
     params,
@@ -104,6 +105,7 @@ export default function ProductDetailPage({
                 }
             } catch (error: any) {
                 safeErrorLog("Error fetching product details", error)
+                toast.error(extractErrorMessage(error))
                 setProduct(null)
             } finally {
                 setLoading(false)
@@ -156,7 +158,7 @@ export default function ProductDetailPage({
             toast.success('Product added to cart!')
         } catch (error: any) {
             safeErrorLog('Error adding to cart', error)
-            toast.error('Failed to add to cart')
+            toast.error(extractErrorMessage(error))
         } finally {
             setAddingToCart(false)
         }
@@ -175,7 +177,7 @@ export default function ProductDetailPage({
             })
             await fetchCart()
         } catch (error) {
-            toast.error('Failed to increase quantity')
+            toast.error(extractErrorMessage(error))
         } finally {
             setOptimisticQuantity(null)
         }
@@ -202,7 +204,7 @@ export default function ProductDetailPage({
             }
             await fetchCart()
         } catch (error) {
-            toast.error('Failed to update quantity')
+            toast.error(extractErrorMessage(error))
         } finally {
             setOptimisticQuantity(null)
         }

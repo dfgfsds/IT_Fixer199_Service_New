@@ -9,6 +9,8 @@ import { useLocation } from '@/context/location-context'
 import Api from '@/api-endpoints/ApiUrls'
 import axiosInstance from '@/configs/axios-middleware'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export default function AllProductsPage() {
     const { location, setShowLocationModal } = useLocation()
@@ -33,7 +35,7 @@ export default function AllProductsPage() {
                 const productCategories = data.filter((cat: any) => cat.status === 'ACTIVE' && cat.type === 'PRODUCT')
                 setCategoriesList(productCategories)
             } catch (error) {
-                console.error("Failed to fetch categories", error)
+                toast.error(extractErrorMessage(error))
             }
         }
         fetchCategories()
@@ -95,6 +97,7 @@ export default function AllProductsPage() {
                 setProducts(mappedProducts)
             } catch (error: any) {
                 safeErrorLog("Error fetching products", error)
+                toast.error(extractErrorMessage(error))
                 setProducts([])
                 setPaginationData(null)
             } finally {

@@ -12,6 +12,8 @@ import axiosInstance from '@/configs/axios-middleware'
 import { useRouter } from 'next/navigation'
 import { type Product } from '@/lib/products'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
+import { toast } from 'sonner'
 
 export default function CategorySinglePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -111,7 +113,9 @@ export default function CategorySinglePage({ params }: { params: Promise<{ id: s
                 // If API fails (e.g. out of zone), ensure we don't show old data
                 setServices([])
                 setProducts([])
-                setError(error.response?.data?.message || 'Content not available at this location.')
+                const msg = extractErrorMessage(error)
+                setError(msg)
+                toast.error(msg)
             } finally {
                 setLoading(false)
             }

@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/auth-context'
 import { safeErrorLog } from '@/lib/error-handler'
+import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
@@ -88,6 +89,7 @@ export default function CartPage() {
       })
     } catch (err) {
       safeErrorLog("Failed to sync slot to cart", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 
@@ -105,6 +107,7 @@ export default function CartPage() {
       })
     } catch (err) {
       safeErrorLog("Failed to sync instant slot to cart", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 
@@ -131,6 +134,7 @@ export default function CartPage() {
         }
       } catch (err) {
         safeErrorLog("Error fetching addresses", err)
+        toast.error(extractErrorMessage(err))
       }
     }
 
@@ -205,7 +209,7 @@ export default function CartPage() {
       })
     } catch (error: any) {
       safeErrorLog('Update quantity error', error)
-      toast.error('Failed to update quantity')
+      toast.error(extractErrorMessage(error))
       // Revert to original quantity on failure
       setOptimisticQuantities(prev => {
         const next = { ...prev }
@@ -223,7 +227,7 @@ export default function CartPage() {
       toast.success('Item removed from cart')
     } catch (err: any) {
       safeErrorLog('Failed to delete cart item', err)
-      toast.error('Could not remove item. Please try again.')
+      toast.error(extractErrorMessage(err))
     } finally {
       setRemovingId(null)
     }
@@ -393,7 +397,7 @@ export default function CartPage() {
 
     } catch (err: any) {
       console.warn("Checkout validation failed:", err?.response?.data, err instanceof Error ? err.message : String(err))
-      toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Checkout failed. Please try again.')
+      toast.error(extractErrorMessage(err))
       setIsCheckoutLoading(false)
     }
   }
@@ -429,8 +433,9 @@ export default function CartPage() {
       })
       setAddresses(sorted)
 
-    } catch (err) {
+    } catch (err: any) {
       safeErrorLog("Failed to sync selection to backend", err)
+      toast.error(extractErrorMessage(err))
     }
   }
 
@@ -472,15 +477,15 @@ export default function CartPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
                 href={isLoggedIn ? "/services" : "/login"}
-                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-[#800000] hover:shadow-xl hover:shadow-red-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
+                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-[#101242] hover:shadow-xl hover:shadow-red-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#101242] group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
+                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#101242] group-hover:text-white rounded-[18px] flex items-center justify-center mb-2.5 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
                   <Wrench className="w-5 h-5" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#101242] transition-colors mb-1 pr-8">Book a Service</h3>
+                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#101242] transition-colors mb-0.5 pr-8">Book a Service</h3>
                   <p className="text-sm text-slate-500 font-medium">Expert doorstep repair & diagnostics.</p>
                 </div>
                 <div className="absolute top-7 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
@@ -492,15 +497,15 @@ export default function CartPage() {
 
               <Link
                 href={isLoggedIn ? "/products" : "/login"}
-                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-slate-800 hover:shadow-xl hover:shadow-slate-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
+                className="group relative bg-white border-2 border-slate-100 rounded-[28px] p-6 hover:border-[#101242] hover:shadow-xl hover:shadow-slate-900/5 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-50/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-slate-800 group-hover:text-white rounded-[18px] flex items-center justify-center mb-6 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
+                <div className="w-12 h-12 bg-slate-50 text-slate-400 group-hover:bg-[#101242] group-hover:text-white rounded-[18px] flex items-center justify-center mb-2.5 transition-all duration-300 relative z-10 group-hover:scale-110 shadow-sm">
                   <PackageSearch className="w-5 h-5" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-slate-800 transition-colors mb-1 pr-8">Browse Products</h3>
+                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#101242] transition-colors mb-0.5 pr-8">Browse Products</h3>
                   <p className="text-sm text-slate-500 font-medium">Genuine spare parts & accessories.</p>
                 </div>
                 <div className="absolute top-7 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
