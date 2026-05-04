@@ -216,7 +216,7 @@ export default function SingleOrderPage() {
     const token = localStorage.getItem('token')
     if (!token) return
 
-    const ws = new WebSocket(`wss://api.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
+    const ws = new WebSocket(`wss://api-test.itfixer199.com/ws/order-tracking/${id}/?token=${token}`)
     wsRef.current = ws
 
     ws.onopen = () => console.log('WS Connected')
@@ -1019,7 +1019,7 @@ export default function SingleOrderPage() {
             </div>
             <button
               onClick={() => setShowTracking(false)}
-              className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+              className="w-full py-4 bg-slate-100 text-[#101242] rounded-2xl font-bold hover:bg-slate-200 transition-all"
             >
               Close Tracking
             </button>
