@@ -1019,7 +1019,7 @@ export default function SingleOrderPage() {
             </div>
             <button
               onClick={() => setShowTracking(false)}
-              className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+              className="w-full py-4 bg-slate-100 text-[#101242] rounded-2xl font-bold hover:bg-slate-200 transition-all"
             >
               Close Tracking
             </button>
