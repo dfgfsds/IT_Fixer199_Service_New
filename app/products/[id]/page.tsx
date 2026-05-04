@@ -397,31 +397,38 @@ export default function ProductDetailPage({
 
                         {attributeGroups && (
                             <div className="space-y-6 pt-2">
-                                {Object.keys(attributeGroups).map((groupName) => (
-                                    <div key={groupName} className="space-y-3">
-                                        <h3 className="text-lg font-bold text-[#101242] uppercase tracking-wider flex items-center gap-2">
-                                            {groupName}
-                                            <span className="text-[10px] text-red-500 font-black tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded-md">* Required</span>
-                                        </h3>
-                                        <div className="flex flex-wrap gap-3">
-                                            {attributeGroups[groupName].map((attr) => {
-                                                const isSelected = selectedAttributes[groupName] === attr.value_id
-                                                return (
-                                                    <button
-                                                        key={attr.value_id}
-                                                        onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
-                                                        className={`px-5 py-2.5 rounded-xl border-2 transition-all font-bold text-sm ${isSelected
-                                                            ? 'border-[#101242] bg-[rgba(16,18,66,0.1)] text-[#101242] scale-[1.02] shadow-sm'
-                                                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                                                            }`}
-                                                    >
-                                                        {attr.value}
-                                                    </button>
-                                                )
-                                            })}
+                                {Object.keys(attributeGroups).map((groupName) => {
+                                    const hasSelection = !!selectedAttributes[groupName];
+                                    return (
+                                        <div key={groupName} className="space-y-3">
+                                            <h3 className="text-lg font-bold text-[#101242] uppercase tracking-wider flex items-center gap-2">
+                                                {groupName}
+                                                {!hasSelection && (
+                                                    <span className="text-[10px] text-red-500 font-black tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded-md animate-in fade-in duration-300">
+                                                        * Required
+                                                    </span>
+                                                )}
+                                            </h3>
+                                            <div className="flex flex-wrap gap-3">
+                                                {attributeGroups[groupName].map((attr) => {
+                                                    const isSelected = selectedAttributes[groupName] === attr.value_id
+                                                    return (
+                                                        <button
+                                                            key={attr.value_id}
+                                                            onClick={() => setSelectedAttributes(prev => ({ ...prev, [groupName]: attr.value_id }))}
+                                                            className={`px-5 py-2.5 rounded-xl border-2 transition-all font-bold text-sm ${isSelected
+                                                                ? 'border-[#101242] bg-[rgba(16,18,66,0.1)] text-[#101242] scale-[1.02] shadow-sm'
+                                                                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                                                }`}
+                                                        >
+                                                            {attr.value}
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
                         )}
 

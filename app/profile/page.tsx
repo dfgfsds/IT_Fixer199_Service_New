@@ -62,6 +62,7 @@ function ProfileContent() {
       <main className="flex-1 py-12 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
           <aside className="lg:col-span-3 space-y-6">
+            {/* <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-44 h-fit self-start"> */}
             <div className="bg-white p-8 rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-100 text-center space-y-4">
               <div className="relative w-24 h-24 mx-auto group">
                 <Image
