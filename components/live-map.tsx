@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Loader2, Target } from 'lucide-react'
+import { Loader2, Target, LocateFixed } from 'lucide-react'
 import { safeErrorLog } from '@/lib/error-handler'
 
 // Helper: Handle Google Maps Script loading safely
@@ -65,12 +65,14 @@ export function LiveMap({
   const googleMapRef = useRef<google.maps.Map | null>(null)
   const agentMarkerRef = useRef<google.maps.Marker | null>(null)
   const customerMarkerRef = useRef<google.maps.Marker | null>(null)
-  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null)
+  const routePolylineRef = useRef<google.maps.Polyline | null>(null)
   const lastRoutePosRef = useRef<{ lat: number, lng: number } | null>(null)
 
   // Animation refs for smooth movement
   const prevPosRef = useRef<{ lat: number, lng: number } | null>(null)
+  const currentPosRef = useRef<{ lat: number, lng: number } | null>(null)
   const animationFrameRef = useRef<number | null>(null)
+
 
   const [isLoaded, setIsLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -110,17 +112,6 @@ export function LiveMap({
         setIsFollowing(false)
       })
 
-      // Directions setup (Road snap)
-      directionsRendererRef.current = new google.maps.DirectionsRenderer({
-        map: googleMapRef.current,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: "#1e3a8a",
-          strokeWeight: 6,
-          strokeOpacity: 0.9,
-        }
-      })
-
       // Customer Marker (Destination - Native Google Red Pin)
       customerMarkerRef.current = new google.maps.Marker({
         position: { lat: customerLat, lng: customerLng },
@@ -140,6 +131,7 @@ export function LiveMap({
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
       googleMapRef.current = null
+      if (routePolylineRef.current) routePolylineRef.current.setMap(null)
     }
   }, [initMap])
 
@@ -152,7 +144,7 @@ export function LiveMap({
     if (lastRoutePosRef.current) {
       const distLat = Math.abs(lastRoutePosRef.current.lat - agentLat)
       const distLng = Math.abs(lastRoutePosRef.current.lng - agentLng)
-      if (distLat < 0.0001 && distLng < 0.0001) return 
+      if (distLat < 0.0001 && distLng < 0.0001) return
     }
 
     const google: any = (window as any).google
@@ -169,9 +161,46 @@ export function LiveMap({
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (result: any, status: any) => {
-        if (status === google.maps.DirectionsStatus.OK && directionsRendererRef.current) {
-          directionsRendererRef.current.setDirections(result)
+        if (status === google.maps.DirectionsStatus.OK) {
           lastRoutePosRef.current = startPos
+
+          // Fix the visual disconnect AND overflow: Extract the exact detailed road path
+          // and prepend/append our exact marker coordinates to create ONE continuous line.
+          const route = result.routes[0];
+          if (route && route.legs && route.legs.length > 0) {
+            const leg = route.legs[0];
+
+            // Extract detailed path from steps
+            const detailedPath: google.maps.LatLng[] = [];
+            leg.steps.forEach((step: any) => {
+              step.path.forEach((point: google.maps.LatLng) => {
+                detailedPath.push(point);
+              });
+            });
+
+            // Create a single unified array of coordinates
+            const unifiedPath = [
+              new google.maps.LatLng(startPos.lat, startPos.lng),
+              ...detailedPath,
+              new google.maps.LatLng(destPos.lat, destPos.lng)
+            ];
+
+            // If we already have a polyline, update it. Otherwise, create it.
+            if (!routePolylineRef.current) {
+              routePolylineRef.current = new google.maps.Polyline({
+                path: unifiedPath,
+                strokeColor: "#101242",
+                strokeOpacity: 0.9,
+                strokeWeight: 6,
+                map: googleMapRef.current,
+                // Ensure rounded caps and joins for perfectly smooth corners
+                strokeLinecap: "round",
+                strokeLinejoin: "round"
+              });
+            } else {
+              routePolylineRef.current.setPath(unifiedPath);
+            }
+          }
 
           // Only auto-zoom/fit bounds the very first time so we don't annoy the user
           if (!initialRouteFetched) {
@@ -236,25 +265,33 @@ export function LiveMap({
         zIndex: 999
       })
       prevPosRef.current = newPos
+      currentPosRef.current = newPos
       return
     }
 
-    const prevPos = prevPosRef.current
+    const targetPos = prevPosRef.current
 
-    // If location changed -> start animation
-    if (prevPos.lat !== newPos.lat || prevPos.lng !== newPos.lng) {
+    // If a new location arrived -> start animation
+    if (targetPos.lat !== newPos.lat || targetPos.lng !== newPos.lng) {
 
       // Ignore tiny micro-fluctuations (GPS jitter)
       const distanceThreshold = 0.00001
-      if (Math.abs(prevPos.lat - newPos.lat) < distanceThreshold && Math.abs(prevPos.lng - newPos.lng) < distanceThreshold) {
+      if (Math.abs(targetPos.lat - newPos.lat) < distanceThreshold && Math.abs(targetPos.lng - newPos.lng) < distanceThreshold) {
         return;
       }
 
-      // Calculate which direction the arrow should face
-      const currentHeading = getBearing(prevPos.lat, prevPos.lng, newPos.lat, newPos.lng)
+      // We animate from exactly where the marker is currently physically sitting
+      const startLat = currentPosRef.current ? currentPosRef.current.lat : targetPos.lat
+      const startLng = currentPosRef.current ? currentPosRef.current.lng : targetPos.lng
+
+      // Calculate which direction the arrow should face based on where we are going
+      const currentHeading = getBearing(startLat, startLng, newPos.lat, newPos.lng)
 
       // Rotate the vector arrow icon immediately
       agentMarkerRef.current?.setIcon(getAgentIcon(currentHeading))
+
+      // Update the target ref so we don't trigger this again for the same coordinates
+      prevPosRef.current = newPos
 
       const startTime = performance.now()
       const duration = 2000
@@ -263,14 +300,15 @@ export function LiveMap({
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
 
-        // Ease out quad calculation for smooth stops
-        const easeProgress = progress * (2 - progress)
-
-        // Calculate the intermediate coordinate
-        const currentLat = prevPos.lat + (newPos.lat - prevPos.lat) * easeProgress
-        const currentLng = prevPos.lng + (newPos.lng - prevPos.lng) * easeProgress
+        // Linear interpolation is often smoother for continuous GPS updates 
+        // than ease-out, which can cause start/stop stuttering
+        const currentLat = startLat + (newPos.lat - startLat) * progress
+        const currentLng = startLng + (newPos.lng - startLng) * progress
 
         const framePos = { lat: currentLat, lng: currentLng }
+
+        // Save physical position so if a new WS message arrives, we start from here
+        currentPosRef.current = framePos
 
         // Reposition the physical marker
         agentMarkerRef.current?.setPosition(framePos)
@@ -282,8 +320,6 @@ export function LiveMap({
 
         if (progress < 1) {
           animationFrameRef.current = requestAnimationFrame(animate)
-        } else {
-          prevPosRef.current = newPos
         }
       }
 
@@ -339,10 +375,10 @@ export function LiveMap({
       {!isFollowing && isLoaded && (agentLat && agentLng) && (
         <button
           onClick={handleRecenter}
-          className="absolute bottom-6 right-4 z-20 bg-[#161c4f] p-3.5 rounded-full shadow-lg shadow-black/20 text-white hover:scale-105 transition-transform animate-in fade-in zoom-in"
+          className="absolute bottom-[70px] right-[9px] z-20 bg-[#101242] backdrop-blur-sm p-2.5 rounded-full shadow-lg shadow-black/10 text-white border border-white hover:scale-105 transition-all animate-in fade-in zoom-in"
           title="Recenter to Expert"
         >
-          <Target className="w-6 h-6 stroke-[2.5]" />
+          <LocateFixed className="w-6 h-6 stroke-[2]" />
         </button>
       )}
     </div>
