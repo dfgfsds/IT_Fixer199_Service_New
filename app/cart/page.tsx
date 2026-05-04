@@ -19,7 +19,7 @@ import { extractErrorMessage } from '@/lib/error-utils'
 
 export default function CartPage() {
   const { cartItem, rawCartData, fetchCart, isLoading } = useCartItem()
-  const { location, setLocation, zoneData } = useLocation()
+  const { location, setLocation, zoneData, refreshZoneData } = useLocation()
   const { user, isLoggedIn } = useAuth()
   const router = useRouter()
 
@@ -397,7 +397,19 @@ export default function CartPage() {
 
     } catch (err: any) {
       console.warn("Checkout validation failed:", err?.response?.data, err instanceof Error ? err.message : String(err))
-      toast.error(extractErrorMessage(err))
+
+      const errorMsg = extractErrorMessage(err).toLowerCase()
+      // If the backend error mentions slot availability, show our custom professional message
+      if (errorMsg.includes("slot") || errorMsg.includes("available") || errorMsg.includes("book")) {
+        toast.error("We are sorry, the time slot you selected was just booked by someone else. Please select a new available slot to continue.", { duration: 5000 })
+        // Silently refresh the slots in the background so the UI updates instantly
+        if (location?.lat && location?.lng && refreshZoneData) {
+          refreshZoneData(location.lat, location.lng)
+        }
+      } else {
+        toast.error(extractErrorMessage(err))
+      }
+
       setIsCheckoutLoading(false)
     }
   }
@@ -936,6 +948,8 @@ export default function CartPage() {
           </div>
 
           {/* Right Column: Order Summary */}
+
+          {/* <div className="lg:col-span-1 lg:sticky lg:top-48 h-fit self-start"> */}
           <div className="lg:col-span-1">
             {(() => {
               const inactiveItems = cartItems.filter(item => item.is_active === false)
@@ -944,6 +958,7 @@ export default function CartPage() {
 
               return (
                 <div className="bg-white rounded-[40px] p-8 border border-[#101242]/30 shadow-xl shadow-slate-200/20 sticky top-12 space-y-8">
+                  {/* <div className="bg-white rounded-[40px] p-8 border border-[#101242]/30 shadow-xl shadow-slate-200/20 space-y-8"> */}
                   <h2 className="text-2xl font-black text-[#101242]">Order Summary</h2>
 
                   <div className="space-y-4">
