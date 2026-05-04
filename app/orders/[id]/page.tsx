@@ -152,7 +152,7 @@ const slotChangeReasons = [
 export default function SingleOrderPage() {
   const { id } = useParams()
   const router = useRouter()
-  const { zoneData, setLocation } = useLocation()
+  const { location, zoneData, setLocation, refreshZoneData } = useLocation()
 
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -439,7 +439,17 @@ export default function SingleOrderPage() {
       fetchOrder()
     } catch (err: any) {
       safeErrorLog('Action failed', err)
-      toast.error(extractErrorMessage(err))
+
+      const errorMsg = extractErrorMessage(err).toLowerCase()
+      if (actionType === 'slot' && (errorMsg.includes("slot") || errorMsg.includes("available") || errorMsg.includes("book"))) {
+        toast.error("We are sorry, the time slot you selected was just booked by someone else. Please select a new available slot to continue.", { duration: 5000 })
+        if (location?.lat && location?.lng && refreshZoneData) {
+          refreshZoneData(location.lat, location.lng)
+        }
+      } else {
+        toast.error(extractErrorMessage(err))
+      }
+
     } finally {
       setSubmitting(false)
     }
