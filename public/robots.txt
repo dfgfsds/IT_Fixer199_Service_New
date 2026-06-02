@@ -1,111 +1,66 @@
-# =========================================
-# ROBOTS.TXT - ITFIXER@199
-# SEO + AEO + GEO OPTIMIZED
-# =========================================
-
+=========================================
+ROBOTS.TXT - ITFIXER@199
+Next.js SEO + AEO + GEO Optimized
+=========================================
 User-agent: *
 Allow: /
-
-# =========================================
-# IMPORTANT PUBLIC FILES
-# =========================================
-Allow: /wp-content/uploads/
-Allow: /assets/
-Allow: /*.css$
-Allow: /*.js$
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.webp$
-Allow: /*.gif$
-Allow: /*.svg$
-
-# =========================================
-# BLOCK PRIVATE / SYSTEM DIRECTORIES
-# =========================================
-Disallow: /admin/
-Disallow: /dashboard/
-Disallow: /login/
-Disallow: /wp-admin/
-Disallow: /wp-login.php
-Disallow: /cgi-bin/
-Disallow: /tmp/
-Disallow: /private/
-Disallow: /backup/
-Disallow: /cache/
-Disallow: /search/
-Disallow: /author/
-Disallow: /trackback/
-Disallow: /xmlrpc.php
-
-# =========================================
-# BLOCK API & SYSTEM FILES
-# =========================================
-Disallow: /api/
-Disallow: /_next/
-Disallow: /node_modules/
+=========================================
+ALLOW IMPORTANT NEXT.JS ASSETS
+=========================================
+Allow: /_next/static/
+Allow: /_next/image/
+=========================================
+PRIVATE PAGES
+=========================================
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /my-account
+Disallow: /account
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /wishlist
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order-success
+=========================================
+ADMIN AREA
+=========================================
+Disallow: /admin
+Disallow: /administrator
+Disallow: /backend
+=========================================
+SYSTEM FILES
+=========================================
 Disallow: /.git/
 Disallow: /.env
-
-# =========================================
-# CRAWL OPTIMIZATION
-# =========================================
-Crawl-delay: 2
-
-# =========================================
-# AI / AEO / GEO SEARCH SUPPORT
-# =========================================
-# Helps AI crawlers and answer engines index
-# gaming PC builds, service pages, and products.
-
+Disallow: /node_modules/
+Disallow: /tmp/
+Disallow: /backup/
+=========================================
+SEARCH & FILTER PAGES
+=========================================
+Disallow: /search
+Disallow: /?sort=
+Disallow: /?filter=
+Disallow: /?price=
+Disallow: /?page=
+=========================================
+AI CRAWLERS
+=========================================
 User-agent: GPTBot
 Allow: /
-
 User-agent: ChatGPT-User
 Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
 User-agent: ClaudeBot
 Allow: /
-
-User-agent: Bytespider
+User-agent: PerplexityBot
 Allow: /
-
-# =========================================
-# GEO TARGETING (LOCAL SEO FOR ITFIXER@199)
-# =========================================
-# Business Location: Ramapuram, Chennai, Tamil Nadu, India
-# Service Areas: Ramapuram, Porur, Guindy, Ashok Nagar,
-# Saidapet, KK Nagar, Ekkatuthangal, Chennai Metro Region.
-
-# =========================================
-# BUSINESS INFORMATION (AI / AEO CONTEXT ONLY)
-# =========================================
-# Business Name: ITFixer@199
-# Address: No.91, Ground Floor, Kothari Nagar,
-# 2nd Main Road, Ramapuram, Chennai – 600089, India
-# Phone: +91 9385939985
-# Email: info@itfixer199.com
-
-# Social Profiles
-# Facebook: https://www.facebook.com/itfixerat199
-# Instagram: https://www.instagram.com/it.fixerat_199
-# Youtube: https://www.youtube.com/@ITFixeAt199
-# Linkedin: https://www.linkedin.com/company/it-fixer-at199/about/
-# Twitter: https://x.com/itfixerat199
-
-# =========================================
-# SITEMAP
-# =========================================
+User-agent: Google-Extended
+Allow: /
+=========================================
+SITEMAP
+=========================================
 Sitemap: https://www.itfixer199.com/sitemap.xml
-
-# =========================================
-# HOST
-# =========================================
-Host: https://www.itfixer199.com/
+Sitemap: https://www.itfixer199.com/server-sitemap.xml
 
