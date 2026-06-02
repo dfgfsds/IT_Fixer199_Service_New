@@ -1,12 +1,107 @@
-'use client'
+
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Scale, Shield, AlertCircle, CreditCard, FileText, Globe, Package, User, RefreshCw, Award, Link as LinkIcon, Mail, Phone, Building } from 'lucide-react'
+import type { Metadata } from "next";
+import Script from "next/script";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "ITFixer @199 – Terms & Conditions | Service Policies",
+    description:
+      "Read ITFixer @199's Terms & Conditions including service policies, repair guidelines, warranty rules, and customer support information.",
+    keywords: [
+      "ITFixer 199 terms",
+      "ITFixer policies",
+      "service terms Chennai",
+      "laptop repair terms",
+      "computer service conditions",
+      "ITFixer warranty rules",
+      "repair policy Chennai",
+    ],
+    robots: {
+      index: true,
+      follow: true,
+    },
+    alternates: {
+      canonical: "https://www.itfixer199.com/terms-and-conditions",
+    },
+    openGraph: {
+      title: "ITFixer @199 – Terms & Conditions",
+      description:
+        "Understand ITFixer @199’s service terms, warranty policies, and repair conditions for laptops, desktops, and MacBooks.",
+      url: "/logo.png",
+      siteName: "ITFixer @199",
+      type: "website",
+      images: [
+        {
+          url: "/logo.png",
+          width: 1200,
+          height: 630,
+          alt: "ITFixer @199 Terms & Conditions",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "ITFixer @199 – Terms & Conditions",
+      description:
+        "Read ITFixer @199’s Terms & Conditions including service policies, repair guidelines, and warranty rules.",
+      images: [
+        "/logo.png",
+      ],
+      site: "@itfixerat199",
+    },
+    other: {
+      image_src: "/logo.png",
+    },
+  };
+}
+
+const termsSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Terms & Conditions – ITFixer @199",
+  url: "https://www.itfixer199.com/terms-and-conditions",
+  description:
+    "Terms & Conditions of ITFixer @199 including repair service rules, warranty policies, and customer support guidelines.",
+  publisher: {
+    "@type": "LocalBusiness",
+    name: "ITFixer @199",
+    url: "https://www.itfixer199.com/",
+    telephone: "+91 9385939985",
+    email: "info@itfixer199.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        "No.91, Ground Floor, Kothari Nagar 2nd Main Road, Ramapuram",
+      addressLocality: "Chennai",
+      postalCode: "600089",
+      addressRegion: "Tamil Nadu",
+      addressCountry: "IN",
+    },
+    sameAs: [
+      "https://www.facebook.com/itfixerat199",
+      "https://www.instagram.com/it.fixerat_199",
+      "https://www.youtube.com/@ITFixeAt199",
+      "https://www.linkedin.com/company/it-fixer-at199/about/",
+      "https://x.com/itfixerat199",
+    ],
+  },
+};
+
 
 export default function TermsConditionsPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col selection:bg-[#101242]/10 selection:text-[#101242]">
+      <Script
+        id="terms-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(termsSchema),
+        }}
+      />
       <Header />
 
       <main className="flex-1">

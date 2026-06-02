@@ -1,13 +1,109 @@
-'use client'
 
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Shield, Users, MapPin, Zap, CheckCircle, Smartphone, Laptop, Monitor, MousePointer, Settings, RefreshCw, Cpu, Star, Target, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import Image from 'next/image'
+import type { Metadata } from "next";
+import Script from "next/script";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "About ITFixer @199 – Best Laptop & Computer Service Center",
+    description:
+      "Learn about ITFixer @199, Chennai’s trusted laptop, computer & MacBook repair center offering chip-level service, upgrades and fast doorstep support.",
+    keywords: [
+      "About ITFixer 199",
+      "laptop service center Chennai",
+      "computer repair Chennai",
+      "MacBook service experts",
+      "chip level technicians",
+      "ITFixer team",
+      "laptop repair Chennai",
+    ],
+    robots: {
+      index: true,
+      follow: true,
+    },
+    alternates: {
+      canonical: "https://www.itfixer199.com/about",
+    },
+    openGraph: {
+      title: "About ITFixer @199 – Laptop & Computer Repair Experts",
+      description:
+        "Know more about ITFixer @199, a trusted laptop & computer service center in Chennai providing chip-level repairs, upgrades, and fast support.",
+      url: "https://www.itfixer199.com/about",
+      siteName: "ITFixer @199",
+      type: "website",
+      images: [
+        {
+          url: "/logo.png",
+          width: 1200,
+          height: 630,
+          alt: "About ITFixer @199",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "About ITFixer @199 – Laptop & Computer Repair Experts",
+      description:
+        "Learn about ITFixer @199, Chennai’s trusted laptop & computer repair experts. Chip-level service, upgrades & doorstep support.",
+      images: [
+        "/logo.png",
+      ],
+      site: "@itfixerat199",
+    },
+    other: {
+      image_src: "/logo.png",
+    },
+  };
+}
+
+
 
 export default function AboutPage() {
+  const aboutSchema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  name: "About ITFixer @199",
+  url: "https://www.itfixer199.com/about",
+  mainEntity: {
+    "@type": "LocalBusiness",
+    name: "ITFixer @199",
+    url: "https://www.itfixer199.com/",
+    image: "/logo.png",
+    description:
+      "ITFixer @199 is a leading laptop, computer and MacBook repair service center in Chennai offering chip-level service, hardware upgrades, and fast support.",
+    telephone: "+91 9385939985",
+    email: "info@itfixer199.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        "No.91, Ground Floor, Kothari Nagar 2nd Main Road, Ramapuram",
+      addressLocality: "Chennai",
+      postalCode: "600089",
+      addressRegion: "Tamil Nadu",
+      addressCountry: "IN",
+    },
+    sameAs: [
+      "https://www.facebook.com/itfixerat199",
+      "https://www.instagram.com/it.fixerat_199",
+      "https://www.youtube.com/@ITFixeAt199",
+      "https://www.linkedin.com/company/it-fixer-at199/about/",
+      "https://x.com/itfixerat199",
+    ],
+  },
+};
+
   return (
     <div className="min-h-screen bg-white flex flex-col selection:bg-[#101242]/10 selection:text-[#101242]">
+      <Script
+        id="about-page-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(aboutSchema),
+        }}
+      />
       <Header />
 
       <main className="flex-1">

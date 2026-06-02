@@ -36,7 +36,7 @@ export function Footer() {
               <a href="https://www.instagram.com/it.fixerat_199" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 hover:bg-slate-100 hover:border-slate-200 flex items-center justify-center transition-all text-slate-400 hover:text-[#e1306c]">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://www.youtube.com/@Itfixerat199" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 hover:bg-slate-100 hover:border-slate-200 flex items-center justify-center transition-all text-slate-400 hover:text-[#ff0000]">
+              <a href="https://www.youtube.com/@ITFixeAt199" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 hover:bg-slate-100 hover:border-slate-200 flex items-center justify-center transition-all text-slate-400 hover:text-[#ff0000]">
                 <Youtube className="w-5 h-5" strokeWidth={1.5} />
               </a>
               <a href="https://www.linkedin.com/in/itfixerat199/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 hover:bg-slate-100 hover:border-slate-200 flex items-center justify-center transition-all text-slate-400 hover:text-[#0077b5]">
@@ -81,7 +81,7 @@ export function Footer() {
                   </div>
                 </a>
               </li>
-              <li className="flex items-center gap-3">
+              {/* <li className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5 text-[#101242]" />
                 </div>
@@ -92,6 +92,34 @@ export function Footer() {
                   <Mail className="w-5 h-5 text-[#101242]" />
                 </div>
                 <a href="mailto:info@itfixer199.com" className="text-sm font-semibold text-slate-500 hover:text-[#101242] transition-colors">info@itfixer199.com</a>
+              </li> */}
+
+              <li className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5 text-[#101242]" />
+                </div>
+
+                <a
+                  href="tel:+919385939985"
+                  className="text-sm font-semibold text-slate-500 hover:text-[#101242] transition-colors"
+                >
+                  +91 9385939985
+                </a>
+              </li>
+
+              <li className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5 text-[#101242]" />
+                </div>
+
+                <a
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=info@itfixer199.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-slate-500 hover:text-[#101242]"
+                >
+                  info@itfixer199.com
+                </a>
               </li>
             </ul>
           </div>
