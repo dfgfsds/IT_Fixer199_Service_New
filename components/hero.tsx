@@ -58,11 +58,11 @@ export function Hero() {
             {/* Trust Indicators */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-border">
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-secondary">10M+</p>
+                <p className="text-2xl sm:text-3xl font-bold text-secondary">5000+</p>
                 <p className="text-sm font-bold text-[#101242] text-muted-foreground mt-1">Happy Customers</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-secondary">50K+</p>
+                <p className="text-2xl sm:text-3xl font-bold text-secondary">100+</p>
                 <p className="text-sm font-bold text-[#101242] text-muted-foreground mt-1">Verified Experts</p>
               </div>
               <div>
