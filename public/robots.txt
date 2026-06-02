@@ -1,6 +1,5 @@
 =========================================
 ROBOTS.TXT - ITFIXER@199
-Next.js SEO + AEO + GEO Optimized
 =========================================
 User-agent: *
 Allow: /
@@ -13,16 +12,11 @@ Allow: /_next/image/
 PRIVATE PAGES
 =========================================
 Disallow: /login
-Disallow: /register
+Disallow: /signup
 Disallow: /forgot-password
-Disallow: /my-account
-Disallow: /account
 Disallow: /profile
-Disallow: /dashboard
-Disallow: /wishlist
 Disallow: /cart
-Disallow: /checkout
-Disallow: /order-success
+Disallow: /orders
 =========================================
 ADMIN AREA
 =========================================
