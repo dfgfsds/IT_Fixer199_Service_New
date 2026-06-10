@@ -1,4 +1,3 @@
-
 'use client'
 
 import { Header } from '@/components/header'
@@ -13,46 +12,52 @@ import { extractErrorMessage } from '@/lib/error-utils'
 import { toast } from 'sonner'
 
 export default function CategoriesClient() {
-    const [searchQuery, setSearchQuery] = useState('')
-    const [categories, setCategories] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState<'ALL' | 'PRODUCT' | 'SERVICE'>('ALL')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'ALL' | 'PRODUCT' | 'SERVICE'>('ALL')
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            setCategories([])
-            setLoading(true)
-            try {
-                const response = await axiosInstance.get(Api.categories)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setCategories([])
+      setLoading(true)
+      try {
+        const response = await axiosInstance.get(Api.categories)
 
-                const categoriesData = response.data?.data || []
-                const mappedCategories = categoriesData.map((cat: any) => ({
-                    id: cat.id,
-                    name: cat.name,
-                    image: cat.media?.[0]?.url || '/placeholder-image.jpg',
-                    count: cat.services_count || 'Explore',
-                    type: cat.type || 'ALL'
-                }))
+        const categoriesData = response.data?.data || []
+        const mappedCategories = categoriesData.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name,
+          image: cat.media?.[0]?.url || '/placeholder-image.jpg',
+          count: cat.services_count || 'Explore',
+          type: cat.type || 'ALL'
+        }))
 
-                setCategories(mappedCategories)
-            } catch (err: any) {
-                toast.error(extractErrorMessage(err))
-            } finally {
-                setLoading(false)
-            }
-        }
+        setCategories(mappedCategories)
+      } catch (err: any) {
+        toast.error(extractErrorMessage(err))
+      } finally {
+        setLoading(false)
+      }
+    }
 
-        fetchCategories()
-    }, [])
+    fetchCategories()
+  }, [])
 
-    const filteredCategories = useMemo(() => {
-        return categories.filter(cat => {
-            const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-            const matchesTab = activeTab === 'ALL' || cat.type === activeTab
-            return matchesSearch && matchesTab
-        })
-    }, [categories, searchQuery, activeTab])
-    return (
+  const filteredCategories = useMemo(() => {
+    return categories.filter(cat => {
+      const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesTab = activeTab === 'ALL' || cat.type === activeTab
+      return matchesSearch && matchesTab
+    })
+  }, [categories, searchQuery, activeTab])
+
+  // Helper function to create URL slug from category name
+  const createSlug = (name: string) => {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+  }
+
+  return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
 
@@ -110,7 +115,7 @@ export default function CategoriesClient() {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
             {filteredCategories.map((category) => (
               <Link
-                href={`/categories/${category.id}`}
+                href={`/categories/${createSlug(category.name)}`}
                 key={category.id}
                 className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-sm"
               >
