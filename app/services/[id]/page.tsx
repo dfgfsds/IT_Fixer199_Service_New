@@ -28,7 +28,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   const { cartItem, fetchCart } = useCartItem()
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
   const [isAdding, setIsAdding] = useState(false)
-
+console.log(relatedServices,"relatedServices")
   const attributeGroups = useMemo(() => {
     if (!service?.attributes || service.attributes.length === 0) return null
     const groups: Record<string, any[]> = {}
@@ -57,7 +57,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         console.log("Full Service Data (url):", serviceData)
 
         // Zone Availability Check
-        const checkUrl = `${Api.services}/?id=${id}&lat=${location.lat}&lng=${location.lng}&status=ACTIVE&size=1`
+        const checkUrl = `${Api.services}/?id=${id}&lat=${location.lat}&lng=${location.lng}&status=ACTIVE&size=1&include_pricing=true&include_media=true`
         const checkRes = await axiosInstance.get(checkUrl)
         const servicesArray = Array.isArray(checkRes.data) ? checkRes.data : (checkRes.data?.services || [])
         console.log("Zone Availability Check (checkUrl) - services array:", servicesArray)
@@ -71,7 +71,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         // Fetch Related Services
         const categoryId = serviceData.categories?.[0]?.category || serviceData.categories?.[0]?.id
         if (categoryId) {
-          const relatedUrl = `${Api.services}/?category_id=${categoryId}&lat=${location.lat}&lng=${location.lng}&size=3`
+          const relatedUrl = `${Api.services}/?category_id=${categoryId}&lat=${location.lat}&lng=${location.lng}&status=ACTIVE&size=3&include_media=true&include_pricing=true`
           const relatedRes = await axiosInstance.get(relatedUrl)
           const rs = Array.isArray(relatedRes.data) ? relatedRes.data : (relatedRes.data?.services || [])
           setRelatedServices(rs.filter((s: any) => s.id !== id))
@@ -265,7 +265,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       </div>
     )
   }
-
+console.log(service)
   const sellingPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
   const regularPrice = service.pricing_models?.find((p: any) => p.pricing_type_name === "Regular Price")?.price
   const serviceImage = service.media_files?.[0]?.image_url || '/placeholder-image.jpg'
@@ -456,7 +456,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
               {relatedServices.map((rs: any) => {
-                const rsPrice = rs.pricing_models?.find((p: any) => p.pricing_type_name === "Selling Price")?.price || 0
+                const rsPrice = rs.pricing_models?.find((p: any) => p?.pricing_type_name === "Selling Price")?.price || 0
                 const rsImage = rs.media_files?.[0]?.image_url || '/placeholder-image.jpg'
 
                 return (

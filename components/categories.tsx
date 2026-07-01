@@ -40,6 +40,10 @@ export function Categories() {
     }
     fetchCategories()
   }, [])
+  // Helper function to create URL slug from category name
+  const createSlug = (name: string) => {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+  }
 
   return (
     <section className="py-10 md:py-20 bg-white">
@@ -63,7 +67,9 @@ export function Categories() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
               {categories.map((category) => (
                 <Link
-                  href={`/categories/${category.id}`}
+                  // href={`/categories/${category.id}`}
+                  href={`/categories/${createSlug(category.name)}`}
+
                   key={category.id}
                   className="group bg-white rounded-[12px] border border-slate-100 overflow-hidden shadow-[0px_8px_16px_rgba(27,30,36,0.1)] hover:shadow-2xl transition-all duration-500 flex flex-col"
                 >

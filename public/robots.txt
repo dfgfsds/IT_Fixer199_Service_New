@@ -1,0 +1,60 @@
+=========================================
+ROBOTS.TXT - ITFIXER@199
+=========================================
+User-agent: *
+Allow: /
+=========================================
+ALLOW IMPORTANT NEXT.JS ASSETS
+=========================================
+Allow: /_next/static/
+Allow: /_next/image/
+=========================================
+PRIVATE PAGES
+=========================================
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /profile
+Disallow: /cart
+Disallow: /orders
+=========================================
+ADMIN AREA
+=========================================
+Disallow: /admin
+Disallow: /administrator
+Disallow: /backend
+=========================================
+SYSTEM FILES
+=========================================
+Disallow: /.git/
+Disallow: /.env
+Disallow: /node_modules/
+Disallow: /tmp/
+Disallow: /backup/
+=========================================
+SEARCH & FILTER PAGES
+=========================================
+Disallow: /search
+Disallow: /?sort=
+Disallow: /?filter=
+Disallow: /?price=
+Disallow: /?page=
+=========================================
+AI CRAWLERS
+=========================================
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+=========================================
+SITEMAP
+=========================================
+Sitemap: https://www.itfixer199.com/sitemap.xml
+Sitemap: https://www.itfixer199.com/server-sitemap.xml
+

@@ -21,6 +21,7 @@ interface LocationContextType {
   showLocationModal: boolean
   setShowLocationModal: (show: boolean) => void
   zoneData: any
+  refreshZoneData: (lat: number, lng: number) => void
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined)
@@ -192,13 +193,6 @@ export function LocationProvider({ children }: any) {
     if (location?.lat && location?.lng) {
       // INITIAL FETCH
       fetchZoneData(location.lat, location.lng)
-
-      // BACKGROUND HEARTBEAT (Auto-refresh every 60 seconds)
-      const interval = setInterval(() => {
-        fetchZoneData(location.lat, location.lng)
-      }, 60000)
-
-      return () => clearInterval(interval)
     }
   }, [location?.lat, location?.lng, fetchZoneData])
 
@@ -209,6 +203,7 @@ export function LocationProvider({ children }: any) {
       showLocationModal,
       setShowLocationModal,
       zoneData,
+      refreshZoneData: fetchZoneData
     }}>
       {children}
     </LocationContext.Provider>

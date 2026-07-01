@@ -132,8 +132,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("token")
       localStorage.removeItem("refresh")
       localStorage.removeItem("user")
+      localStorage.removeItem("user_location")
 
-      router.push('/login')
+      // Use a full reload to guarantee all global states (LocationContext, CartContext) are completely wiped.
+      window.location.href = '/login'
     }
   }, [user, router])
 
