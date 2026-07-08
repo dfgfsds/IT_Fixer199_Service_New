@@ -24,11 +24,11 @@ export function Hero() {
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center lg:text-left">
                 <span className="block bg-[#101242]  bg-clip-text text-transparent">
-                  Chennai’s Smart
+               Best  PC
                 </span>
 
                 <span className="block mt-2 bg-gradient-to-r from-[#101242] to-[#821616] bg-clip-text text-transparent">
-                  Choice for Laptop & PC Repairs
+                  Laptop Repair &   On-Site Computer Services in Chennai
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
