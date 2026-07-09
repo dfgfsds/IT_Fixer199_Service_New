@@ -150,7 +150,7 @@ export default function AboutSection() {
 
                         {/* Paragraphs */}
                         <p className="text-gray-600 text-lg">
-                            Looking for reliable <span className='text-black font-bold'>laptop repair services in Chennai </span> without the hassle of visiting a service center? 
+                            Looking for reliable laptop repair services in Chennai  without the hassle of visiting a service center? 
                             <span className="font-semibold text-gray-900"> IT Fixer @199 </span> 
                             brings professional computer repair services right to your doorstep.
                         </p>
@@ -161,7 +161,7 @@ export default function AboutSection() {
                         </p>
 
                         <p className="text-gray-600">
-                            We specialize in<span className='text-black font-bold'> laptop repair services in Chennai </span>, desktop repair, gaming PC service, and hardware upgrades, 
+                            We specialize in laptop repair services in Chennai , desktop repair, gaming PC service, and hardware upgrades, 
                             making us one of the most trusted doorstep IT service providers in Chennai.
                         </p>
                         
