@@ -22,7 +22,7 @@ export function Hero() {
               </div>
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center lg:text-left">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center lg:text-left">
                 <span className="block bg-[#101242]  bg-clip-text text-transparent">
                Best  PC
                 </span>
@@ -30,7 +30,7 @@ export function Hero() {
                 <span className="block mt-2 bg-gradient-to-r from-[#101242] to-[#821616] bg-clip-text text-transparent">
                   Laptop Repair &   On-Site Computer Services in Chennai
                 </span>
-              </h1>
+              </h2>
               <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
                 Affordable doorstep laptop & computer repair.
                 Expert technicians. Same-day service @ ₹199
