@@ -136,7 +136,7 @@ export function WhyUs() {
                 If you've been searching for reliable laptop repair services in Chennai that skip the shop visit entirely, IT Fixer @199 flips that around — the technician comes to you instead.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                We handle laptop repair services in Chennai for ₹199 in desktop repairs, gaming PC maintenance and component upgrades.
+                We handle laptop service in Chennai for ₹199 in desktop repairs, gaming PC maintenance and component upgrades.
               </p>
               <p className="font-semibold text-gray-800 pt-2">
                 Core services at a glance:
@@ -195,7 +195,7 @@ export function WhyUs() {
             {/* Section 1 */}
             <div className="space-y-5 max-w-4xl">
               <h4 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#101242] tracking-tight">
-                Doorstep Tech Support,<span className="text-[#821616] block sm:inline">Without the Wait</span>
+                Doorstep Laptop Service in Chennai,<span className="text-[#821616] block sm:inline">Support Without the Wait</span>
               </h4>
               <div className="space-y-4 text-gray-600 leading-relaxed text-sm sm:text-base max-w-3xl mx-auto text-justify sm:text-center">
                 <p>
@@ -203,7 +203,7 @@ export function WhyUs() {
                   Getting your laptop or desktop repaired should not mean travelling across the city or waiting days for updates.<strong className="text-[#101242]">IT Fixer @199</strong>  brings expert technicians to your doorstep for on-the-spot diagnosis and repairs. We handle laptops, desktops, gaming PCs, workstations and accessories across Chennai. If you need the best PC repair service in Chennai, our on-site approach saves both time and effort.
                 </p>
                 <p>
-                  With 5,000+ customers, coverage across 20+ locations and access to 3,000+ spare parts, we complete most repairs without unnecessary delays. This dependable computer services in Chennai experience is why customers continue to trust us.
+                  With 5,000+ customers, coverage across 20+ locations and access to 3,000+ spare parts, we complete most repairs without unnecessary delays. This dependable Laptop service in Chennai experience is why customers continue to trust us.
                 </p>
                 {/* <p className="font-medium text-gray-800 bg-gray-50 py-2 px-4 rounded-xl inline-block border border-gray-100">
                   🎯 With <span className="text-[#821616] font-bold">5000+ happy customers</span>, 20+ service locations and access to 3000+ spare parts, IT Fixer @199 helps users save time.
@@ -227,7 +227,7 @@ export function WhyUs() {
             {/* Section 3 */}
             <div className="space-y-6 w-full max-w-4xl">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#101242] tracking-tight">
-                Affordable Computer Services <span className="text-[#821616] block sm:inline">in Chennai for Homes & Offices</span>
+                Affordable Laptop Service <span className="text-[#821616] block sm:inline">in Chennai for Homes & Offices</span>
               </h3>
               <div className="space-y-3 text-gray-600 text-sm sm:text-base max-w-3xl mx-auto">
                 <p>Getting your device looked at shouldn't drain your wallet before you even know what's broken. That's the thinking behind our <span className="text-[#821616] font-bold">₹199</span> visit fee.</p>
@@ -257,7 +257,7 @@ export function WhyUs() {
             {/* Section 4 */}
             <div className="space-y-6 w-full max-w-4xl">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#101242] tracking-tight">
-                Doorstep Laptop Repair Services <span className="text-[#821616] block sm:inline">in Chennai with Fast Support</span>
+                Doorstep Laptop Service <span className="text-[#821616] block sm:inline">in Chennai with Fast Support</span>
               </h2>
               <div className="space-y-3 text-gray-600 text-sm sm:text-base max-w-3xl mx-auto">
                 <p>IT Fixer @199 skips that step entirely with on-site and doorstep laptop repair across Chennai.</p>
@@ -336,7 +336,7 @@ export function WhyUs() {
               </h3>
               <div className="space-y-3 text-gray-600 text-sm sm:text-base max-w-3xl mx-auto">
                 <p>Ask around and you'll find IT Fixer @199 mentioned among the trusted laptop repair services providers in Chennai — largely because we don't oversell. Positive customer referrals are the foundation of dependable laptop repair services in Chennai.</p>
-                <p>Our technicians handle laptops, desktops, branded computers, gaming PCs and workstations, making us a trusted choice for experienced computer services in Chennai — and often the best PC repair service in Chennai for handling a mix of devices under one roof — rather than a one-size-fits-all fix.</p>
+                <p>Our technicians handle laptops, desktops, branded computers, gaming PCs and workstations, making us a trusted choice for experienced Laptop service in Chennai — and often the best PC repair service in Chennai for handling a mix of devices under one roof — rather than a one-size-fits-all fix.</p>
               </div>
 
               <div className="pt-4 max-w-2xl mx-auto w-full">
@@ -368,7 +368,7 @@ export function WhyUs() {
             <div className="bg-gradient-to-br from-gray-50 to-[#821616]/5 border border-gray-100 p-8 sm:p-10 rounded-3xl space-y-4 w-full max-w-3xl mx-auto shadow-inner relative overflow-hidden text-center">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#821616]/5 rounded-full blur-2xl -mr-5 -mt-5" />
               <h4 className="text-xl sm:text-2xl font-extrabold text-[#101242] flex items-center justify-center gap-2">
-                <MapPin className="w-5 h-5 text-[#821616] animate-pulse shrink-0" /> Where We Operate in Chennai
+                <MapPin className="w-5 h-5 text-[#821616] animate-pulse shrink-0" /> Areas We Serve for laptop Service in Chennai
               </h4>
               <div className="text-gray-600 text-sm sm:text-base space-y-3 leading-relaxed">
                 <p>
