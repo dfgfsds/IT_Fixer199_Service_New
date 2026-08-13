@@ -454,6 +454,7 @@ export const metadata: Metadata = {
     "Book doorstep laptop, desktop and gaming PC repair service in Chennai from ₹199 with fast diagnosis, genuine spares, upgrades and same-day support.",
   keywords: [
     "laptop repair services in Chennai",
+    "Laptop service in Chennai",
     "computer service in Chennai",
     "best PC repair service in Chennai",
     "on-site PC repair in Chennai",
