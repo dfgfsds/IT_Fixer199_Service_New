@@ -24,9 +24,11 @@ export function Hero() {
             <div className="space-y-4">
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-center lg:text-left">
                 <span className="block bg-[#101242]  bg-clip-text text-transparent">
-                  Best  PC
+                  Best PC
                 </span>
 
+                <span className='hidden'>,    </span>
+                
                 <span className="block mt-2 bg-gradient-to-r from-[#101242] to-[#821616] bg-clip-text text-transparent">
                   Laptop Repair &   On-Site Computer Services in Chennai
                 </span>
