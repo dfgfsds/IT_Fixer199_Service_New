@@ -105,11 +105,11 @@ import { ChevronDown, HelpCircle, CheckCircle2 } from 'lucide-react'
 
 const FAQS = [
   {
-    q: '1. Which doorstep laptop repair services in Chennai can fix a broken screen or keyboard issue same day?',
+    q: '1. Which doorstep laptop service in Chennai can fix a broken screen or keyboard issue same day?',
     a: 'IT Fixer @199 sends a technician to your location to diagnose screen, keyboard, and battery issues on the spot, with most common repairs completed during that same visit.'
   },
   {
-    q: "2. Is there an honest, affordable computer service in Chennai that doesn't add hidden charges?",
+    q: "2. Is there an honest, affordable Laptop service in Chennai that doesn't add hidden charges?",
     a: 'IT Fixer @199 charges a flat ₹199 visit fee covering inspection, diagnosis, and consultation — the technician confirms any repair cost before starting work, so there are no surprise add-ons.'
   },
   {
