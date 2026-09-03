@@ -55,6 +55,7 @@ export function Footer() {
               <li><Link href="/categories" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Categories</Link></li>
               <li><Link href="/services" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Services</Link></li>
               <li><Link href="/products" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Products</Link></li>
+              <li><Link href="/connect" className="text-slate-500 hover:text-[#101242] font-semibold transition-colors text-sm">Connect</Link></li>
             </ul>
           </div>
 
