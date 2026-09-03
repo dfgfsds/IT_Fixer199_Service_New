@@ -473,6 +473,7 @@ export function Header() {
               {/* <Link href="/blog" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Blog</Link> */}
               <Link href="/categories" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Categories</Link>
               <Link href="/products" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Products</Link>
+              {/* <Link href="/connect" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Connect</Link> */}
             </nav>
           </div>
         </div>
@@ -500,6 +501,7 @@ export function Header() {
               // { href: '/blog', label: 'Blog' },
               { href: '/categories', label: 'Categories' },
               { href: '/products', label: 'Products' },
+              { href: '/connect', label: 'Connect' },
             ].map((item) => (
               <Link
                 key={item.href}

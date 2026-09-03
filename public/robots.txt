@@ -3,6 +3,7 @@ ROBOTS.TXT - ITFIXER@199
 =========================================
 User-agent: *
 Allow: /
+Allow: /connect
 =========================================
 ALLOW IMPORTANT NEXT.JS ASSETS
 =========================================

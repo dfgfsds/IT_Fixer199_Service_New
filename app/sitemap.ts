@@ -40,5 +40,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: lastModDate,
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/connect`,
+      lastModified: new Date('2026-08-04T00:00:00.000Z'),
+      priority: 0.9,
+    },
   ];
 }
