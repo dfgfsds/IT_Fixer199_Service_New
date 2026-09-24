@@ -1,15 +1,3 @@
-// import ServiceClient from "./ServiceClient";
-
-// export default function ServicesPage() {
-
-
-//   return (
-//     <>
-//     <ServiceClient/>
-//     </>
-//   )
-// }
-
 import type { Metadata } from "next";
 import Script from "next/script";
 import ServiceClient from "./ServiceClient";
@@ -84,9 +72,9 @@ const servicesSchema = {
     address: {
       "@type": "PostalAddress",
       streetAddress:
-        "No.91, Ground Floor, Kothari Nagar 2nd Main Road, Ramapuram",
+        "46, 1st floor, Giri Rd, Satyamurthy Nagar, T. Nagar",
       addressLocality: "Chennai",
-      postalCode: "600089",
+      postalCode: "600017",
       addressRegion: "Tamil Nadu",
       addressCountry: "IN",
     },
