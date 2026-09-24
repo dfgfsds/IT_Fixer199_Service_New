@@ -65,7 +65,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://www.google.com/maps/search/?api=1&query=No.91,+Ground+Floor,+Kothari+Nagar,+2nd+Main+Road,+Ramapuram,+Chennai+-+600089"
+                  href="https://www.google.com/maps/search/?api=1&query=Giri+Road+T+Nagar+Chennai+600017"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-3 hover:opacity-80 transition-opacity group cursor-pointer"
@@ -75,9 +75,7 @@ export function Footer() {
                   </div>
                   <div className="text-sm">
                     <p className="text-slate-500 font-semibold group-hover:text-[#101242] transition-colors">
-                      No.91, Ground Floor, <br />Kothari Nagar
-                      2nd Main Road, <br />Ramapuram, <br />
-                      Chennai - 600089
+                      46, 1st floor, Giri Rd, Satyamurthy Nagar, T. Nagar, Chennai, Tamil Nadu 600017
                     </p>
                   </div>
                 </a>

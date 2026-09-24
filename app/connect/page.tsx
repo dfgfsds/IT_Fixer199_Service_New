@@ -111,10 +111,10 @@ export default function ConnectPage() {
     priceRange: '₹199+',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'No.91, Ground Floor, Kothari Nagar 2nd Main Road, Ramapuram',
+      streetAddress: '46, 1st floor, Giri Rd, Satyamurthy Nagar, T. Nagar',
       addressLocality: 'Chennai',
       addressRegion: 'Tamil Nadu',
-      postalCode: '600089',
+      postalCode: '600017',
       addressCountry: 'IN'
     },
     sameAs: [
@@ -686,9 +686,9 @@ export default function ConnectPage() {
                     </h2>
                     <div className="space-y-1 text-slate-700 font-bold text-sm sm:text-base">
                       <p className="text-[#101242] font-black text-lg">IT Fixer @199</p>
-                      <p className="font-medium text-slate-600">No.91, Ground Floor,</p>
-                      <p className="font-medium text-slate-600">Kothari Nagar 2nd Main Road, Ramapuram,</p>
-                      <p className="font-medium text-slate-600">Chennai – 600089</p>
+                      <p className="font-medium text-slate-600">46, 1st floor, Giri Rd,</p>
+                      <p className="font-medium text-slate-600">Satyamurthy Nagar, T. Nagar,</p>
+                      <p className="font-medium text-slate-600">Chennai – 600017</p>
                     </div>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium pt-2 leading-relaxed">
                       Visit us for professional computer support, hardware upgrades, system diagnostics, and expert technical assistance.

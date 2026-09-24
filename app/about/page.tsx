@@ -79,9 +79,9 @@ export default function AboutPage() {
     address: {
       "@type": "PostalAddress",
       streetAddress:
-        "No.91, Ground Floor, Kothari Nagar 2nd Main Road, Ramapuram",
+        "46, 1st floor, Giri Rd, Satyamurthy Nagar, T. Nagar",
       addressLocality: "Chennai",
-      postalCode: "600089",
+      postalCode: "600017",
       addressRegion: "Tamil Nadu",
       addressCountry: "IN",
     },
