@@ -498,7 +498,7 @@ export function Header() {
               { href: '/', label: 'Home' },
               { href: '/about', label: 'About' },
               { href: '/services', label: 'Services' },
-              // { href: '/blog', label: 'Blog' },
+              { href: '/blog', label: 'Blog' },
               { href: '/categories', label: 'Categories' },
               { href: '/products', label: 'Products' },
               { href: '/connect', label: 'Connect' },

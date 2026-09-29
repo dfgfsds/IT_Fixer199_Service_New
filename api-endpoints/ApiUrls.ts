@@ -80,6 +80,9 @@ const registerFCM = `${baseUrl}/api/notifications/register-fcm/`;
 // Modifications
 const modificationApproval = `${baseUrl}/api/order/order-item-modification/`;
 
+// Blog
+const blogs = `${baseUrl}/api/blog/`;
+const blogDetail = (id: string) => `${baseUrl}/api/blog/${id}/`;
 
 export default {
     categories,
@@ -109,4 +112,6 @@ export default {
     itemTracking,
     registerFCM,
     modificationApproval,
+    blogs,
+    blogDetail,
 }
