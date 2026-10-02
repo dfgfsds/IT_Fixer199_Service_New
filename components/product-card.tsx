@@ -11,9 +11,11 @@ import { formatPrice } from '@/lib/format-price'
 type Props = {
   product: Product
   basePath?: string
+  hidePrice?: boolean
+  isCallAction?: boolean
 }
 
-export function ProductCard({ product, basePath = 'products' }: Props) {
+export function ProductCard({ product, basePath = 'products', hidePrice = false, isCallAction = false }: Props) {
   const router = useRouter()
   const discountPct = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -66,20 +68,28 @@ export function ProductCard({ product, basePath = 'products' }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 sm:pt-4 border-t border-border/50 gap-2 sm:gap-0">
           <div className="space-y-0.5 sm:space-y-1">
 
-            <div className="flex items-center gap-3">
-              <span className="text-lg sm:text-2xl font-bold text-gray-800">₹{formatPrice(product.price)}</span>
-              {product.originalPrice && (
-                <span className="text-sm font-medium text-slate-400 line-through decoration-[#101242]/30 underline-offset-2">
-                  ₹{formatPrice(product.originalPrice)}
-                </span>
-              )}
-            </div>
+            {!hidePrice && (
+              <div className="flex items-center gap-3">
+                <span className="text-lg sm:text-2xl font-bold text-gray-800">₹{formatPrice(product.price)}</span>
+                {product.originalPrice && (
+                  <span className="text-sm font-medium text-slate-400 line-through decoration-[#101242]/30 underline-offset-2">
+                    ₹{formatPrice(product.originalPrice)}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           <button
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
+              
+              if (isCallAction) {
+                window.location.href = 'tel:+919385939985'
+                return;
+              }
+
               const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
               if (!token) {
                 toast.error('Please login to book a product')
@@ -91,7 +101,7 @@ export function ProductCard({ product, basePath = 'products' }: Props) {
             className="flex justify-center items-center gap-1.5 bg-[#101242] hover:from-accent/90 hover:to-accent text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-[10px] sm:text-sm whitespace-nowrap shadow-md hover:shadow-lg active:scale-95"
           >
             <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-            Book
+            {isCallAction ? "Book Now" : "Book"}
           </button>
 
         </div>
