@@ -473,6 +473,20 @@ export function Header() {
               {/* <Link href="/blog" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Blog</Link> */}
               <Link href="/categories" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Categories</Link>
               <Link href="/products" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Products</Link>
+              <Link href="/cctv" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">CCTV</Link>
+              
+              {/* LED Display Dropdown */}
+              <div className="relative h-full flex items-center group cursor-pointer">
+                <div className="text-[15px] font-medium text-slate-500 group-hover:text-[#101242] transition-colors border-b-2 border-transparent group-hover:border-[#101242] h-full flex items-center gap-1">
+                  LED Display <ChevronDown className="w-4 h-4 transition-transform group-hover:-rotate-180" />
+                </div>
+                {/* Dropdown Menu */}
+                <div className="absolute top-full left-0 w-48 bg-white border border-slate-100 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 flex flex-col py-2 translate-y-2 group-hover:translate-y-0">
+                  <Link href="/led-display/indoor" className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-[#101242] transition-colors border-l-2 border-transparent hover:border-[#101242]">Indoor LED</Link>
+                  <Link href="/led-display/outdoor" className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-[#101242] transition-colors border-l-2 border-transparent hover:border-[#101242]">Outdoor LED</Link>
+                </div>
+              </div>
+
               {/* <Link href="/connect" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Connect</Link> */}
             </nav>
           </div>
@@ -501,6 +515,9 @@ export function Header() {
               // { href: '/blog', label: 'Blog' },
               { href: '/categories', label: 'Categories' },
               { href: '/products', label: 'Products' },
+              { href: '/cctv', label: 'CCTV' },
+              { href: '/led-display/indoor', label: 'LED Display - Indoor' },
+              { href: '/led-display/outdoor', label: 'LED Display - Outdoor' },
               { href: '/connect', label: 'Connect' },
             ].map((item) => (
               <Link

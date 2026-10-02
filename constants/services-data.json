@@ -1,0 +1,123 @@
+{
+    "cctv": [
+        {
+            "id": 1001,
+            "name": "Demo CCTV Camera - Memo",
+            "category": "CCTV",
+            "price": 2499,
+            "originalPrice": 3499,
+            "image": "/cctv-memo.jpg",
+            "inStock": true,
+            "rating": 4.8,
+            "reviews": 124,
+            "badge": "Demo Product"
+        },
+        {
+            "id": 1002,
+            "name": "Dome IP Camera 4MP Night Vision",
+            "category": "CCTV",
+            "price": 3200,
+            "originalPrice": 4500,
+            "image": "/cctv-dome.jpg",
+            "inStock": true,
+            "rating": 4.9,
+            "reviews": 312,
+            "badge": "Best Seller"
+        },
+        {
+            "id": 1003,
+            "name": "Bullet Camera 1080p Outdoor Waterproof",
+            "category": "CCTV",
+            "price": 1800,
+            "originalPrice": 2200,
+            "image": "/cctv-bullet.jpg",
+            "inStock": true,
+            "rating": 4.5,
+            "reviews": 95
+        },
+        {
+            "id": 1004,
+            "name": "PTZ Wi-Fi Smart Security Camera",
+            "category": "CCTV",
+            "price": 4500,
+            "originalPrice": 5999,
+            "image": "/cctv-ptz.jpg",
+            "inStock": true,
+            "rating": 4.7,
+            "reviews": 210,
+            "badge": "New"
+        }
+    ],
+    "indoorLed": [
+        {
+            "id": 2001,
+            "name": "P2.5 Indoor LED Screen Panel",
+            "category": "LED Display",
+            "price": 15000,
+            "originalPrice": 18000,
+            "image": "/indoor-p25.jpg",
+            "inStock": true,
+            "rating": 4.8,
+            "reviews": 45,
+            "badge": "Premium"
+        },
+        {
+            "id": 2002,
+            "name": "P3 Indoor Full Color LED",
+            "category": "LED Display",
+            "price": 12500,
+            "image": "/indoor-p3.jpg",
+            "inStock": true,
+            "rating": 4.6,
+            "reviews": 32
+        },
+        {
+            "id": 2003,
+            "name": "P4 Flexible Indoor LED Module",
+            "category": "LED Display",
+            "price": 18500,
+            "originalPrice": 22000,
+            "image": "/indoor-p4.jpg",
+            "inStock": true,
+            "rating": 4.9,
+            "reviews": 78,
+            "badge": "Best Seller"
+        }
+    ],
+    "outdoorLed": [
+        {
+            "id": 3001,
+            "name": "P5 Outdoor Waterproof LED",
+            "category": "LED Display",
+            "price": 22000,
+            "originalPrice": 26000,
+            "image": "/outdoor-p5.jpg",
+            "inStock": true,
+            "rating": 4.7,
+            "reviews": 56,
+            "badge": "Waterproof"
+        },
+        {
+            "id": 3002,
+            "name": "P6 High Brightness Outdoor Screen",
+            "category": "LED Display",
+            "price": 19500,
+            "image": "/outdoor-p6.jpg",
+            "inStock": true,
+            "rating": 4.5,
+            "reviews": 28
+        },
+        {
+            "id": 3003,
+            "name": "P8 Outdoor Advertisement LED",
+            "category": "LED Display",
+            "price": 17500,
+            "originalPrice": 20000,
+            "image": "/outdoor-p8.jpg",
+            "inStock": true,
+            "rating": 4.8,
+            "reviews": 92,
+            "badge": "Best Seller"
+        }
+    ]
+}
