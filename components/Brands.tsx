@@ -6,7 +6,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 
 const BRANDS = [
-    { name: 'Apple', logo: '/brand/1.png' },
+
     { name: 'Dell', logo: '/brand/2.png' },
     { name: 'Lenovo', logo: '/brand/3.png' },
     { name: 'Asus', logo: '/brand/4.png' },
