@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { MapPin, Search, ShoppingCart, User, ChevronDown, Menu, X, Loader2, Package, Star } from 'lucide-react'
+import { MapPin, Search, ShoppingCart, User, ChevronDown, Menu, X, Loader2, Package, Star, CalendarCheck } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import axiosInstance from '@/configs/axios-middleware'
@@ -211,33 +211,71 @@ export function Header() {
       <header className="bg-white sticky top-0 z-40 w-full shadow-sm">
         {/* Main Header Row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between h-auto py-4 md:py-0 md:h-[90px] gap-y-4 gap-x-4 lg:gap-8">
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0 flex items-center transition-transform">
-              <Image
-                src="/logo.png"
-                alt="IT FIXER"
-                width={100}
-                height={100}
-                className="h-[48px] md:h-[60px] w-auto object-contain"
-                priority
-              />
-            </Link>
+          <div className="flex flex-col md:flex-row md:items-center justify-between py-3 md:py-0 md:h-[90px] gap-y-3 md:gap-x-4 lg:gap-x-8">
+            {/* Top Row on Mobile / Left Section on Desktop */}
+            <div className="flex items-center justify-between w-full md:w-auto gap-2 sm:gap-4 shrink-0">
+              {/* Logo */}
+              <Link href="/" className="shrink-0 flex items-center transition-transform">
+                <Image
+                  src="/logo.png"
+                  alt="IT FIXER"
+                  width={100}
+                  height={100}
+                  className="h-[36px] xs:h-[42px] sm:h-[48px] md:h-[60px] w-auto object-contain"
+                  priority
+                />
+              </Link>
 
-            {/* Location Picker */}
-            <button
-              onClick={() => setShowLocationModal(true)}
-              className="hidden md:flex cursor-pointer items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/50 hover:shadow-nsm transition-all text-slate-600 shadow-sm max-w-[200px] lg:max-w-[280px] group"
-            >
-              <MapPin className="w-4 h-4 text-[#101242] flex-shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-[13px] font-bold truncate text-[#101242]">
-                {location?.address || location?.city || 'Select Location'}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 group-hover:translate-y-0.5 transition-transform" />
-            </button>
+              {/* Location Picker (Desktop) */}
+              <button
+                onClick={() => setShowLocationModal(true)}
+                className="hidden md:flex cursor-pointer items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 hover:border-[#101242]/50 hover:shadow-nsm transition-all text-slate-600 shadow-sm max-w-[200px] lg:max-w-[280px] group shrink-0"
+              >
+                <MapPin className="w-4 h-4 text-[#101242] flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="text-[13px] font-bold truncate text-[#101242]">
+                  {location?.address || location?.city || 'Select Location'}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 group-hover:translate-y-0.5 transition-transform" />
+              </button>
+
+              {/* Mobile Actions: Location + Book Now + Hamburger */}
+              <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+                {/* Mobile Location Picker */}
+                <button
+                  onClick={() => setShowLocationModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 hover:border-[#101242]/30 hover:bg-slate-100 transition-all shadow-sm active:scale-95 max-w-[90px] xs:max-w-[120px]"
+                >
+                  <MapPin className="w-3 h-3 text-[#101242] shrink-0" />
+                  <span className="text-[11px] font-bold text-[#101242] truncate mobile-location-modal">
+                    {location?.address || location?.city || 'Location'}
+                  </span>
+                  <ChevronDown className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                </button>
+
+                {/* Mobile Book Now */}
+                <a
+                  href="https://booking.itfixer199.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#800000] hover:bg-[#101242] text-white font-semibold transition-all shadow-sm active:scale-95 text-[11px] xs:text-xs whitespace-nowrap"
+                >
+                  <CalendarCheck className="w-3.5 h-3.5" />
+                  <span>Book Now</span>
+                </a>
+
+                {/* Mobile Menu Button */}
+                <button
+                  className="p-1.5 text-slate-600 hover:text-[#101242] flex items-center justify-center"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle Menu"
+                >
+                  {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              </div>
+            </div>
 
             {/* Search Bar Container */}
-            <div className="w-full md:flex-1 md:w-auto md:max-w-2xl order-last md:order-none" ref={searchRef}>
+            <div className="w-full md:flex-1 md:max-w-2xl" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
                 <input
                   ref={inputRef}
@@ -404,25 +442,13 @@ export function Header() {
               </form>
             </div>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-2.5 sm:gap-4">
-              {/* Mobile Location Picker */}
-              <button
-                onClick={() => setShowLocationModal(true)}
-                className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 hover:border-[#101242]/30 hover:bg-slate-100 transition-all shadow-sm active:scale-95"
-              >
-                <MapPin className="w-3.5 h-3.5 text-[#101242] shrink-0" />
-                <span className="text-[11px] font-bold text-[#101242] truncate mobile-location-modal">
-                  {location?.address || location?.city || 'Select Location'}
-                </span>
-                <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
-              </button>
-
+            {/* Desktop Right Actions */}
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
               {/* Cart - Only visible if logged in */}
               {isLoggedIn && (
                 <Link
                   href="/cart"
-                  className="relative hidden md:flex p-2.5 bg-slate-50 text-[#101242] rounded-xl hover:bg-[#101242] hover:text-white transition-all shadow-sm group"
+                  className="relative flex p-2.5 bg-slate-50 text-[#101242] rounded-xl hover:bg-[#101242] hover:text-white transition-all shadow-sm group"
                 >
                   <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-110" />
                   {totalItems > 0 && (
@@ -433,11 +459,22 @@ export function Header() {
                 </Link>
               )}
 
+              {/* Book Now Button */}
+              <a
+                href="https://booking.itfixer199.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#800000] hover:bg-[#101242] text-white font-semibold transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
+              >
+                <CalendarCheck className="w-4 h-4" />
+                <span>Book Now</span>
+              </a>
+
               {/* Login / Profile */}
               {isLoggedIn ? (
                 <Link
                   href="/profile"
-                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-100 hover:bg-[#101242] text-[#101242] hover:text-white font-semibold transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-100 hover:bg-[#101242] text-[#101242] hover:text-white font-semibold transition-all shadow-sm active:scale-95"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm">{user?.name?.split(' ')[0] || 'Profile'}</span>
@@ -445,20 +482,12 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#101242] hover:bg-[#800000] text-white font-semibold transition-all shadow-none active:scale-95"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#101242] hover:bg-[#800000] text-white font-semibold transition-all shadow-none active:scale-95"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm">Login</span>
                 </Link>
               )}
-
-              {/* Mobile Menu Button */}
-              <button
-                className="md:hidden p-2 text-slate-600"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
             </div>
           </div>
         </div>
@@ -474,7 +503,7 @@ export function Header() {
               <Link href="/categories" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Categories</Link>
               <Link href="/products" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">Products</Link>
               <Link href="/cctv" className="text-[15px] font-medium text-slate-500 hover:text-[#101242] transition-colors border-b-2 border-transparent hover:border-[#101242] h-full flex items-center">CCTV</Link>
-              
+
               {/* LED Display Dropdown */}
               <div className="relative h-full flex items-center group cursor-pointer">
                 <div className="text-[15px] font-medium text-slate-500 group-hover:text-[#101242] transition-colors border-b-2 border-transparent group-hover:border-[#101242] h-full flex items-center gap-1">
@@ -495,6 +524,16 @@ export function Header() {
         {/* Mobile nav */}
         {isMenuOpen && (
           <div className="lg:hidden border-t border-slate-100 bg-white px-4 py-4 space-y-1">
+            <a
+              href="https://booking.itfixer199.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-[#800000] hover:bg-[#101242] text-white font-semibold transition-all shadow-sm text-sm mb-3"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <CalendarCheck className="w-4 h-4" />
+              <span>Book Now</span>
+            </a>
             {/* Mobile Location */}
             {/* 
             <button
